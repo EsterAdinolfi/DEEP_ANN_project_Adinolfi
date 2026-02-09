@@ -1,1 +1,15 @@
+# LaTeX
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.synctex(busy)
+*.synctex.gz(busy)
+
+# Project specific
 dataset_e_script\progetto\risultati\human_source_of_truth.csv
