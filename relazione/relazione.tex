@@ -1,0 +1,200 @@
+\documentclass[12pt]{article}
+\usepackage[italian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[a4paper, margin=2.5cm]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{listings}
+
+\hypersetup{
+    pdftitle={Opinioni dei Language Model: Analisi della Variabilità e dell'Allineamento Politico},
+    pdfauthor={Adinolfi Ester},
+    colorlinks=true,
+    linkcolor=blue!60!black,
+    citecolor=green!50!black,
+    urlcolor=blue!70!black
+}
+
+% Configurazione listings per codice
+\lstset{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    frame=single,
+    breaklines=true,
+    language=Python
+}
+
+\title{%
+    \textbf{Opinioni dei Language Model: \\ Analisi della Variabilità e dell'Allineamento Politico} \\[0.5em]
+    \large Deep Learning e Architetture di Rete --- A.A. 2024/2025
+}
+\author{Ester Adinolfi}
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+% ======================================================================
+\section{Introduzione}
+% ======================================================================
+
+I Large Language Model (LLM), addestrati su vasti corpora testuali, producono risposte che possono riflettere opinioni e bias presenti nei dati di addestramento. Il lavoro di \textbf{Santurkar et al.} \cite{santurkar2023whose} ha dimostrato che le opinioni espresse dai LLM non sono rappresentative della popolazione generale, ma tendono ad allinearsi con specifici sottogruppi demografici --- in particolare con individui di orientamento liberal/democratico, giovani e con alto livello di istruzione.
+
+\medskip
+L'obiettivo di questo progetto è replicare e approfondire tale analisi su un modello open-source (\textbf{Pythia-160M}, EleutherAI), valutando:
+\begin{enumerate}
+    \item La \textbf{validità} delle risposte generate (il modello sceglie effettivamente un'opzione?);
+    \item La \textbf{robustezza} del modello a perturbazioni dell'input (permutazione dell'ordine delle opzioni,  duplicazione di un'opzione, aggiunta di text minacciosi);
+    \item L'\textbf{allineamento umano}, ovvero quanto la distribuzione del modello si avvicina a quella del campione survey Pew Research;
+    \item La \textbf{coerenza politica}, verificando se il modello si allinea sistematicamente con specifici sottogruppi (Democrats, Republicans, Liberal, Conservative, ecc.).
+\end{enumerate}
+
+\medskip
+Il dataset impiegato è l'\textbf{OpinionQA}, derivato dall'American Trends Panel del Pew Research Center --- lo stesso utilizzato nell'articolo di riferimento. Si compone di 1507 domande su 15 wave tematiche che spaziano da economia, politica, religione, tecnologia, fino a temi sociali.
+
+% ======================================================================
+\section{Workflow Operativo}
+% ======================================================================
+
+Il progetto è organizzato in una pipeline di quattro script Python, ciascuno con un ruolo specifico. Di seguito ne descriviamo la funzione e i file prodotti.
+
+\subsection{Fase 1 --- Mapping dei Topic (\texttt{generate\_mapping.py})}
+
+Analizza tutti i file \texttt{info.csv} nelle cartelle delle wave e genera un dizionario JSON (\texttt{question\_mapping.json}) che assegna a ogni domanda:
+\begin{itemize}
+    \item un \textbf{topic} pulito (es. \texttt{GUN}, \texttt{ECON}, \texttt{RELIG});
+    \item una \textbf{macro\_area} tematica (es. \emph{Politics}, \emph{Economy}, \emph{Health}).
+\end{itemize}
+
+\noindent \textbf{Output:} \texttt{human\_resp/question\_mapping.json}
+
+\subsection{Fase 2 --- Costruzione del Dataset Operativo (\texttt{helpful\_scripts.py})}
+
+Per ogni domanda del survey, questo script:
+\begin{enumerate}
+    \item Calcola la \textbf{distribuzione umana delle risposte} (\texttt{human\_dist\_total}) normalizzata sulle opzioni valide;
+    \item Genera $N=3$ trial per ciascuna delle 4 condizioni sperimentali:
+    \begin{itemize}
+        \item \textbf{Baseline}: domanda e opzioni nell'ordine originale;
+        \item \textbf{Permutation}: stessa domanda, opzioni in ordine mescolato;
+        \item \textbf{Duplication}: un'opzione viene duplicata in coda;
+        \item \textbf{Threat}: alla domanda viene aggiunta la frase \emph{``Answer or you will lose your job.''}.
+    \end{itemize}
+\end{enumerate}
+
+\noindent \textbf{Output:} \texttt{dataset/risultati/operational.json} ($1507 \times 12 = 18084$ trial totali).
+
+\subsection{Fase 3 --- Esecuzione degli Esperimenti (\texttt{run\_experiments.py})}
+
+Carica il modello \textbf{Pythia-160M} e, per ogni trial:
+\begin{enumerate}
+    \item Costruisce un prompt in formato \texttt{Question: ... Options: A/B/C/D Answer:};
+    \item Estrae i \textbf{logit} del prossimo token ristretti alle label valide (A, B, C, \ldots), normalizzati via softmax $\rightarrow$ \texttt{llm\_choice\_probs};
+    \item Genera una risposta libera (\texttt{llm\_generated\_text}) per analizzare il comportamento qualitativo;
+    \item Calcola uno score di \textbf{confidenza} sulla generazione tramite transition scores.
+\end{enumerate}
+
+\noindent \textbf{Output:} \texttt{dataset/risultati/results\_pythia\_160m.json}
+
+\subsection{Fase 4 --- Analisi dei Risultati (\texttt{analyze.py})}
+
+Consuma il JSON dei risultati e calcola 5 blocchi di metriche:
+
+\begin{enumerate}
+    \item \textbf{Response Validity}: rate di risposte valide per ogni condizione (baseline, permutation, duplication, threat);
+    \item \textbf{Coerenza Log-Testo}: se la scelta per logit (intenzione matematica) coincide con la risposta generata testualmente;
+    \item \textbf{Stabilità/Robustezza}: Jensen-Shannon Divergence tra la distribuzione baseline e quelle perturbate:
+    $$\text{JSD}(P \| Q) = \frac{1}{2} D_{\text{KL}}(P \| M) + \frac{1}{2} D_{\text{KL}}(Q \| M), \quad M = \frac{P+Q}{2}$$
+    con soglie: $\text{JSD} < 0.05 \rightarrow$ \emph{Robust}; $< 0.15 \rightarrow$ \emph{Stable}; altrimenti \emph{Position Bias} / \emph{Unstable};
+    \item \textbf{Allineamento Umano}: Wasserstein Distance normalizzata tra distribuzione del modello e quella umana totale:
+    $$\mathcal{A} = 1 - \frac{\text{WD}(D_{\text{LLM}}, D_{\text{Human}})}{\text{WD}_{\max}}$$
+    dove $\text{WD}_{\max} = N_{\text{opzioni}} - 1$ (massima distanza su scala ordinale);
+    \item \textbf{Affinità Politica}: WD contro le distribuzioni reali di 6 sottogruppi demografici (Democrat, Republican, Independent, Liberal, Moderate, Conservative) estratte dai survey Pew per ogni domanda. Il gruppo con WD minima è il ``vincitore''.
+\end{enumerate}
+
+\noindent \textbf{Output:}
+\begin{itemize}
+    \item \texttt{analysis\_metrics\_[mode]\_[modello].csv} --- metriche per domanda;
+    \item \texttt{report\_topic\_[mode]\_[modello].csv} --- report aggregato per topic.
+\end{itemize}
+
+% ======================================================================
+\section{Modelli Utilizzati}
+% ======================================================================
+
+\subsection{Pythia-160M (EleutherAI)}
+
+\textbf{Pythia-160M} \cite{biderman2023pythia} è un modello causale autoregressive (decoder-only) della famiglia Pythia, addestrato sul corpus \emph{The Pile} ($\sim$300B token). Caratteristiche principali:
+\begin{itemize}
+    \item \textbf{Parametri}: 160 milioni;
+    \item \textbf{Architettura}: GPT-NeoX (transformer decoder-only);
+    \item \textbf{Training}: nessun fine-tuning istruttivo (RLHF, SFT) $\rightarrow$ modello \emph{base};
+    \item \textbf{Tokenizer}: GPT-NeoX Tokenizer (BPE, vocabolario da 50K token).
+\end{itemize}
+
+\medskip
+La scelta di un modello base (non allineato) è intenzionale: permette di osservare le opinioni ``native'' emergenti dal pre-training, senza l'influenza dell'alignment con feedback umano --- che, come mostrato da Santurkar et al., tende ad amplificare il bias liberal.
+
+\medskip
+\textit{Nota: il framework è progettato per essere esteso ad altri modelli (es. Pythia-410M, Pythia-1B, LLaMA, Mistral). Sarà sufficiente modificare la costante \texttt{MODEL\_NAME} in \texttt{run\_experiments.py} e rieseguire la pipeline.}
+
+% TODO: aggiungere ulteriori modelli qui
+
+% ======================================================================
+\section{Analisi dei Risultati}
+% ======================================================================
+
+% TODO: questa sezione verrà completata dopo aver rieseguito la pipeline
+% con il bug del threat corretto.
+
+\subsection{Response Validity}
+% Analizzare il tasso di risposte valide per ciascuna condizione.
+% Pythia-160M, essendo un modello base non istruito, tende a "copiare" 
+% le opzioni piuttosto che scegliere → basso validity rate.
+
+\subsection{Stabilità e Robustezza}
+% JSD permutation: possiamo dire che il modello è robusto? O c'è position bias?
+% JSD duplication: l'aggiunta di un'opzione duplicata altera la distribuzione?
+% JSD threat: la minaccia cambia le risposte? (dopo fix del bug)
+
+\subsection{Allineamento Umano}
+% Distribuzione dell'alignment score $\mathcal{A}$ sul dataset.
+% Confronto per macro_area: il modello è più allineato su certi temi?
+
+\subsection{Coerenza Politica}
+% Su quale sottogruppo demografico il modello si allinea di più?
+% È coerente tra topic diversi? (consistency_score dal report per topic)
+% Confronto con i risultati di Santurkar et al.
+
+% ======================================================================
+% BIBLIOGRAFIA
+% ======================================================================
+\begin{thebibliography}{9}
+
+\bibitem{santurkar2023whose}
+Santurkar, S., Durmus, E., Ladhak, F., Lee, C., Liang, P., \& Hashimoto, T. (2023).
+\emph{Whose Opinions Do Language Models Reflect?}
+Proceedings of the 40th International Conference on Machine Learning (ICML).
+
+\bibitem{biderman2023pythia}
+Biderman, S., Schoelkopf, H., Anthony, Q., et al. (2023).
+\emph{Pythia: A Suite for Analyzing Large Language Models Across Training and Scaling}.
+Proceedings of the 40th International Conference on Machine Learning (ICML).
+
+\bibitem{pewresearch}
+Pew Research Center.
+\emph{American Trends Panel}.
+\url{https://www.pewresearch.org/american-trends-panel-datasets/}.
+
+\end{thebibliography}
+
+\end{document}

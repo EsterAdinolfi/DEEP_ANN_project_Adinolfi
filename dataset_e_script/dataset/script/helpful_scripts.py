@@ -1,3 +1,4 @@
+import ast
 import pandas as pd
 import json
 import os
@@ -161,7 +162,7 @@ def generate_threat(i, valid_options_list, question_text):
     )
     # Flag e dettagli
     trial["is_threatened"] = True
-    trial["threat_text"] = question_text + THREAT_SUFFIX
+    trial["threaten_question"] = question_text + THREAT_SUFFIX
     return trial
 
 
@@ -270,7 +271,7 @@ def create_operational_dataset(data_path):
                     # Dizionario finale {Testo: Codice} 
                     valid_options_map = {
                         text: code 
-                        for code, text in sorted(eval(row['option_mapping']).items()) 
+                        for code, text in sorted(ast.literal_eval(row['option_mapping']).items()) 
                         if text != 'Refused'
                     }
                             

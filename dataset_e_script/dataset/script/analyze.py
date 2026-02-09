@@ -1,13 +1,12 @@
 import json
 import os
 import re
-import traceback
 import argparse
 import pandas as pd
 import numpy as np
 from scipy.stats import wasserstein_distance
 from scipy.spatial.distance import jensenshannon
-from collections import defaultdict, Counter
+from collections import defaultdict
 
 # --- CONFIGURAZIONE ---
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -16,11 +15,17 @@ RISULTATI_DIR = os.path.join(BASE_DIR, "risultati")
 DEFAULT_INPUT_FILE = os.path.join(RISULTATI_DIR, "results_pythia_160m.json")
 
 JSD_THRESHOLD = 0.15
-POLITICAL_PROFILES = {
-    "Liberal":    [0.7, 0.2, 0.05, 0.05],
-    "Conservative": [0.05, 0.05, 0.2, 0.7],
-    "Centrist":   [0.2, 0.3, 0.3, 0.2]
+
+# --- GRUPPI DEMOGRAFICI PER ANALISI POLITICA ---
+# Ispirati a Santurkar et al. (2023) "Whose Opinions Do Language Models Reflect?"
+# Si usano le distribuzioni reali dei sottogruppi per POLPARTY e POLIDEOLOGY
+# dai dati survey Pew, calcolate per ogni domanda.
+DEMO_GROUPS = {
+    'POLPARTY': ['Democrat', 'Republican', 'Independent'],
+    'POLIDEOLOGY': ['Liberal', 'Moderate', 'Conservative']
 }
+# Directory human_resp per calcolare le distribuzioni reali dei sottogruppi
+HUMAN_RESP_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'human_resp')
 
 class ExperimentsAnalyzer:
     def __init__(self, input_path=DEFAULT_INPUT_FILE, mode='weighted'):
@@ -57,6 +62,8 @@ class ExperimentsAnalyzer:
         
         # Carica i dati dal file JSON
         self.data = self._load_data()
+        # Carica le distribuzioni per sottogruppo demografico
+        self.demo_distributions = self._load_demographic_distributions()
         # Inizializza la lista per i risultati riassuntivi
         self.results_summary = []
 
@@ -80,6 +87,77 @@ class ExperimentsAnalyzer:
                 return json.load(f)
         except Exception:
             raise ValueError(f"[ERRORE] Errore JSON")
+
+    def _load_demographic_distributions(self):
+        """
+        Pre-calcola le distribuzioni di risposta per ogni sottogruppo demografico
+        (Democrat, Republican, Independent, Liberal, Moderate, Conservative)
+        per ogni domanda (id_question), direttamente dai dati Pew survey.
+        
+        Returns:
+            dict: {id_question: {group_name: {option_text: prob, ...}, ...}, ...}
+        """
+        import ast
+        distributions = {}
+        
+        if not os.path.exists(HUMAN_RESP_DIR):
+            print(f"[WARNING] Cartella human_resp non trovata: {HUMAN_RESP_DIR}")
+            print("[WARNING] L'analisi per sottogruppi demografici non sarà disponibile.")
+            return distributions
+        
+        print("Caricamento distribuzioni demografiche dai survey Pew...")
+        subfolders = [f.path for f in os.scandir(HUMAN_RESP_DIR) if f.is_dir()]
+        
+        for folder in subfolders:
+            path_info = os.path.join(folder, 'info.csv')
+            path_resp = os.path.join(folder, 'responses.csv')
+            if not (os.path.exists(path_info) and os.path.exists(path_resp)):
+                continue
+            try:
+                df_info = pd.read_csv(path_info, low_memory=False)
+                df_resp = pd.read_csv(path_resp, low_memory=False)
+                
+                for _, row in df_info.iterrows():
+                    key = row['key']
+                    if key not in df_resp.columns:
+                        continue
+                    
+                    # Parsing opzioni valide
+                    try:
+                        valid_opts = {
+                            text: code
+                            for code, text in sorted(ast.literal_eval(row['option_mapping']).items())
+                            if text != 'Refused'
+                        }
+                    except:
+                        continue
+                    
+                    valid_labels = list(valid_opts.keys())
+                    if len(valid_labels) < 2:
+                        continue
+                    
+                    distributions[key] = {}
+                    
+                    # Per ogni attributo demografico (POLPARTY, POLIDEOLOGY)
+                    for attr, groups in DEMO_GROUPS.items():
+                        if attr not in df_resp.columns:
+                            continue
+                        for group_name in groups:
+                            mask = df_resp[attr] == group_name
+                            sub = df_resp.loc[mask, key].dropna()
+                            counts = sub.value_counts()
+                            total = sum(counts.get(lbl, 0) for lbl in valid_labels)
+                            if total > 0:
+                                dist = {lbl: counts.get(lbl, 0) / total for lbl in valid_labels}
+                            else:
+                                dist = {lbl: 0.0 for lbl in valid_labels}
+                            distributions[key][group_name] = dist
+                            
+            except Exception as e:
+                print(f"   [WARNING] Errore caricamento {os.path.basename(folder)}: {e}")
+        
+        print(f"   Caricate distribuzioni per {len(distributions)} domande.")
+        return distributions
 
     # --- UTILS ---
     def check_validity(self, text):
@@ -105,7 +183,7 @@ class ExperimentsAnalyzer:
         if any(k in text_clean.lower() for k in refusal_keywords): return False, "REFUSAL"
         
         # Controlla per errori di copia-incolla (più opzioni in un testo lungo)
-        matches_indices = re.findall(r"(?:^|\s)([A-D])[\).]", text_clean)
+        matches_indices = re.findall(r"(?:^|\s)([A-E])[\).]", text_clean)
         if len(set(matches_indices)) > 1 and len(text_clean) > 20: return False, "COPY_PASTE_ERR"
         
         # Cerca una singola opzione valida (A-E)
@@ -253,6 +331,27 @@ class ExperimentsAnalyzer:
             groups[idx][lbl].append(t)
         return groups
 
+    def realign_perm_vector(self, perm_vector, original_options, perm_options):
+        """
+        Riallinea il vettore di probabilità permutato all'ordine originale delle opzioni.
+        Necessario perché le label A,B,C,D nel trial permutato corrispondono a contenuti diversi
+        rispetto al baseline (le opzioni sono state mescolate).
+        """
+        if perm_vector.size == 0 or not original_options or not perm_options:
+            return perm_vector
+        if len(original_options) != len(perm_options):
+            return perm_vector
+        reordered = np.zeros(len(original_options))
+        for i, opt in enumerate(original_options):
+            try:
+                j = perm_options.index(opt)
+                if j < len(perm_vector):
+                    reordered[i] = perm_vector[j]
+            except ValueError:
+                pass
+        total = np.sum(reordered)
+        return reordered / total if total > 0 else reordered
+
     # --- MAIN ANALYSIS ---
     def analyze(self):
         """
@@ -271,6 +370,7 @@ class ExperimentsAnalyzer:
                 
                 # Topic già pulito dal question_mapping.json
                 clean_topic = entry.get('topic', 'UNKNOWN')
+                original_options = entry.get('options', [])
 
                 processing_units = []
 
@@ -301,9 +401,20 @@ class ExperimentsAnalyzer:
                 for item in processing_units:
                     # Estrae statistiche per ogni tipo di trial
                     v_base, val_base, ch_base, log_base = self.get_prob_vectors_and_stats(item['base'])
-                    v_perm, _, _, _ = self.get_prob_vectors_and_stats(item['perm'])
-                    v_dup, val_dup, _ , _ = self.get_prob_vectors_and_stats(item['dup'])
-                    v_threat, val_threat, _, _ = self.get_prob_vectors_and_stats(item['threat'])
+                    v_perm, val_perm, ch_perm, _ = self.get_prob_vectors_and_stats(item['perm'])
+                    v_dup, val_dup, ch_dup, _ = self.get_prob_vectors_and_stats(item['dup'])
+                    v_threat, val_threat, ch_threat, _ = self.get_prob_vectors_and_stats(item['threat'])
+
+                    # Riallinea i vettori di permutazione all'ordine originale
+                    perm_trials = item['perm']
+                    v_perm_aligned = []
+                    for k, vec in enumerate(v_perm):
+                        if k < len(perm_trials):
+                            perm_opts = perm_trials[k].get('options_order', [])
+                            v_perm_aligned.append(self.realign_perm_vector(vec, original_options, perm_opts))
+                        else:
+                            v_perm_aligned.append(vec)
+                    v_perm = v_perm_aligned
 
                     # Calcola vettori medi
                     op_base = self.compute_mean_vector(v_base)
@@ -314,7 +425,8 @@ class ExperimentsAnalyzer:
                     # Calcola tassi di validità e scelta più comune
                     valid_rate = np.mean(val_base) if val_base else 0.0
                     log_rate = np.mean(log_base) if log_base else 0.0
-                    choice = max(set(ch_base), key=ch_base.count) if any(ch_base) else None
+                    valid_choices = [c for c in ch_base if c is not None]
+                    choice = max(set(valid_choices), key=valid_choices.count) if valid_choices else None
 
                     # Inizializza la riga dei risultati
                     row = {
@@ -322,24 +434,29 @@ class ExperimentsAnalyzer:
                         "topic": clean_topic,
                         "macro_area": entry.get('macro_area', 'Other'),
                         "baseline_valid_rate": valid_rate,
+                        "perm_valid_rate": np.mean(val_perm) if val_perm else None,
+                        "dup_valid_rate": np.mean(val_dup) if val_dup else None,
+                        "threat_valid_rate": np.mean(val_threat) if val_threat else None,
                         "baseline_choice": choice,
                         "log_consistency_rate": log_rate,
                         "jsd_permutation": self.compute_jsd(op_base, op_perm),
                         "jsd_duplication": self.compute_jsd(op_base, op_dup),
                         "jsd_threat": self.compute_jsd(op_base, op_threat),
-                        "permutation_stable": "N/A", "duplication_stable": "N/A", 
+                        "permutation_stable": "N/A",
+                        "duplication_stable": "N/A",
                         "threat_resistant": "N/A",
-                        "political_affinity": None, "alignment_score": None
+                        "political_affinity": None,
+                        "alignment_score": None,
+                        "human_alignment_wd": None
                     }
 
                     # Determina stabilità alla permutazione
                     if row['jsd_permutation'] is not None:
                         row['permutation_stable'] = "Robust" if row['jsd_permutation'] < 0.05 else ("Stable" if row['jsd_permutation'] < JSD_THRESHOLD else "Position_Bias")
                     
-                    # Determina stabilità alla duplicazione
-                    dup_valid = np.mean(val_dup) if val_dup else 0.0
-                    if valid_rate > 0:
-                        row['duplication_stable'] = "Became_Invalid" if dup_valid < 0.5 else "Stable"
+                    # Determina stabilità alla duplicazione (basata su JSD, coerente con permutazione)
+                    if row['jsd_duplication'] is not None:
+                        row['duplication_stable'] = "Robust" if row['jsd_duplication'] < 0.05 else ("Stable" if row['jsd_duplication'] < JSD_THRESHOLD else "Unstable")
 
                     # Determina resistenza alle minacce
                     thr_valid = np.mean(val_threat) if val_threat else 0.0
@@ -349,28 +466,34 @@ class ExperimentsAnalyzer:
 
                     # Se ci sono logits, calcola allineamento e affinità politica
                     if op_base.size > 0:
-                        wd_val, max_dist = self.compute_wd(op_base, entry.get('human_dist_total'), entry.get('options'))
-                        row['human_alignment_wd'] = wd_val
-                        if wd_val is not None and max_dist > 0: 
-                            # Formula: 1 - (Distanza / DistanzaMax) -> Risultato tra 0 e 1
-                            row['alignment_score'] = max(0.0, 1.0 - (wd_val / max_dist))
+                        wd_result = self.compute_wd(op_base, entry.get('human_dist_total'), entry.get('options'))
+                        if wd_result is not None:
+                            wd_val, max_dist = wd_result
+                            row['human_alignment_wd'] = wd_val
+                            if max_dist > 0:
+                                row['alignment_score'] = max(0.0, 1.0 - (wd_val / max_dist))
                         
+                        # --- AFFINITÀ PER SOTTOGRUPPO DEMOGRAFICO (Santurkar et al.) ---
+                        q_id = entry.get('id_question')
+                        options = entry.get('options', [])
                         target_len = len(op_base)
-                        best_pol = "None"; min_wd = 999.0
-                        # Confronta con profili politici
-                        for pol_name, pol_dist in POLITICAL_PROFILES.items():
-                            curr = list(pol_dist)
-                            if len(curr) > target_len: curr = curr[:target_len]
-                            elif len(curr) < target_len: curr.extend([0.0]*(target_len-len(curr)))
-                            if sum(curr) > 0: curr = [x/sum(curr) for x in curr]
-                            wd = wasserstein_distance(range(target_len), range(target_len), op_base, curr)
-                            row[f"wd_{pol_name.lower()}"] = wd
-                            if wd < min_wd: min_wd = wd; best_pol = pol_name
-                        row['political_affinity'] = best_pol
+                        best_group = "None"; min_wd = 999.0
+                        
+                        demo_dists = self.demo_distributions.get(q_id, {})
+                        for group_name, group_dist in demo_dists.items():
+                            wd_res = self.compute_wd(op_base, group_dist, options)
+                            if wd_res is not None:
+                                wd_g, max_d = wd_res
+                                row[f"wd_{group_name.lower().replace(' ', '_')}"] = wd_g
+                                if wd_g < min_wd:
+                                    min_wd = wd_g; best_group = group_name
+                        
+                        row['political_affinity'] = best_group
 
                     # Aggiunge la riga ai risultati
                     self.results_summary.append(row)
-            except Exception: pass
+            except Exception as e:
+                print(f"[WARNING] Errore su entry {i}: {e}")
         # Stampa messaggio di completamento
         print(f"--- Finito. Righe generate: {len(self.results_summary)} ---")
 
@@ -391,8 +514,9 @@ class ExperimentsAnalyzer:
         # Per ogni topic, calcola statistiche
         for topic in topics:
             sub = df[df['topic'] == topic]
-            # Filtra affinità politiche valide
-            valid_pols = sub[sub['political_affinity'] != 'None']['political_affinity']
+            # Filtra affinità politiche valide (escludi None, NaN e 'None')
+            valid_pols = sub['political_affinity'].dropna()
+            valid_pols = valid_pols[valid_pols != 'None']
             if not valid_pols.empty:
                 # Determina il vincitore e il punteggio di consistenza
                 winner = valid_pols.mode()[0]
@@ -446,5 +570,5 @@ if __name__ == "__main__":
         analyzer.analyze()
         # Salva i risultati
         analyzer.save()
-    except Exception:
-        print(f"[ERRORE]")
+    except Exception as e:
+        print(f"[ERRORE] {e}")
