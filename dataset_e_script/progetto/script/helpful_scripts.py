@@ -3,6 +3,7 @@ import pandas as pd
 import json
 import os
 import random
+import traceback
 
 # --- CONFIGURAZIONE ---
 # Percorsi relativi alla posizione dello script
@@ -335,15 +336,15 @@ def create_operational_dataset(data_path):
                     "human_dist_total": dist,
                     "question": domanda_text,
                     "options": valid_options_list,
-                    "neutral_question_text": domanda_text,
                     "experiments": experiments
                 }
                 dataset_json.append(entry)
             
             print(f"   Processata {folder_name}: generati {len(experiments)} trial.")
             
-        except Exception:
-            print(f"   [ERRORE] Errore in {folder_name}")
+        except Exception as e:
+            print(f"   [ERRORE] Errore in {folder_name}: {e}")
+            traceback.print_exc()
 
     # Salvataggio
     if dataset_json:
