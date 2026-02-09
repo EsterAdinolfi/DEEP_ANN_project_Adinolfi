@@ -25,7 +25,7 @@ DEMO_GROUPS = {
     'POLIDEOLOGY': ['Liberal', 'Moderate', 'Conservative']
 }
 # Directory human_resp per calcolare le distribuzioni reali dei sottogruppi
-HUMAN_RESP_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'human_resp')
+HUMAN_RESP_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'human_resp')
 
 class ExperimentsAnalyzer:
     def __init__(self, input_path=DEFAULT_INPUT_FILE, mode='weighted'):
