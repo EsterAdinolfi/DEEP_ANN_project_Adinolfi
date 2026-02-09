@@ -1,0 +1,7472 @@
+{
+    "SAFECRIME_W26": {
+        "topic": "SAFECRIME",
+        "macro_area": "Crime",
+        "wave": "26"
+    },
+    "WORLDDANGER_W26": {
+        "topic": "WORLDDANGER",
+        "macro_area": "Other",
+        "wave": "26"
+    },
+    "WORRYA_W26": {
+        "topic": "WORRY",
+        "macro_area": "Personal Security",
+        "wave": "26"
+    },
+    "WORRYB_W26": {
+        "topic": "WORRY",
+        "macro_area": "Personal Security",
+        "wave": "26"
+    },
+    "WORRYC_W26": {
+        "topic": "WORRY",
+        "macro_area": "Personal Security",
+        "wave": "26"
+    },
+    "WORRYD_W26": {
+        "topic": "WORRY",
+        "macro_area": "Personal Security",
+        "wave": "26"
+    },
+    "WORRYE_W26": {
+        "topic": "WORRY",
+        "macro_area": "Crime",
+        "wave": "26"
+    },
+    "WORRYF_W26": {
+        "topic": "WORRY",
+        "macro_area": "Personal Security",
+        "wave": "26"
+    },
+    "WORRYG_W26": {
+        "topic": "WORRY",
+        "macro_area": "Health",
+        "wave": "26"
+    },
+    "GUN_W26": {
+        "topic": "GUN",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUN1_W26": {
+        "topic": "GUN",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "EVEROWN_W26": {
+        "topic": "EVEROWN",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "NEVEROWN_W26": {
+        "topic": "NEVEROWN",
+        "macro_area": "Other",
+        "wave": "26"
+    },
+    "GUNTYPEOWNC_W26": {
+        "topic": "GUNTYPEOWNC",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "EVERSHOT_W26": {
+        "topic": "EVERSHOT",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "REASONGUNA_W26": {
+        "topic": "REASONGUN",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "REASONGUNB_W26": {
+        "topic": "REASONGUN",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "REASONGUNC_W26": {
+        "topic": "REASONGUN",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "REASONGUND_W26": {
+        "topic": "REASONGUN",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "REASONGUNE_W26": {
+        "topic": "REASONGUN",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "IMPREASONGUN_W26": {
+        "topic": "IMPREASONGUN",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNIDENTITY_W26": {
+        "topic": "GUNIDENTITY",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNFRIEND_W26": {
+        "topic": "GUNFRIEND",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNSOCIETY_W26": {
+        "topic": "GUNSOCIETY",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNCOMMUNITY_W26": {
+        "topic": "GUNCOMMUNITY",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "SHOOTFREQ_W26": {
+        "topic": "SHOOTFREQ",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNSAFE_W26": {
+        "topic": "GUNSAFE",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNSAFE2_W26": {
+        "topic": "GUNSAFE",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNCOURSES_W26": {
+        "topic": "GUNCOURSES",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNACCESS_W26": {
+        "topic": "GUNACCESS",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNLOCKED1_W26": {
+        "topic": "GUNLOCKED",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNLOADED1_W26": {
+        "topic": "GUNLOADED",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNLOCKED2_W26": {
+        "topic": "GUNLOCKED",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNLOADED2_W26": {
+        "topic": "GUNLOADED",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNCONTRIBA_W26": {
+        "topic": "GUNCONTRIB",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNCONTRIBB_W26": {
+        "topic": "GUNCONTRIB",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNCONTRIBC_W26": {
+        "topic": "GUNCONTRIB",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNCONTRIBD_W26": {
+        "topic": "GUNCONTRIB",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNCONTRIBE_W26": {
+        "topic": "GUNCONTRIB",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNCONTRIBF_W26": {
+        "topic": "GUNCONTRIB",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GROWUPVIOL_W26": {
+        "topic": "GROWUPVIOL",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GROWUPGUN1_W26": {
+        "topic": "GROWUPGUN",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GROWUPGUN2A_W26": {
+        "topic": "GROWUPGUN",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GROWUPGUN2B_W26": {
+        "topic": "GROWUPGUN",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GROWUPGUN2C_W26": {
+        "topic": "GROWUPGUN",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GROWUPGUN4_W26": {
+        "topic": "GROWUPGUN",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GROWUPGUN6_W26": {
+        "topic": "GROWUPGUN",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GROWUPGUN7_W26": {
+        "topic": "GROWUPGUN",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNRESPNOKIDSA_W26": {
+        "topic": "GUNRESPNOKIDS",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNRESPNOKIDSB_W26": {
+        "topic": "GUNRESPNOKIDS",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNRESPNOKIDSC_W26": {
+        "topic": "GUNRESPNOKIDS",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNRESPNOKIDSD_W26": {
+        "topic": "GUNRESPNOKIDS",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNRESPNOKIDSE_W26": {
+        "topic": "GUNRESPNOKIDS",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNRESPNOKIDSF_W26": {
+        "topic": "GUNRESPNOKIDS",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNRESPNOKIDSG_W26": {
+        "topic": "GUNRESPNOKIDS",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNRESPKIDSA_W26": {
+        "topic": "GUNRESPKIDS",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNRESPKIDSB_W26": {
+        "topic": "GUNRESPKIDS",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNRESPKIDSC_W26": {
+        "topic": "GUNRESPKIDS",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNRESPKIDSD_W26": {
+        "topic": "GUNRESPKIDS",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNRESPKIDSE_W26": {
+        "topic": "GUNRESPKIDS",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNRESPKIDSF_W26": {
+        "topic": "GUNRESPKIDS",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNRESPKIDSG_W26": {
+        "topic": "GUNRESPKIDS",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNRESPKIDSH_W26": {
+        "topic": "GUNRESPKIDS",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNSAFETYKIDS_W26": {
+        "topic": "GUNSAFETYKIDS",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "CARRYGUN_W26": {
+        "topic": "CARRYGUN",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "NOCARRYGUN_W26": {
+        "topic": "NOCARRYGUN",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNKILLF1_W26": {
+        "topic": "GUNKILLF",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNKILLF2_W26": {
+        "topic": "GUNKILLF",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "DEFENDGUN_W26": {
+        "topic": "DEFENDGUN",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNTHREAT_W26": {
+        "topic": "GUNTHREAT",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "CRIMEVICTIM_W26": {
+        "topic": "CRIMEVICTIM",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "MARGUN_W26": {
+        "topic": "MARGUN",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNASSOCIATIONA_W26": {
+        "topic": "GUNASSOCIATIONA",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNACTIVITYA_W26": {
+        "topic": "GUNACTIVITY",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNACTIVITYB_W26": {
+        "topic": "GUNACTIVITY",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNACTIVITYC_W26": {
+        "topic": "GUNACTIVITY",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNACTIVITYD_W26": {
+        "topic": "GUNACTIVITY",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "GUNACTIVITYE_W26": {
+        "topic": "GUNACTIVITY",
+        "macro_area": "Guns",
+        "wave": "26"
+    },
+    "CAREREL_W27": {
+        "topic": "CAREREL",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "INDUSTRY_W27": {
+        "topic": "INDUSTRY",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "PREDICTA_W27": {
+        "topic": "PREDICT",
+        "macro_area": "Health",
+        "wave": "27"
+    },
+    "PREDICTB_W27": {
+        "topic": "PREDICT",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "PREDICTC_W27": {
+        "topic": "PREDICT",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "PREDICTD_W27": {
+        "topic": "PREDICT",
+        "macro_area": "Housing",
+        "wave": "27"
+    },
+    "CARS1_W27": {
+        "topic": "CARS",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CARS2_W27": {
+        "topic": "CARS",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CARS3A_W27": {
+        "topic": "CARS",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CARS3B_W27": {
+        "topic": "CARS",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CARS4_W27": {
+        "topic": "CARS",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CARS5_W27": {
+        "topic": "CARS",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CARS7A_W27": {
+        "topic": "CARS",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CARS7B_W27": {
+        "topic": "CARS",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CARS8_W27": {
+        "topic": "CARS",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CARS9A_W27": {
+        "topic": "CARS",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CARS9B_W27": {
+        "topic": "CARS",
+        "macro_area": "Education",
+        "wave": "27"
+    },
+    "CARS9C_W27": {
+        "topic": "CARS",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CARS10A_W27": {
+        "topic": "CARS",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CARS10B_W27": {
+        "topic": "CARS",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "CARS10C_W27": {
+        "topic": "CARS",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CARS10D_W27": {
+        "topic": "CARS",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CARS10E_W27": {
+        "topic": "CARS",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "WORK2_W27": {
+        "topic": "WORK",
+        "macro_area": "Other",
+        "wave": "27"
+    },
+    "WORK3A_W27": {
+        "topic": "WORK",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "WORK3B_W27": {
+        "topic": "WORK",
+        "macro_area": "Other",
+        "wave": "27"
+    },
+    "WORK3C_W27": {
+        "topic": "WORK",
+        "macro_area": "Other",
+        "wave": "27"
+    },
+    "WORK3D_W27": {
+        "topic": "WORK",
+        "macro_area": "Other",
+        "wave": "27"
+    },
+    "WORK3E_W27": {
+        "topic": "WORK",
+        "macro_area": "Other",
+        "wave": "27"
+    },
+    "WORK3F_W27": {
+        "topic": "WORK",
+        "macro_area": "Other",
+        "wave": "27"
+    },
+    "WORK4A_W27": {
+        "topic": "WORK",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "WORK4B_W27": {
+        "topic": "WORK",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "WORK4C_W27": {
+        "topic": "WORK",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "ROBJOB1_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "ROBJOB2_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "ROBJOB3A_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "ROBJOB3B_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "ROBJOB4A_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "ROBJOB4B_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "ROBJOB4C_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "ROBJOB4D_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "ROBJOB4E_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "ROBJOB4F_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "ROBJOB5B_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "ROBJOB5C_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "ROBJOB5D_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Politics",
+        "wave": "27"
+    },
+    "ROBJOB6_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Other",
+        "wave": "27"
+    },
+    "ROBJOB7_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Other",
+        "wave": "27"
+    },
+    "ROBJOB8A_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "ROBJOB8B_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "ROBJOB8C_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "ROBJOB8D_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "ROBJOB8E_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "ROBJOB8F_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "ROBJOB8G_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "ROBJOB9_W27": {
+        "topic": "ROBJOB",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "WORK5A_W27": {
+        "topic": "WORK",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "WORK6_W27": {
+        "topic": "WORK",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "WORK7_W27": {
+        "topic": "WORK",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CAREGIV1_W27": {
+        "topic": "CAREGIV",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CAREGIV2_W27": {
+        "topic": "CAREGIV",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CAREGIV3A_W27": {
+        "topic": "CAREGIV",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CAREGIV3B_W27": {
+        "topic": "CAREGIV",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CAREGIV4_W27": {
+        "topic": "CAREGIV",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CAREGIV6A_W27": {
+        "topic": "CAREGIV",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CAREGIV6B_W27": {
+        "topic": "CAREGIV",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CAREGIV6C_W27": {
+        "topic": "CAREGIV",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CAREGIV6D_W27": {
+        "topic": "CAREGIV",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CAREGIV6E_W27": {
+        "topic": "CAREGIV",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CAREGIV6F_W27": {
+        "topic": "CAREGIV",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "CAREGIV7_W27": {
+        "topic": "CAREGIV",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "HIRING1_W27": {
+        "topic": "HIRING",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "HIRING2_W27": {
+        "topic": "HIRING",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "HIRING3A_W27": {
+        "topic": "HIRING",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "HIRING3B_W27": {
+        "topic": "HIRING",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "HIRING4_W27": {
+        "topic": "HIRING",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "HIRING6A_W27": {
+        "topic": "HIRING",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "HIRING6B_W27": {
+        "topic": "HIRING",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "HIRING6C_W27": {
+        "topic": "HIRING",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "HIRING6D_W27": {
+        "topic": "HIRING",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "HIRING7A_W27": {
+        "topic": "HIRING",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "HIRING7B_W27": {
+        "topic": "HIRING",
+        "macro_area": "Economy",
+        "wave": "27"
+    },
+    "VOICE1_W27": {
+        "topic": "VOICE",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "VOICE3_W27": {
+        "topic": "VOICE",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "VOICE4_W27": {
+        "topic": "VOICE",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "VOICE5A_W27": {
+        "topic": "VOICE",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "VOICE5B_W27": {
+        "topic": "VOICE",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "VOICE5C_W27": {
+        "topic": "VOICE",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "VOICE5D_W27": {
+        "topic": "VOICE",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "DRONE1_W27": {
+        "topic": "DRONE",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "DRONE2_W27": {
+        "topic": "DRONE",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "DRONE4A_W27": {
+        "topic": "DRONE",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "DRONE4B_W27": {
+        "topic": "DRONE",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "DRONE4C_W27": {
+        "topic": "DRONE",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "DRONE4D_W27": {
+        "topic": "DRONE",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "DRONE4E_W27": {
+        "topic": "DRONE",
+        "macro_area": "Technology",
+        "wave": "27"
+    },
+    "PERSDISCR_W29": {
+        "topic": "PERSDISCR",
+        "macro_area": "Gender",
+        "wave": "29"
+    },
+    "NOWSMK_NHIS_W29": {
+        "topic": "NOWSMK_NHIS",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "BLOODPR_W29": {
+        "topic": "BLOODPR",
+        "macro_area": "Health",
+        "wave": "29"
+    },
+    "DIFF1A_W29": {
+        "topic": "DIFF",
+        "macro_area": "Gender",
+        "wave": "29"
+    },
+    "DIFF1B_W29": {
+        "topic": "DIFF",
+        "macro_area": "Gender",
+        "wave": "29"
+    },
+    "DIFF1C_W29": {
+        "topic": "DIFF",
+        "macro_area": "Family",
+        "wave": "29"
+    },
+    "DIFF1D_W29": {
+        "topic": "DIFF",
+        "macro_area": "Gender",
+        "wave": "29"
+    },
+    "DIFF1E_W29": {
+        "topic": "DIFF",
+        "macro_area": "Gender",
+        "wave": "29"
+    },
+    "MASC2_W29": {
+        "topic": "MASC",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "FEM2_W29": {
+        "topic": "FEM",
+        "macro_area": "Gender",
+        "wave": "29"
+    },
+    "MASC1F1_W29": {
+        "topic": "MASC",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "MASC2AF1_W29": {
+        "topic": "MASC",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "MASC2BF1_W29": {
+        "topic": "MASC",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "FEM1F2_W29": {
+        "topic": "FEM",
+        "macro_area": "Gender",
+        "wave": "29"
+    },
+    "FEM2AF2_W29": {
+        "topic": "FEM",
+        "macro_area": "Gender",
+        "wave": "29"
+    },
+    "FEM2BF2_W29": {
+        "topic": "FEM",
+        "macro_area": "Gender",
+        "wave": "29"
+    },
+    "GOODJOBS_W29": {
+        "topic": "GOODJOBS",
+        "macro_area": "Economy",
+        "wave": "29"
+    },
+    "HELPHURTA_W29": {
+        "topic": "HELPHURT",
+        "macro_area": "Immigration",
+        "wave": "29"
+    },
+    "HELPHURTB_W29": {
+        "topic": "HELPHURT",
+        "macro_area": "Gender",
+        "wave": "29"
+    },
+    "HELPHURTC_W29": {
+        "topic": "HELPHURT",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "HELPHURTD_W29": {
+        "topic": "HELPHURT",
+        "macro_area": "Economy",
+        "wave": "29"
+    },
+    "HELPHURTE_W29": {
+        "topic": "HELPHURT",
+        "macro_area": "Economy",
+        "wave": "29"
+    },
+    "HELPHURTF_W29": {
+        "topic": "HELPHURT",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "HELPHURTG_W29": {
+        "topic": "HELPHURT",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "TRANSGEND1_W29": {
+        "topic": "TRANSGEND",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "SEENMASC_W29": {
+        "topic": "SEENMASC",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "SEENFEM_W29": {
+        "topic": "SEENFEM",
+        "macro_area": "Gender",
+        "wave": "29"
+    },
+    "MAN1A_W29": {
+        "topic": "MA",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "MAN1B_W29": {
+        "topic": "MA",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "MAN1C_W29": {
+        "topic": "MA",
+        "macro_area": "Gender",
+        "wave": "29"
+    },
+    "MAN1D_W29": {
+        "topic": "MA",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "MAN1E_W29": {
+        "topic": "MA",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "MESUM1_FA_W29": {
+        "topic": "MESUM",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "MESUM1_FB_W29": {
+        "topic": "MESUM",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "MESUM1_FC_W29": {
+        "topic": "MESUM",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "MESUM1_FD_W29": {
+        "topic": "MESUM",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "MESUM1_FE_W29": {
+        "topic": "MESUM",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "MESUM1_FF_W29": {
+        "topic": "MESUM",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "MESUM2_FA_W29": {
+        "topic": "MESUM",
+        "macro_area": "Environment",
+        "wave": "29"
+    },
+    "MESUM2_FB_W29": {
+        "topic": "MESUM",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "MESUM2_FC_W29": {
+        "topic": "MESUM",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "MESUM2_FD_W29": {
+        "topic": "MESUM",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "MESUM2_FE_W29": {
+        "topic": "MESUM",
+        "macro_area": "Gender",
+        "wave": "29"
+    },
+    "MESUM2_FF_W29": {
+        "topic": "MESUM",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "TRANSGEND2_W29": {
+        "topic": "TRANSGEND",
+        "macro_area": "Gender",
+        "wave": "29"
+    },
+    "TRANSGEND3_W29": {
+        "topic": "TRANSGEND",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "TRAITSA_W29": {
+        "topic": "TRAITS",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "TRAITSB_W29": {
+        "topic": "TRAITS",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "TRAITSC_W29": {
+        "topic": "TRAITS",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "TRAITSD_W29": {
+        "topic": "TRAITS",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "TRAITSE_W29": {
+        "topic": "TRAITS",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "TRAITSF_W29": {
+        "topic": "TRAITS",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "BOYSF1A_W29": {
+        "topic": "BOYSF",
+        "macro_area": "Gender",
+        "wave": "29"
+    },
+    "BOYSF1B_W29": {
+        "topic": "BOYSF",
+        "macro_area": "Gender",
+        "wave": "29"
+    },
+    "BOYSF1C_W29": {
+        "topic": "BOYSF",
+        "macro_area": "Gender",
+        "wave": "29"
+    },
+    "BOYSF1D_W29": {
+        "topic": "BOYSF",
+        "macro_area": "Education",
+        "wave": "29"
+    },
+    "GIRLSF2A_W29": {
+        "topic": "GIRLSF",
+        "macro_area": "Gender",
+        "wave": "29"
+    },
+    "GIRLSF2B_W29": {
+        "topic": "GIRLSF",
+        "macro_area": "Gender",
+        "wave": "29"
+    },
+    "GIRLSF2C_W29": {
+        "topic": "GIRLSF",
+        "macro_area": "Gender",
+        "wave": "29"
+    },
+    "GIRLSF2D_W29": {
+        "topic": "GIRLSF",
+        "macro_area": "Education",
+        "wave": "29"
+    },
+    "SPOUSESEX_W29": {
+        "topic": "SPOUSESEX",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "HOOD_NHISA_W29": {
+        "topic": "HOOD_NHIS",
+        "macro_area": "Quality of Life",
+        "wave": "29"
+    },
+    "HOOD_NHISB_W29": {
+        "topic": "HOOD_NHIS",
+        "macro_area": "Institutional Confidence",
+        "wave": "29"
+    },
+    "HOOD_NHISC_W29": {
+        "topic": "HOOD_NHIS",
+        "macro_area": "Quality of Life",
+        "wave": "29"
+    },
+    "LOCALELECT_W29": {
+        "topic": "LOCALELECT",
+        "macro_area": "Education",
+        "wave": "29"
+    },
+    "PARTICIPATEA_W29": {
+        "topic": "PARTICIPATE",
+        "macro_area": "Education",
+        "wave": "29"
+    },
+    "PARTICIPATEB_W29": {
+        "topic": "PARTICIPATE",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "PARTICIPATEC_W29": {
+        "topic": "PARTICIPATE",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "S7_W29": {
+        "topic": "S",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "S12_W29": {
+        "topic": "S",
+        "macro_area": "Housing",
+        "wave": "29"
+    },
+    "S13_W29": {
+        "topic": "S",
+        "macro_area": "Family",
+        "wave": "29"
+    },
+    "TALK_CPS_W29": {
+        "topic": "TALK_CPS",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "FAVORS_CPS_W29": {
+        "topic": "FAVORS_CPS",
+        "macro_area": "Other",
+        "wave": "29"
+    },
+    "WORRYRET_W29": {
+        "topic": "WORRYRET",
+        "macro_area": "Personal Security",
+        "wave": "29"
+    },
+    "WORRYBILL_W29": {
+        "topic": "WORRYBILL",
+        "macro_area": "Personal Security",
+        "wave": "29"
+    },
+    "GOPDIRCT_W29": {
+        "topic": "GOPDIRCT",
+        "macro_area": "Politics",
+        "wave": "29"
+    },
+    "DEMDIRCT_W29": {
+        "topic": "DEMDIRCT",
+        "macro_area": "Politics",
+        "wave": "29"
+    },
+    "SATLIFEA_W32": {
+        "topic": "SATLIFE",
+        "macro_area": "Family",
+        "wave": "32"
+    },
+    "SATLIFEB_W32": {
+        "topic": "SATLIFE",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "SATLIFEC_W32": {
+        "topic": "SATLIFE",
+        "macro_area": "Personal Finance",
+        "wave": "32"
+    },
+    "SATLIFED_W32": {
+        "topic": "SATLIFE",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "SATLIFEE_W32": {
+        "topic": "SATLIFE",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "SOCTRUST_W32": {
+        "topic": "SOCTRUST",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "SOCTRUST2_W32": {
+        "topic": "SOCTRUST",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "SOCTRUST4_W32": {
+        "topic": "SOCTRUST",
+        "macro_area": "Institutional Confidence",
+        "wave": "32"
+    },
+    "SOCTRUST5_W32": {
+        "topic": "SOCTRUST",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "COMMYRS_W32": {
+        "topic": "COMMYRS",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "COMATTACH_W32": {
+        "topic": "COMATTACH",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "FEELA_W32": {
+        "topic": "FEEL",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "FEELB_W32": {
+        "topic": "FEEL",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "FEELC_W32": {
+        "topic": "FEEL",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "FEELD_W32": {
+        "topic": "FEEL",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "INC_W32": {
+        "topic": "INC",
+        "macro_area": "Personal Finance",
+        "wave": "32"
+    },
+    "INCFUTURE_W32": {
+        "topic": "INCFUTURE",
+        "macro_area": "Personal Finance",
+        "wave": "32"
+    },
+    "COMMIMPA_W32": {
+        "topic": "COMMIMP",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "COMMIMPB_W32": {
+        "topic": "COMMIMP",
+        "macro_area": "Family",
+        "wave": "32"
+    },
+    "COMMIMPC_W32": {
+        "topic": "COMMIMP",
+        "macro_area": "Race/Ethnicity",
+        "wave": "32"
+    },
+    "COMMIMPD_W32": {
+        "topic": "COMMIMP",
+        "macro_area": "Politics",
+        "wave": "32"
+    },
+    "COMMIMPE_W32": {
+        "topic": "COMMIMP",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "COMMIMPF_W32": {
+        "topic": "COMMIMP",
+        "macro_area": "Family",
+        "wave": "32"
+    },
+    "COMMIMPG_W32": {
+        "topic": "COMMIMP",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "COMMIMPH_W32": {
+        "topic": "COMMIMP",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "FAMNEAR_W32": {
+        "topic": "FAMNEAR",
+        "macro_area": "Family",
+        "wave": "32"
+    },
+    "SUCCESSIMPA_W32": {
+        "topic": "SUCCESSIMP",
+        "macro_area": "Education",
+        "wave": "32"
+    },
+    "SUCCESSIMPB_W32": {
+        "topic": "SUCCESSIMP",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "SUCCESSIMPC_W32": {
+        "topic": "SUCCESSIMP",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "SUCCESSIMPD_W32": {
+        "topic": "SUCCESSIMP",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "FEDSHAREA_W32": {
+        "topic": "FEDSHARE",
+        "macro_area": "Politics",
+        "wave": "32"
+    },
+    "FEDSHAREB_W32": {
+        "topic": "FEDSHARE",
+        "macro_area": "Politics",
+        "wave": "32"
+    },
+    "FEDSHAREC_W32": {
+        "topic": "FEDSHARE",
+        "macro_area": "Politics",
+        "wave": "32"
+    },
+    "LOCALPROBA_W32": {
+        "topic": "LOCALPROB",
+        "macro_area": "Economy",
+        "wave": "32"
+    },
+    "LOCALPROBB_W32": {
+        "topic": "LOCALPROB",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "LOCALPROBC_W32": {
+        "topic": "LOCALPROB",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "LOCALPROBD_W32": {
+        "topic": "LOCALPROB",
+        "macro_area": "Health",
+        "wave": "32"
+    },
+    "LOCALPROBE_W32": {
+        "topic": "LOCALPROB",
+        "macro_area": "Technology",
+        "wave": "32"
+    },
+    "LOCALPROBF_W32": {
+        "topic": "LOCALPROB",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "LOCALPROBG_W32": {
+        "topic": "LOCALPROB",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "LOCALPROBH_W32": {
+        "topic": "LOCALPROB",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "LOCALPROBI_W32": {
+        "topic": "LOCALPROB",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "LOCALPROBJ_W32": {
+        "topic": "LOCALPROB",
+        "macro_area": "Crime",
+        "wave": "32"
+    },
+    "LOCALPROBK_W32": {
+        "topic": "LOCALPROB",
+        "macro_area": "Education",
+        "wave": "32"
+    },
+    "LOCALPROBL_F1_W32": {
+        "topic": "LOCALPROBL_F",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "LOCALPROBM_F2_W32": {
+        "topic": "LOCALPROBM_F",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "JOBSFUTURE_W32": {
+        "topic": "JOBSFUTURE",
+        "macro_area": "Economy",
+        "wave": "32"
+    },
+    "HARASS1A_W32": {
+        "topic": "HARASS",
+        "macro_area": "Gender",
+        "wave": "32"
+    },
+    "HARASS1B_W32": {
+        "topic": "HARASS",
+        "macro_area": "Gender",
+        "wave": "32"
+    },
+    "HARASS1C_W32": {
+        "topic": "HARASS",
+        "macro_area": "Gender",
+        "wave": "32"
+    },
+    "HARASS1D_W32": {
+        "topic": "HARASS",
+        "macro_area": "Gender",
+        "wave": "32"
+    },
+    "HARASS2F1_W32": {
+        "topic": "HARASS",
+        "macro_area": "Gender",
+        "wave": "32"
+    },
+    "HARASS3F2_W32": {
+        "topic": "HARASS",
+        "macro_area": "Gender",
+        "wave": "32"
+    },
+    "HARASS4_W32": {
+        "topic": "HARASS",
+        "macro_area": "Gender",
+        "wave": "32"
+    },
+    "HARASS5_W32": {
+        "topic": "HARASS",
+        "macro_area": "Gender",
+        "wave": "32"
+    },
+    "GROWUPNEAR_W32": {
+        "topic": "GROWUPNEAR",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "LIFELOC_W32": {
+        "topic": "LIFELOC",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "VALUEURBAN_W32": {
+        "topic": "VALUEURBAN",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "VALUESUBURB_W32": {
+        "topic": "VALUESUBURB",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "VALUERURAL_W32": {
+        "topic": "VALUERURAL",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "NEIGHKNOW_W32": {
+        "topic": "NEIGHKNOW",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "NEIGHINTERA_W32": {
+        "topic": "NEIGHINTER",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "NEIGHINTERB_W32": {
+        "topic": "NEIGHINTER",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "NEIGHINTERC_W32": {
+        "topic": "NEIGHINTER",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "NEIGHINTERD_W32": {
+        "topic": "NEIGHINTER",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "NEIGHKEYS_W32": {
+        "topic": "NEIGHKEYS",
+        "macro_area": "Housing",
+        "wave": "32"
+    },
+    "NEIGHKIDS_W32": {
+        "topic": "NEIGHKIDS",
+        "macro_area": "Family",
+        "wave": "32"
+    },
+    "NEIGHSAMEA_W32": {
+        "topic": "NEIGHSAME",
+        "macro_area": "Race/Ethnicity",
+        "wave": "32"
+    },
+    "NEIGHSAMEB_W32": {
+        "topic": "NEIGHSAME",
+        "macro_area": "Economy",
+        "wave": "32"
+    },
+    "NEIGHSAMEC_W32": {
+        "topic": "NEIGHSAME",
+        "macro_area": "Politics",
+        "wave": "32"
+    },
+    "IMMCOMM_W32": {
+        "topic": "IMMCOMM",
+        "macro_area": "Immigration",
+        "wave": "32"
+    },
+    "IMMIMPACT_W32": {
+        "topic": "IMMIMPACT",
+        "macro_area": "Immigration",
+        "wave": "32"
+    },
+    "GROWUPUSR_W32": {
+        "topic": "GROWUPUSR",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "COMTYPE2_W32": {
+        "topic": "COMTYPE",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "CITYSIZE_W32": {
+        "topic": "CITYSIZE",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "SUBURBNEAR_W32": {
+        "topic": "SUBURBNEAR",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "PROBURBAN_W32": {
+        "topic": "PROBURBAN",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "PROBSUBURB_W32": {
+        "topic": "PROBSUBURB",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "PROBRURAL_W32": {
+        "topic": "PROBRURAL",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "WANTMOVE_W32": {
+        "topic": "WANTMOVE",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "WILLMOVE_W32": {
+        "topic": "WILLMOVE",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "MOVEURBAN_W32": {
+        "topic": "MOVEURBAN",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "MOVESUBURB_W32": {
+        "topic": "MOVESUBURB",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "MOVERURAL_W32": {
+        "topic": "MOVERURAL",
+        "macro_area": "Quality of Life",
+        "wave": "32"
+    },
+    "ETHNCMAJ_W32": {
+        "topic": "ETHNCMAJ",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "IMMCULT2_W32": {
+        "topic": "IMMCULT",
+        "macro_area": "Immigration",
+        "wave": "32"
+    },
+    "MARRFAM2_W32": {
+        "topic": "MARRFAM",
+        "macro_area": "Family",
+        "wave": "32"
+    },
+    "ECONFAIR2_W32": {
+        "topic": "ECONFAIR",
+        "macro_area": "Economy",
+        "wave": "32"
+    },
+    "WOMENOPPS_W32": {
+        "topic": "WOMENOPPS",
+        "macro_area": "Gender",
+        "wave": "32"
+    },
+    "GOVT_ROLE_W32": {
+        "topic": "GOVT_ROLE",
+        "macro_area": "Politics",
+        "wave": "32"
+    },
+    "WHADVANT_W32": {
+        "topic": "WHADVANT",
+        "macro_area": "Other",
+        "wave": "32"
+    },
+    "GAYMARR2_W32": {
+        "topic": "GAYMARR",
+        "macro_area": "Family",
+        "wave": "32"
+    },
+    "ABORTION_W32": {
+        "topic": "ABORTION",
+        "macro_area": "Health",
+        "wave": "32"
+    },
+    "ABORTIONRESTR_W32": {
+        "topic": "ABORTIONRESTR",
+        "macro_area": "Health",
+        "wave": "32"
+    },
+    "ABORTIONALLOW_W32": {
+        "topic": "ABORTIONALLOW",
+        "macro_area": "Health",
+        "wave": "32"
+    },
+    "CLASS_W32": {
+        "topic": "CLASS",
+        "macro_area": "Economy",
+        "wave": "32"
+    },
+    "MISINFG_W32": {
+        "topic": "MISINF",
+        "macro_area": "Technology",
+        "wave": "32"
+    },
+    "MISINFT_W32": {
+        "topic": "MISINF",
+        "macro_area": "Technology",
+        "wave": "32"
+    },
+    "SCI1_W34": {
+        "topic": "SC",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "SCI2A_W34": {
+        "topic": "SC",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "SCI2B_W34": {
+        "topic": "SC",
+        "macro_area": "Health",
+        "wave": "34"
+    },
+    "SCI2C_W34": {
+        "topic": "SC",
+        "macro_area": "Environment",
+        "wave": "34"
+    },
+    "SCI3A_W34": {
+        "topic": "SC",
+        "macro_area": "Politics",
+        "wave": "34"
+    },
+    "SCI3B_W34": {
+        "topic": "SC",
+        "macro_area": "Politics",
+        "wave": "34"
+    },
+    "SCI3C_W34": {
+        "topic": "SC",
+        "macro_area": "Politics",
+        "wave": "34"
+    },
+    "SCI4_W34": {
+        "topic": "SC",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "SCI5_W34": {
+        "topic": "SC",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "EAT1_W34": {
+        "topic": "EAT",
+        "macro_area": "Health",
+        "wave": "34"
+    },
+    "EAT2_W34": {
+        "topic": "EAT",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "EAT3E_W34": {
+        "topic": "EAT",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "EAT3F_W34": {
+        "topic": "EAT",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "EAT3G_W34": {
+        "topic": "EAT",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "EAT3H_W34": {
+        "topic": "EAT",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "EAT3I_W34": {
+        "topic": "EAT",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "EAT3J_W34": {
+        "topic": "EAT",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "EAT3K_W34": {
+        "topic": "EAT",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "FUD22_W34": {
+        "topic": "FUD",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "FUD24_W34": {
+        "topic": "FUD",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "EAT5A_W34": {
+        "topic": "EAT",
+        "macro_area": "Health",
+        "wave": "34"
+    },
+    "EAT5B_W34": {
+        "topic": "EAT",
+        "macro_area": "Health",
+        "wave": "34"
+    },
+    "EAT5C_W34": {
+        "topic": "EAT",
+        "macro_area": "Health",
+        "wave": "34"
+    },
+    "EAT5D_W34": {
+        "topic": "EAT",
+        "macro_area": "Health",
+        "wave": "34"
+    },
+    "EAT6_W34": {
+        "topic": "EAT",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "FUD32_W34": {
+        "topic": "FUD",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "FUD33A_W34": {
+        "topic": "FUD",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "FUD33B_W34": {
+        "topic": "FUD",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "FUD35_W34": {
+        "topic": "FUD",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "FUD37A_W34": {
+        "topic": "FUD",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "FUD37B_W34": {
+        "topic": "FUD",
+        "macro_area": "Health",
+        "wave": "34"
+    },
+    "FUD37C_W34": {
+        "topic": "FUD",
+        "macro_area": "Environment",
+        "wave": "34"
+    },
+    "FUD37D_W34": {
+        "topic": "FUD",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "MED1_W34": {
+        "topic": "MED",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "MED2A_W34": {
+        "topic": "MED",
+        "macro_area": "Health",
+        "wave": "34"
+    },
+    "MED2B_W34": {
+        "topic": "MED",
+        "macro_area": "Health",
+        "wave": "34"
+    },
+    "MED2C_W34": {
+        "topic": "MED",
+        "macro_area": "Health",
+        "wave": "34"
+    },
+    "MED2D_W34": {
+        "topic": "MED",
+        "macro_area": "Health",
+        "wave": "34"
+    },
+    "MED2E_W34": {
+        "topic": "MED",
+        "macro_area": "Health",
+        "wave": "34"
+    },
+    "MED2F_W34": {
+        "topic": "MED",
+        "macro_area": "Health",
+        "wave": "34"
+    },
+    "MED2G_W34": {
+        "topic": "MED",
+        "macro_area": "Health",
+        "wave": "34"
+    },
+    "MED3_W34": {
+        "topic": "MED",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "MED4A_W34": {
+        "topic": "MED",
+        "macro_area": "Technology",
+        "wave": "34"
+    },
+    "MED4B_W34": {
+        "topic": "MED",
+        "macro_area": "Technology",
+        "wave": "34"
+    },
+    "MED4C_W34": {
+        "topic": "MED",
+        "macro_area": "Technology",
+        "wave": "34"
+    },
+    "MED5_W34": {
+        "topic": "MED",
+        "macro_area": "Health",
+        "wave": "34"
+    },
+    "MED6A_W34": {
+        "topic": "MED",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "MED6B_W34": {
+        "topic": "MED",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "MED6C_W34": {
+        "topic": "MED",
+        "macro_area": "Health",
+        "wave": "34"
+    },
+    "MED6D_W34": {
+        "topic": "MED",
+        "macro_area": "Economy",
+        "wave": "34"
+    },
+    "MED6E_W34": {
+        "topic": "MED",
+        "macro_area": "Health",
+        "wave": "34"
+    },
+    "MED7_W34": {
+        "topic": "MED",
+        "macro_area": "Other",
+        "wave": "34"
+    },
+    "BIOTECHA_W34": {
+        "topic": "BIOTECH",
+        "macro_area": "Technology",
+        "wave": "34"
+    },
+    "BIOTECHB_W34": {
+        "topic": "BIOTECH",
+        "macro_area": "Technology",
+        "wave": "34"
+    },
+    "BIOTECHC_W34": {
+        "topic": "BIOTECH",
+        "macro_area": "Technology",
+        "wave": "34"
+    },
+    "BIOTECHD_W34": {
+        "topic": "BIOTECH",
+        "macro_area": "Technology",
+        "wave": "34"
+    },
+    "BIOTECHE_W34": {
+        "topic": "BIOTECH",
+        "macro_area": "Technology",
+        "wave": "34"
+    },
+    "EVOONE_W34": {
+        "topic": "EVOONE",
+        "macro_area": "Religion",
+        "wave": "34"
+    },
+    "EVOTWO_W34": {
+        "topic": "EVOTWO",
+        "macro_area": "Religion",
+        "wave": "34"
+    },
+    "EVOTHREE_W34": {
+        "topic": "EVOTHREE",
+        "macro_area": "Religion",
+        "wave": "34"
+    },
+    "EVOPERS3_W34": {
+        "topic": "EVOPERS",
+        "macro_area": "Religion",
+        "wave": "34"
+    },
+    "EVOPERS3A_W34": {
+        "topic": "EVOPERS",
+        "macro_area": "Religion",
+        "wave": "34"
+    },
+    "EVOBIOA_W34": {
+        "topic": "EVOBIO",
+        "macro_area": "Religion",
+        "wave": "34"
+    },
+    "EVOBIOB_W34": {
+        "topic": "EVOBIO",
+        "macro_area": "Religion",
+        "wave": "34"
+    },
+    "BIO15_W34": {
+        "topic": "BIO",
+        "macro_area": "Technology",
+        "wave": "34"
+    },
+    "G1_W34": {
+        "topic": "G",
+        "macro_area": "Family",
+        "wave": "34"
+    },
+    "G2_W34": {
+        "topic": "G",
+        "macro_area": "Family",
+        "wave": "34"
+    },
+    "HAPPYLIFE_W36": {
+        "topic": "HAPPYLIFE",
+        "macro_area": "Quality of Life",
+        "wave": "36"
+    },
+    "ESSENPOLF1A_W36": {
+        "topic": "ESSENPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "ESSENPOLF1B_W36": {
+        "topic": "ESSENPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "ESSENPOLF1C_W36": {
+        "topic": "ESSENPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "ESSENPOLF1D_W36": {
+        "topic": "ESSENPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "ESSENPOLF1E_W36": {
+        "topic": "ESSENPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "ESSENPOLF1F_W36": {
+        "topic": "ESSENPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "ESSENPOLF1G_W36": {
+        "topic": "ESSENPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "ESSENPOLF1H_W36": {
+        "topic": "ESSENPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "ESSENPOLF1I_W36": {
+        "topic": "ESSENPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "ESSENBIZF2A_W36": {
+        "topic": "ESSENBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "ESSENBIZF2B_W36": {
+        "topic": "ESSENBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "ESSENBIZF2C_W36": {
+        "topic": "ESSENBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "ESSENBIZF2D_W36": {
+        "topic": "ESSENBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "ESSENBIZF2E_W36": {
+        "topic": "ESSENBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "ESSENBIZF2F_W36": {
+        "topic": "ESSENBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "ESSENBIZF2G_W36": {
+        "topic": "ESSENBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "ESSENBIZF2H_W36": {
+        "topic": "ESSENBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "ESSENBIZF2I_W36": {
+        "topic": "ESSENBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "ESSENBIZF2J_W36": {
+        "topic": "ESSENBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "ESSENBIZF2K_W36": {
+        "topic": "ESSENBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "ESSENBIZF2L_W36": {
+        "topic": "ESSENBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "STYLE1_W36": {
+        "topic": "STYLE",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "STYLE2_W36": {
+        "topic": "STYLE",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "AMNTWMNPF1_W36": {
+        "topic": "AMNTWMNPF",
+        "macro_area": "Other",
+        "wave": "36"
+    },
+    "AMNTWMNP2F1_W36": {
+        "topic": "AMNTWMN",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "AMNTWMNBF1_W36": {
+        "topic": "AMNTWMNBF",
+        "macro_area": "Other",
+        "wave": "36"
+    },
+    "AMNTWMNB2F1_W36": {
+        "topic": "AMNTWMN",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "EASIERBIZF2_W36": {
+        "topic": "EASIERBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "EASIERPOLF2_W36": {
+        "topic": "EASIERPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "EQUALPOLF2_W36": {
+        "topic": "EQUALPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "EQUALBIZF2_W36": {
+        "topic": "EQUALBIZF",
+        "macro_area": "Gender",
+        "wave": "36"
+    },
+    "IMPROVE1_W36": {
+        "topic": "IMPROVE",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "IMPROVE2_W36": {
+        "topic": "IMPROVE",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "IMPROVE3_W36": {
+        "topic": "IMPROVE",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "WHYNOTPOLF1A_W36": {
+        "topic": "WHYNOTPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "WHYNOTPOLF1B_W36": {
+        "topic": "WHYNOTPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "WHYNOTPOLF1C_W36": {
+        "topic": "WHYNOTPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "WHYNOTPOLF1D_W36": {
+        "topic": "WHYNOTPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "WHYNOTPOLF1E_W36": {
+        "topic": "WHYNOTPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "WHYNOTPOLF1F_W36": {
+        "topic": "WHYNOTPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "WHYNOTPOLF1G_W36": {
+        "topic": "WHYNOTPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "WHYNOTPOLF1H_W36": {
+        "topic": "WHYNOTPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "WHYNOTPOLF1I_W36": {
+        "topic": "WHYNOTPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "WHYNOTPOLF1J_W36": {
+        "topic": "WHYNOTPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "WHYNOTPOLF1K_W36": {
+        "topic": "WHYNOTPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "WHYNOTPOLF1L_W36": {
+        "topic": "WHYNOTPOLF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "WHYNOTBIZF2A_W36": {
+        "topic": "WHYNOTBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "WHYNOTBIZF2B_W36": {
+        "topic": "WHYNOTBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "WHYNOTBIZF2C_W36": {
+        "topic": "WHYNOTBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "WHYNOTBIZF2D_W36": {
+        "topic": "WHYNOTBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "WHYNOTBIZF2F_W36": {
+        "topic": "WHYNOTBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "WHYNOTBIZF2G_W36": {
+        "topic": "WHYNOTBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "WHYNOTBIZF2H_W36": {
+        "topic": "WHYNOTBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "WHYNOTBIZF2I_W36": {
+        "topic": "WHYNOTBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "WHYNOTBIZF2J_W36": {
+        "topic": "WHYNOTBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "WHYNOTBIZF2K_W36": {
+        "topic": "WHYNOTBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "WHYNOTBIZF2L_W36": {
+        "topic": "WHYNOTBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "WHYNOTBIZF2M_W36": {
+        "topic": "WHYNOTBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "WHYNOTBIZF2N_W36": {
+        "topic": "WHYNOTBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "WHYNOTBIZF2O_W36": {
+        "topic": "WHYNOTBIZF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "HIGHED_W36": {
+        "topic": "HIGHED",
+        "macro_area": "Education",
+        "wave": "36"
+    },
+    "HIGHEDWRNGA_W36": {
+        "topic": "HIGHEDWRNG",
+        "macro_area": "Education",
+        "wave": "36"
+    },
+    "HIGHEDWRNGB_W36": {
+        "topic": "HIGHEDWRNG",
+        "macro_area": "Education",
+        "wave": "36"
+    },
+    "HIGHEDWRNGC_W36": {
+        "topic": "HIGHEDWRNG",
+        "macro_area": "Education",
+        "wave": "36"
+    },
+    "HIGHEDWRNGD_W36": {
+        "topic": "HIGHEDWRNG",
+        "macro_area": "Education",
+        "wave": "36"
+    },
+    "HIGHEDWRNGS_W36": {
+        "topic": "HIGHEDWRNG",
+        "macro_area": "Education",
+        "wave": "36"
+    },
+    "BETTERPOL1F1A_W36": {
+        "topic": "BETTERPOL",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "BETTERPOL1F1B_W36": {
+        "topic": "BETTERPOL",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "BETTERPOL1F1C_W36": {
+        "topic": "BETTERPOL",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "BETTERPOL1F1D_W36": {
+        "topic": "BETTERPOL",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "BETTERPOL1F1E_W36": {
+        "topic": "BETTERPOL",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "BETTERPOL1F1F_W36": {
+        "topic": "BETTERPOL",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "BETTERPOL1F1G_W36": {
+        "topic": "BETTERPOL",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "BETTERPOL1F1H_W36": {
+        "topic": "BETTERPOL",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "BETTERPOL1F1I_W36": {
+        "topic": "BETTERPOL",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "BETTERPOL2F1A_W36": {
+        "topic": "BETTERPOL",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "BETTERPOL2F1B_W36": {
+        "topic": "BETTERPOL",
+        "macro_area": "Education",
+        "wave": "36"
+    },
+    "BETTERPOL2F1C_W36": {
+        "topic": "BETTERPOL",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "BETTERPOL2F1D_W36": {
+        "topic": "BETTERPOL",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "BETTERPOL2F1E_W36": {
+        "topic": "BETTERPOL",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "BETTERPOL2F1F_W36": {
+        "topic": "BETTERPOL",
+        "macro_area": "Guns",
+        "wave": "36"
+    },
+    "BETTERBIZ1F2A_W36": {
+        "topic": "BETTERBIZ",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "BETTERBIZ1F2B_W36": {
+        "topic": "BETTERBIZ",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "BETTERBIZ1F2C_W36": {
+        "topic": "BETTERBIZ",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "BETTERBIZ1F2D_W36": {
+        "topic": "BETTERBIZ",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "BETTERBIZ1F2E_W36": {
+        "topic": "BETTERBIZ",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "BETTERBIZ1F2F_W36": {
+        "topic": "BETTERBIZ",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "BETTERBIZ1F2G_W36": {
+        "topic": "BETTERBIZ",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "BETTERBIZ1F2H_W36": {
+        "topic": "BETTERBIZ",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "BETTERBIZ1F2I_W36": {
+        "topic": "BETTERBIZ",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "BETTERBIZ1F2J_W36": {
+        "topic": "BETTERBIZ",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "BETTERBIZ1F2K_W36": {
+        "topic": "BETTERBIZ",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "BETTERBIZ1F2L_W36": {
+        "topic": "BETTERBIZ",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "BETTERBIZ2F2A_W36": {
+        "topic": "BETTERBIZ",
+        "macro_area": "Technology",
+        "wave": "36"
+    },
+    "BETTERBIZ2F2B_W36": {
+        "topic": "BETTERBIZ",
+        "macro_area": "Gender",
+        "wave": "36"
+    },
+    "BETTERBIZ2F2C_W36": {
+        "topic": "BETTERBIZ",
+        "macro_area": "Institutional Confidence",
+        "wave": "36"
+    },
+    "BETTERBIZ2F2D_W36": {
+        "topic": "BETTERBIZ",
+        "macro_area": "Gender",
+        "wave": "36"
+    },
+    "BETTERBIZ2F2E_W36": {
+        "topic": "BETTERBIZ",
+        "macro_area": "Health",
+        "wave": "36"
+    },
+    "BETTERBIZ2F2F_W36": {
+        "topic": "BETTERBIZ",
+        "macro_area": "Gender",
+        "wave": "36"
+    },
+    "TRAITPOLWF1A_W36": {
+        "topic": "TRAITPOLWF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "TRAITPOLWF1B_W36": {
+        "topic": "TRAITPOLWF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "TRAITPOLWF1C_W36": {
+        "topic": "TRAITPOLWF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "TRAITPOLWF1D_W36": {
+        "topic": "TRAITPOLWF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "TRAITPOLWF1E_W36": {
+        "topic": "TRAITPOLWF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "TRAITPOLWF1F_W36": {
+        "topic": "TRAITPOLWF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "TRAITPOLWF1G_W36": {
+        "topic": "TRAITPOLWF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "TRAITPOLMF1A_W36": {
+        "topic": "TRAITPOLMF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "TRAITPOLMF1B_W36": {
+        "topic": "TRAITPOLMF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "TRAITPOLMF1C_W36": {
+        "topic": "TRAITPOLMF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "TRAITPOLMF1D_W36": {
+        "topic": "TRAITPOLMF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "TRAITPOLMF1E_W36": {
+        "topic": "TRAITPOLMF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "TRAITPOLMF1F_W36": {
+        "topic": "TRAITPOLMF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "TRAITPOLMF1G_W36": {
+        "topic": "TRAITPOLMF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "POLCHF1_W36": {
+        "topic": "POLCHF",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "TRAITBIZWF2A_W36": {
+        "topic": "TRAITBIZWF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "TRAITBIZWF2B_W36": {
+        "topic": "TRAITBIZWF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "TRAITBIZWF2C_W36": {
+        "topic": "TRAITBIZWF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "TRAITBIZWF2D_W36": {
+        "topic": "TRAITBIZWF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "TRAITBIZWF2E_W36": {
+        "topic": "TRAITBIZWF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "TRAITBIZWF2F_W36": {
+        "topic": "TRAITBIZWF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "TRAITBIZWF2G_W36": {
+        "topic": "TRAITBIZWF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "TRAITBIZMF2A_W36": {
+        "topic": "TRAITBIZMF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "TRAITBIZMF2B_W36": {
+        "topic": "TRAITBIZMF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "TRAITBIZMF2C_W36": {
+        "topic": "TRAITBIZMF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "TRAITBIZMF2D_W36": {
+        "topic": "TRAITBIZMF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "TRAITBIZMF2E_W36": {
+        "topic": "TRAITBIZMF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "TRAITBIZMF2F_W36": {
+        "topic": "TRAITBIZMF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "TRAITBIZMF2G_W36": {
+        "topic": "TRAITBIZMF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "EXECCHF2_W36": {
+        "topic": "EXECCHF",
+        "macro_area": "Economy",
+        "wave": "36"
+    },
+    "WMNPRZ1_W36": {
+        "topic": "WMNPRZ",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "MOREWMN1F2_W36": {
+        "topic": "MOREWMN",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "MOREWMN2F2_W36": {
+        "topic": "MOREWMN",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "MOREWMN3F2_W36": {
+        "topic": "MOREWMN",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "MOREWMN4F2_W36": {
+        "topic": "MOREWMN",
+        "macro_area": "Politics",
+        "wave": "36"
+    },
+    "COLSPEECH_W36": {
+        "topic": "COLSPEECH",
+        "macro_area": "Education",
+        "wave": "36"
+    },
+    "E5_W36": {
+        "topic": "E",
+        "macro_area": "Housing",
+        "wave": "36"
+    },
+    "EARN_W36": {
+        "topic": "EARN",
+        "macro_area": "Personal Finance",
+        "wave": "36"
+    },
+    "FERTIL1_W36": {
+        "topic": "FERTIL",
+        "macro_area": "Family",
+        "wave": "36"
+    },
+    "OPTIMIST_W41": {
+        "topic": "OPTIMIST",
+        "macro_area": "Other",
+        "wave": "41"
+    },
+    "AVGFAM_W41": {
+        "topic": "AVGFAM",
+        "macro_area": "Family",
+        "wave": "41"
+    },
+    "HAPPENa_W41": {
+        "topic": "HAPPEN",
+        "macro_area": "Economy",
+        "wave": "41"
+    },
+    "HAPPENb_W41": {
+        "topic": "HAPPEN",
+        "macro_area": "Health",
+        "wave": "41"
+    },
+    "HAPPENc_W41": {
+        "topic": "HAPPEN",
+        "macro_area": "Race/Ethnicity",
+        "wave": "41"
+    },
+    "HAPPENd_W41": {
+        "topic": "HAPPEN",
+        "macro_area": "Other",
+        "wave": "41"
+    },
+    "HAPPENe_W41": {
+        "topic": "HAPPEN",
+        "macro_area": "Other",
+        "wave": "41"
+    },
+    "HAPPENf_W41": {
+        "topic": "HAPPEN",
+        "macro_area": "Education",
+        "wave": "41"
+    },
+    "HAPPENg_W41": {
+        "topic": "HAPPEN",
+        "macro_area": "Religion",
+        "wave": "41"
+    },
+    "HAPPENhF1_W41": {
+        "topic": "HAPPEN",
+        "macro_area": "Other",
+        "wave": "41"
+    },
+    "HAPPENiF2_W41": {
+        "topic": "HAPPEN",
+        "macro_area": "Family",
+        "wave": "41"
+    },
+    "HAPPENj_W41": {
+        "topic": "HAPPEN",
+        "macro_area": "Politics",
+        "wave": "41"
+    },
+    "HAPPEN2a_W41": {
+        "topic": "HAPPEN",
+        "macro_area": "Other",
+        "wave": "41"
+    },
+    "HAPPEN2b_W41": {
+        "topic": "HAPPEN",
+        "macro_area": "Other",
+        "wave": "41"
+    },
+    "HAPPEN2c_W41": {
+        "topic": "HAPPEN",
+        "macro_area": "Other",
+        "wave": "41"
+    },
+    "HAPPEN2d_W41": {
+        "topic": "HAPPEN",
+        "macro_area": "Other",
+        "wave": "41"
+    },
+    "HAPPEN2e_W41": {
+        "topic": "HAPPEN",
+        "macro_area": "Politics",
+        "wave": "41"
+    },
+    "HAPPEN2f_W41": {
+        "topic": "HAPPEN",
+        "macro_area": "Politics",
+        "wave": "41"
+    },
+    "HAPPEN2g_W41": {
+        "topic": "HAPPEN",
+        "macro_area": "Other",
+        "wave": "41"
+    },
+    "HAPPEN2h_W41": {
+        "topic": "HAPPEN",
+        "macro_area": "Other",
+        "wave": "41"
+    },
+    "NATDEBT_W41": {
+        "topic": "NATDEBT",
+        "macro_area": "Personal Finance",
+        "wave": "41"
+    },
+    "ENVC_W41": {
+        "topic": "ENVC",
+        "macro_area": "Environment",
+        "wave": "41"
+    },
+    "POPPROB_W41": {
+        "topic": "POPPROB",
+        "macro_area": "Other",
+        "wave": "41"
+    },
+    "FTRWORRYa_W41": {
+        "topic": "FTRWORRY",
+        "macro_area": "Economy",
+        "wave": "41"
+    },
+    "FTRWORRYb_W41": {
+        "topic": "FTRWORRY",
+        "macro_area": "Education",
+        "wave": "41"
+    },
+    "FTRWORRYc_W41": {
+        "topic": "FTRWORRY",
+        "macro_area": "Politics",
+        "wave": "41"
+    },
+    "FTRWORRYd_W41": {
+        "topic": "FTRWORRY",
+        "macro_area": "Politics",
+        "wave": "41"
+    },
+    "FTRWORRYe_W41": {
+        "topic": "FTRWORRY",
+        "macro_area": "Personal Security",
+        "wave": "41"
+    },
+    "FTRWORRYf_W41": {
+        "topic": "FTRWORRY",
+        "macro_area": "Environment",
+        "wave": "41"
+    },
+    "ELDCARE_W41": {
+        "topic": "ELDCARE",
+        "macro_area": "Technology",
+        "wave": "41"
+    },
+    "ELDFINANCEF1_W41": {
+        "topic": "ELDFINANCEF",
+        "macro_area": "Personal Finance",
+        "wave": "41"
+    },
+    "ELDFINANCEF2_W41": {
+        "topic": "ELDFINANCEF",
+        "macro_area": "Personal Finance",
+        "wave": "41"
+    },
+    "GOVPRIOa_W41": {
+        "topic": "GOVPRIO",
+        "macro_area": "Politics",
+        "wave": "41"
+    },
+    "GOVPRIOb_W41": {
+        "topic": "GOVPRIO",
+        "macro_area": "Education",
+        "wave": "41"
+    },
+    "GOVPRIOc_W41": {
+        "topic": "GOVPRIO",
+        "macro_area": "Politics",
+        "wave": "41"
+    },
+    "GOVPRIOd_W41": {
+        "topic": "GOVPRIO",
+        "macro_area": "Politics",
+        "wave": "41"
+    },
+    "GOVPRIOe_W41": {
+        "topic": "GOVPRIO",
+        "macro_area": "Politics",
+        "wave": "41"
+    },
+    "GOVPRIOfF1_W41": {
+        "topic": "GOVPRIO",
+        "macro_area": "Politics",
+        "wave": "41"
+    },
+    "GOVPRIOgF1_W41": {
+        "topic": "GOVPRIO",
+        "macro_area": "Politics",
+        "wave": "41"
+    },
+    "GOVPRIOhF1_W41": {
+        "topic": "GOVPRIO",
+        "macro_area": "Politics",
+        "wave": "41"
+    },
+    "GOVPRIOiF1_W41": {
+        "topic": "GOVPRIO",
+        "macro_area": "Politics",
+        "wave": "41"
+    },
+    "GOVPRIOjF1_W41": {
+        "topic": "GOVPRIO",
+        "macro_area": "Politics",
+        "wave": "41"
+    },
+    "GOVPRIOkF2_W41": {
+        "topic": "GOVPRIO",
+        "macro_area": "Politics",
+        "wave": "41"
+    },
+    "GOVPRIOlF2_W41": {
+        "topic": "GOVPRIO",
+        "macro_area": "Politics",
+        "wave": "41"
+    },
+    "GOVPRIOmF2_W41": {
+        "topic": "GOVPRIO",
+        "macro_area": "Politics",
+        "wave": "41"
+    },
+    "GOVPRIOnF2_W41": {
+        "topic": "GOVPRIO",
+        "macro_area": "Politics",
+        "wave": "41"
+    },
+    "GOVPRIOoF2_W41": {
+        "topic": "GOVPRIO",
+        "macro_area": "Politics",
+        "wave": "41"
+    },
+    "WRKTRN1F1_W41": {
+        "topic": "WRKTRN",
+        "macro_area": "Other",
+        "wave": "41"
+    },
+    "WRKTRN1F2_W41": {
+        "topic": "WRKTRN",
+        "macro_area": "Other",
+        "wave": "41"
+    },
+    "JOBSECURITY_W41": {
+        "topic": "JOBSECURITY",
+        "macro_area": "Economy",
+        "wave": "41"
+    },
+    "JOBBENEFITS_W41": {
+        "topic": "JOBBENEFITS",
+        "macro_area": "Health",
+        "wave": "41"
+    },
+    "AUTOWKPLC_W41": {
+        "topic": "AUTOWKPLC",
+        "macro_area": "Economy",
+        "wave": "41"
+    },
+    "ROBWRK_W41": {
+        "topic": "ROBWRK",
+        "macro_area": "Technology",
+        "wave": "41"
+    },
+    "ROBWRK2_W41": {
+        "topic": "ROBWRK",
+        "macro_area": "Technology",
+        "wave": "41"
+    },
+    "AUTOLKLY_W41": {
+        "topic": "AUTOLKLY",
+        "macro_area": "Technology",
+        "wave": "41"
+    },
+    "ROBIMPACTa_W41": {
+        "topic": "ROBIMPACT",
+        "macro_area": "Economy",
+        "wave": "41"
+    },
+    "ROBIMPACTb_W41": {
+        "topic": "ROBIMPACT",
+        "macro_area": "Economy",
+        "wave": "41"
+    },
+    "LEGALIMG_W41": {
+        "topic": "LEGALIMG",
+        "macro_area": "Economy",
+        "wave": "41"
+    },
+    "FUTRCLASSa_W41": {
+        "topic": "FUTRCLASS",
+        "macro_area": "Economy",
+        "wave": "41"
+    },
+    "FUTRCLASSb_W41": {
+        "topic": "FUTRCLASS",
+        "macro_area": "Economy",
+        "wave": "41"
+    },
+    "FUTRCLASSc_W41": {
+        "topic": "FUTRCLASS",
+        "macro_area": "Economy",
+        "wave": "41"
+    },
+    "HARASS1F1a_W41": {
+        "topic": "HARASS",
+        "macro_area": "Gender",
+        "wave": "41"
+    },
+    "HARASS1F1b_W41": {
+        "topic": "HARASS",
+        "macro_area": "Gender",
+        "wave": "41"
+    },
+    "HARASS1F1c_W41": {
+        "topic": "HARASS",
+        "macro_area": "Gender",
+        "wave": "41"
+    },
+    "HARASS1F1d_W41": {
+        "topic": "HARASS",
+        "macro_area": "Gender",
+        "wave": "41"
+    },
+    "HARASS1NOWRKF2a_W41": {
+        "topic": "HARASS",
+        "macro_area": "Gender",
+        "wave": "41"
+    },
+    "HARASS1NOWRKF2c_W41": {
+        "topic": "HARASS",
+        "macro_area": "Gender",
+        "wave": "41"
+    },
+    "HARASS1NOWRKF2d_W41": {
+        "topic": "HARASS",
+        "macro_area": "Gender",
+        "wave": "41"
+    },
+    "HARASS3F1_W41": {
+        "topic": "HARASS",
+        "macro_area": "Gender",
+        "wave": "41"
+    },
+    "HARASS3NOWRKF2_W41": {
+        "topic": "HARASS",
+        "macro_area": "Gender",
+        "wave": "41"
+    },
+    "HARASS4_W41": {
+        "topic": "HARASS",
+        "macro_area": "Gender",
+        "wave": "41"
+    },
+    "HARASS5_W41": {
+        "topic": "HARASS",
+        "macro_area": "Gender",
+        "wave": "41"
+    },
+    "ETHNCMAJMOD_W41": {
+        "topic": "ETHNCMAJMOD",
+        "macro_area": "Race/Ethnicity",
+        "wave": "41"
+    },
+    "AGEMAJ_W41": {
+        "topic": "AGEMAJ",
+        "macro_area": "Other",
+        "wave": "41"
+    },
+    "INTRMAR_W41": {
+        "topic": "INTRMAR",
+        "macro_area": "Race/Ethnicity",
+        "wave": "41"
+    },
+    "SSMONEY_W41": {
+        "topic": "SSMONEY",
+        "macro_area": "Personal Security",
+        "wave": "41"
+    },
+    "SSCUT_W41": {
+        "topic": "SSCUT",
+        "macro_area": "Personal Security",
+        "wave": "41"
+    },
+    "FUTR_ABR_W41": {
+        "topic": "FUTR_ABR",
+        "macro_area": "Health",
+        "wave": "41"
+    },
+    "FUTR_DIV_W41": {
+        "topic": "FUTR_DIV",
+        "macro_area": "Other",
+        "wave": "41"
+    },
+    "FUTR_M_W41": {
+        "topic": "FUTR_",
+        "macro_area": "Other",
+        "wave": "41"
+    },
+    "FUTR_K_W41": {
+        "topic": "FUTR_",
+        "macro_area": "Other",
+        "wave": "41"
+    },
+    "SOLVPROBa_W41": {
+        "topic": "SOLVPROB",
+        "macro_area": "Technology",
+        "wave": "41"
+    },
+    "SOLVPROBb_W41": {
+        "topic": "SOLVPROB",
+        "macro_area": "Other",
+        "wave": "41"
+    },
+    "SOLVPROBc_W41": {
+        "topic": "SOLVPROB",
+        "macro_area": "Other",
+        "wave": "41"
+    },
+    "SOLVPROBdF1_W41": {
+        "topic": "SOLVPROB",
+        "macro_area": "Politics",
+        "wave": "41"
+    },
+    "SOLVPROBeF2_W41": {
+        "topic": "SOLVPROB",
+        "macro_area": "Politics",
+        "wave": "41"
+    },
+    "SOLVPROBf_W41": {
+        "topic": "SOLVPROB",
+        "macro_area": "Other",
+        "wave": "41"
+    },
+    "SOLVPROBg_W41": {
+        "topic": "SOLVPROB",
+        "macro_area": "Foreign Policy",
+        "wave": "41"
+    },
+    "SOLVPROBh_W41": {
+        "topic": "SOLVPROB",
+        "macro_area": "Education",
+        "wave": "41"
+    },
+    "SOLVPROBi_W41": {
+        "topic": "SOLVPROB",
+        "macro_area": "Education",
+        "wave": "41"
+    },
+    "PAST_W42": {
+        "topic": "PAST",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "FUTURE_W42": {
+        "topic": "FUTURE",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "SC1_W42": {
+        "topic": "SC",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "CONFa_W42": {
+        "topic": "CONF",
+        "macro_area": "Institutional Confidence",
+        "wave": "42"
+    },
+    "CONFb_W42": {
+        "topic": "CONF",
+        "macro_area": "Institutional Confidence",
+        "wave": "42"
+    },
+    "CONFc_W42": {
+        "topic": "CONF",
+        "macro_area": "Institutional Confidence",
+        "wave": "42"
+    },
+    "CONFd_F1_W42": {
+        "topic": "CONF",
+        "macro_area": "Institutional Confidence",
+        "wave": "42"
+    },
+    "CONFd_F2_W42": {
+        "topic": "CONF",
+        "macro_area": "Institutional Confidence",
+        "wave": "42"
+    },
+    "CONFe_W42": {
+        "topic": "CONF",
+        "macro_area": "Institutional Confidence",
+        "wave": "42"
+    },
+    "CONFf_W42": {
+        "topic": "CONF",
+        "macro_area": "Institutional Confidence",
+        "wave": "42"
+    },
+    "CONFg_W42": {
+        "topic": "CONF",
+        "macro_area": "Institutional Confidence",
+        "wave": "42"
+    },
+    "POLICY1_W42": {
+        "topic": "POLICY",
+        "macro_area": "Politics",
+        "wave": "42"
+    },
+    "POLICY2_W42": {
+        "topic": "POLICY",
+        "macro_area": "Politics",
+        "wave": "42"
+    },
+    "POLICY3_W42": {
+        "topic": "POLICY",
+        "macro_area": "Politics",
+        "wave": "42"
+    },
+    "RQ1_F1A_W42": {
+        "topic": "RQ",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "RQ2_F1A_W42": {
+        "topic": "RQ",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "RQ3_F1Aa_W42": {
+        "topic": "RQ",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "RQ3_F1Ab_W42": {
+        "topic": "RQ",
+        "macro_area": "Education",
+        "wave": "42"
+    },
+    "RQ3_F1Ac_W42": {
+        "topic": "RQ",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "RQ3_F1Ad_W42": {
+        "topic": "RQ",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "RQ4_F1Aa_W42": {
+        "topic": "RQ",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "RQ4_F1Ab_W42": {
+        "topic": "RQ",
+        "macro_area": "Technology",
+        "wave": "42"
+    },
+    "RQ4_F1Ac_W42": {
+        "topic": "RQ",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "RQ4_F1Ad_W42": {
+        "topic": "RQ",
+        "macro_area": "Economy",
+        "wave": "42"
+    },
+    "RQ4_F1Ae_W42": {
+        "topic": "RQ",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "RQ5_F1A_W42": {
+        "topic": "RQ",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "RQ6_F1A_W42": {
+        "topic": "RQ",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "RQ7_F1A_W42": {
+        "topic": "RQ",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "RQ8_F1A_W42": {
+        "topic": "RQ",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "RQ1_F1B_W42": {
+        "topic": "RQ",
+        "macro_area": "Environment",
+        "wave": "42"
+    },
+    "RQ2_F1B_W42": {
+        "topic": "RQ",
+        "macro_area": "Environment",
+        "wave": "42"
+    },
+    "RQ3_F1Ba_W42": {
+        "topic": "RQ",
+        "macro_area": "Environment",
+        "wave": "42"
+    },
+    "RQ3_F1Bb_W42": {
+        "topic": "RQ",
+        "macro_area": "Education",
+        "wave": "42"
+    },
+    "RQ3_F1Bc_W42": {
+        "topic": "RQ",
+        "macro_area": "Environment",
+        "wave": "42"
+    },
+    "RQ3_F1Bd_W42": {
+        "topic": "RQ",
+        "macro_area": "Environment",
+        "wave": "42"
+    },
+    "RQ4_F1Ba_W42": {
+        "topic": "RQ",
+        "macro_area": "Environment",
+        "wave": "42"
+    },
+    "RQ4_F1Bb_W42": {
+        "topic": "RQ",
+        "macro_area": "Technology",
+        "wave": "42"
+    },
+    "RQ4_F1Bc_W42": {
+        "topic": "RQ",
+        "macro_area": "Environment",
+        "wave": "42"
+    },
+    "RQ4_F1Bd_W42": {
+        "topic": "RQ",
+        "macro_area": "Economy",
+        "wave": "42"
+    },
+    "RQ4_F1Be_W42": {
+        "topic": "RQ",
+        "macro_area": "Environment",
+        "wave": "42"
+    },
+    "RQ5_F1B_W42": {
+        "topic": "RQ",
+        "macro_area": "Environment",
+        "wave": "42"
+    },
+    "RQ6_F1B_W42": {
+        "topic": "RQ",
+        "macro_area": "Environment",
+        "wave": "42"
+    },
+    "RQ7_F1B_W42": {
+        "topic": "RQ",
+        "macro_area": "Environment",
+        "wave": "42"
+    },
+    "RQ8_F1B_W42": {
+        "topic": "RQ",
+        "macro_area": "Environment",
+        "wave": "42"
+    },
+    "RQ1_F1C_W42": {
+        "topic": "RQ",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "RQ2_F1C_W42": {
+        "topic": "RQ",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "RQ3_F1Ca_W42": {
+        "topic": "RQ",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "RQ3_F1Cb_W42": {
+        "topic": "RQ",
+        "macro_area": "Education",
+        "wave": "42"
+    },
+    "RQ3_F1Cc_W42": {
+        "topic": "RQ",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "RQ3_F1Cd_W42": {
+        "topic": "RQ",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "RQ4_F1Ca_W42": {
+        "topic": "RQ",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "RQ4_F1Cb_W42": {
+        "topic": "RQ",
+        "macro_area": "Technology",
+        "wave": "42"
+    },
+    "RQ4_F1Cc_W42": {
+        "topic": "RQ",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "RQ4_F1Cd_W42": {
+        "topic": "RQ",
+        "macro_area": "Economy",
+        "wave": "42"
+    },
+    "RQ4_F1Ce_W42": {
+        "topic": "RQ",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "RQ5_F1C_W42": {
+        "topic": "RQ",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "RQ6_F1C_W42": {
+        "topic": "RQ",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "RQ7_F1C_W42": {
+        "topic": "RQ",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "RQ8_F1C_W42": {
+        "topic": "RQ",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "PQ1_F2A_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ2_F2A_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ3_F2Aa_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ3_F2Ab_W42": {
+        "topic": "P",
+        "macro_area": "Education",
+        "wave": "42"
+    },
+    "PQ3_F2Ac_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ3_F2Ad_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ4_F2Aa_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ4_F2Ab_W42": {
+        "topic": "P",
+        "macro_area": "Technology",
+        "wave": "42"
+    },
+    "PQ4_F2Ac_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ4_F2Ad_W42": {
+        "topic": "P",
+        "macro_area": "Economy",
+        "wave": "42"
+    },
+    "PQ4_F2Ae_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ5_F2A_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ6_F2A_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ7_F2A_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ8_F2A_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ1_F2B_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ2_F2B_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ3_F2Ba_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ3_F2Bb_W42": {
+        "topic": "P",
+        "macro_area": "Education",
+        "wave": "42"
+    },
+    "PQ3_F2Bc_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ3_F2Bd_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ4_F2Ba_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ4_F2Bb_W42": {
+        "topic": "P",
+        "macro_area": "Technology",
+        "wave": "42"
+    },
+    "PQ4_F2Bc_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ4_F2Bd_W42": {
+        "topic": "P",
+        "macro_area": "Economy",
+        "wave": "42"
+    },
+    "PQ4_F2Be_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ5_F2B_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ6_F2B_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ7_F2B_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ8_F2B_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ1_F2C_W42": {
+        "topic": "P",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "PQ2_F2C_W42": {
+        "topic": "P",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "PQ3_F2Ca_W42": {
+        "topic": "P",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "PQ3_F2Cb_W42": {
+        "topic": "P",
+        "macro_area": "Education",
+        "wave": "42"
+    },
+    "PQ3_F2Cc_W42": {
+        "topic": "P",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "PQ3_F2Cd_W42": {
+        "topic": "P",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "PQ4_F2Ca_W42": {
+        "topic": "P",
+        "macro_area": "Health",
+        "wave": "42"
+    },
+    "PQ4_F2Cb_W42": {
+        "topic": "P",
+        "macro_area": "Technology",
+        "wave": "42"
+    },
+    "PQ4_F2Cc_W42": {
+        "topic": "P",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "PQ4_F2Cd_W42": {
+        "topic": "P",
+        "macro_area": "Economy",
+        "wave": "42"
+    },
+    "PQ4_F2Ce_W42": {
+        "topic": "P",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "PQ5_F2C_W42": {
+        "topic": "P",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "PQ6_F2C_W42": {
+        "topic": "P",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "PQ7_F2C_W42": {
+        "topic": "P",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "PQ8_F2C_W42": {
+        "topic": "P",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "SCM4a_W42": {
+        "topic": "SC",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "SCM4b_W42": {
+        "topic": "SC",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "Q6F1_W42": {
+        "topic": "Q",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "Q7F1_W42": {
+        "topic": "Q",
+        "macro_area": "Technology",
+        "wave": "42"
+    },
+    "Q8F1_W42": {
+        "topic": "Q",
+        "macro_area": "Politics",
+        "wave": "42"
+    },
+    "Q9F1_W42": {
+        "topic": "Q",
+        "macro_area": "Economy",
+        "wave": "42"
+    },
+    "Q6F2_W42": {
+        "topic": "Q",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "Q7F2_W42": {
+        "topic": "Q",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "Q8F2_W42": {
+        "topic": "Q",
+        "macro_area": "Politics",
+        "wave": "42"
+    },
+    "Q9F2_W42": {
+        "topic": "Q",
+        "macro_area": "Economy",
+        "wave": "42"
+    },
+    "SCM5a_W42": {
+        "topic": "SC",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "SCM5b_W42": {
+        "topic": "SC",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "SCM5c_W42": {
+        "topic": "SC",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "SCM5d_W42": {
+        "topic": "SC",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "SCM5e_W42": {
+        "topic": "SC",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "SCM5f_W42": {
+        "topic": "SC",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "SCM5g_W42": {
+        "topic": "SC",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "SCM5h_W42": {
+        "topic": "SC",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "SCM5i_W42": {
+        "topic": "SC",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "SCM5j_W42": {
+        "topic": "SC",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "SCM2_W42": {
+        "topic": "SC",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "SCM3_W42": {
+        "topic": "SC",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "POP1_W42": {
+        "topic": "PO",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "POP2_W42": {
+        "topic": "PO",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "POP3_W42": {
+        "topic": "PO",
+        "macro_area": "Other",
+        "wave": "42"
+    },
+    "RACESURV1a_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Health",
+        "wave": "43"
+    },
+    "RACESURV1b_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV1c_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Family",
+        "wave": "43"
+    },
+    "RACESURV1d_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Personal Finance",
+        "wave": "43"
+    },
+    "ADMISSIONa_W43": {
+        "topic": "ADMISSION",
+        "macro_area": "Education",
+        "wave": "43"
+    },
+    "ADMISSIONb_W43": {
+        "topic": "ADMISSION",
+        "macro_area": "Education",
+        "wave": "43"
+    },
+    "ADMISSIONc_W43": {
+        "topic": "ADMISSION",
+        "macro_area": "Education",
+        "wave": "43"
+    },
+    "ADMISSIONd_W43": {
+        "topic": "ADMISSION",
+        "macro_area": "Education",
+        "wave": "43"
+    },
+    "ADMISSIONe_W43": {
+        "topic": "ADMISSION",
+        "macro_area": "Education",
+        "wave": "43"
+    },
+    "ADMISSIONf_W43": {
+        "topic": "ADMISSION",
+        "macro_area": "Education",
+        "wave": "43"
+    },
+    "ADMISSIONg_W43": {
+        "topic": "ADMISSION",
+        "macro_area": "Education",
+        "wave": "43"
+    },
+    "ADMISSIONh_W43": {
+        "topic": "ADMISSION",
+        "macro_area": "Education",
+        "wave": "43"
+    },
+    "RACESURV2_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV3_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV4_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV5a_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV5b_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV5c_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV5d_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV5e_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV5f_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV5g_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV5h_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV5i_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV5j_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV5k_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV5l_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV6_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV7_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Family",
+        "wave": "43"
+    },
+    "RACESURV8_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Family",
+        "wave": "43"
+    },
+    "RACESURV9_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Family",
+        "wave": "43"
+    },
+    "RACESURV10_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV11_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV12_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV13_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACATTN_W43": {
+        "topic": "RACATTN",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV14_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Politics",
+        "wave": "43"
+    },
+    "RACESURV15a_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Politics",
+        "wave": "43"
+    },
+    "RACESURV15b_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Politics",
+        "wave": "43"
+    },
+    "RACESURV16_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV17_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV18a_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV18b_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV18c_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV18d_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV18e_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV18f_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV19a_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV19b_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV19c_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Education",
+        "wave": "43"
+    },
+    "RACESURV19d_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV19e_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Economy",
+        "wave": "43"
+    },
+    "RACESURV19f_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Family",
+        "wave": "43"
+    },
+    "RACESURV20_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV21_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Family",
+        "wave": "43"
+    },
+    "RACESURV22_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Family",
+        "wave": "43"
+    },
+    "RACESURV24_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV25_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV26_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV27_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "IDIMPORT_W43": {
+        "topic": "IDIMPORT",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV28a_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV28b_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV28c_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV28d_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV28e_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV28f_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Politics",
+        "wave": "43"
+    },
+    "RACESURV28g_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Health",
+        "wave": "43"
+    },
+    "RACESURV29a_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV29b_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV29c_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV29d_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV34a_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV34b_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV34c_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Personal Finance",
+        "wave": "43"
+    },
+    "RACESURV34d_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV34e_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV36_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Family",
+        "wave": "43"
+    },
+    "RACESURV37_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Family",
+        "wave": "43"
+    },
+    "RACESURV38_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV40_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV41_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Family",
+        "wave": "43"
+    },
+    "RACESURV44_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV45_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Family",
+        "wave": "43"
+    },
+    "RACESURV47a_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV47b_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV47c_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV47d_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV47e_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV47f_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV48_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV49_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV50_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Education",
+        "wave": "43"
+    },
+    "RACESURV51_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV52_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV53a_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV53b_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV53c_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV53d_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV53e_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV53f_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "RACESURV53g_W43": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "43"
+    },
+    "NEWS_PLATFORMg_W45": {
+        "topic": "NEWS_PLATFORM",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "NEWS_PLATFORMh_W45": {
+        "topic": "NEWS_PLATFORM",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "NEWSPREFV2_W45": {
+        "topic": "NEWSPREFV",
+        "macro_area": "Other",
+        "wave": "45"
+    },
+    "SOURCESKEPa_W45": {
+        "topic": "SOURCESKEP",
+        "macro_area": "Institutional Confidence",
+        "wave": "45"
+    },
+    "SOURCESKEPb_W45": {
+        "topic": "SOURCESKEP",
+        "macro_area": "Institutional Confidence",
+        "wave": "45"
+    },
+    "SOURCESKEPc_W45": {
+        "topic": "SOURCESKEP",
+        "macro_area": "Institutional Confidence",
+        "wave": "45"
+    },
+    "SOURCESKEPd_W45": {
+        "topic": "SOURCESKEP",
+        "macro_area": "Institutional Confidence",
+        "wave": "45"
+    },
+    "SOURCESKEPe_W45": {
+        "topic": "SOURCESKEP",
+        "macro_area": "Institutional Confidence",
+        "wave": "45"
+    },
+    "INFOCONFUSEa_W45": {
+        "topic": "INFOCONFUSE",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOCONFUSEb_W45": {
+        "topic": "INFOCONFUSE",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOCONFUSEc_W45": {
+        "topic": "INFOCONFUSE",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOCONFUSEd_W45": {
+        "topic": "INFOCONFUSE",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOCONFUSEe_W45": {
+        "topic": "INFOCONFUSE",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOKNOWa_W45": {
+        "topic": "INFOKNOW",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOKNOWb_W45": {
+        "topic": "INFOKNOW",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOKNOWc_W45": {
+        "topic": "INFOKNOW",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOKNOWd_W45": {
+        "topic": "INFOKNOW",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOKNOWe_W45": {
+        "topic": "INFOKNOW",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOOWNa_W45": {
+        "topic": "INFOOWN",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOOWNb_W45": {
+        "topic": "INFOOWN",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOOWNc_W45": {
+        "topic": "INFOOWN",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOOWNd_W45": {
+        "topic": "INFOOWN",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOOWNe_W45": {
+        "topic": "INFOOWN",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "MEDIALOYAL3_W45": {
+        "topic": "MEDIALOYAL",
+        "macro_area": "Other",
+        "wave": "45"
+    },
+    "LEAD_W45": {
+        "topic": "LEAD",
+        "macro_area": "Family",
+        "wave": "45"
+    },
+    "SEEK_W45": {
+        "topic": "SEEK",
+        "macro_area": "Other",
+        "wave": "45"
+    },
+    "INFORESTRICTa_W45": {
+        "topic": "INFORESTRICT",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFORESTRICTb_W45": {
+        "topic": "INFORESTRICT",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFORESTRICTc_W45": {
+        "topic": "INFORESTRICT",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFORESTRICTd_W45": {
+        "topic": "INFORESTRICT",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFORESTRICTe_W45": {
+        "topic": "INFORESTRICT",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOWHYa_W45": {
+        "topic": "INFOWHY",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOWHYb_W45": {
+        "topic": "INFOWHY",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOWHYc_W45": {
+        "topic": "INFOWHY",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOWHYd_W45": {
+        "topic": "INFOWHY",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOCREATEa_W45": {
+        "topic": "INFOCREATE",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOCREATEb_W45": {
+        "topic": "INFOCREATE",
+        "macro_area": "Politics",
+        "wave": "45"
+    },
+    "INFOCREATEc_W45": {
+        "topic": "INFOCREATE",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOCREATEd_W45": {
+        "topic": "INFOCREATE",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOCREATEe_W45": {
+        "topic": "INFOCREATE",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "MADEUPOFT_W45": {
+        "topic": "MADEUPOFT",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "MADEUPSHARE1_W45": {
+        "topic": "MADEUPSHARE",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "MADEUPSHARE2_W45": {
+        "topic": "MADEUPSHARE",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "MADEUPSHAREWHY_W45": {
+        "topic": "MADEUPSHAREWHY",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "MADEUPTOPICa_W45": {
+        "topic": "MADEUPTOPIC",
+        "macro_area": "Politics",
+        "wave": "45"
+    },
+    "MADEUPTOPICb_W45": {
+        "topic": "MADEUPTOPIC",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "MADEUPTOPICc_W45": {
+        "topic": "MADEUPTOPIC",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "MADEUPTOPICd_W45": {
+        "topic": "MADEUPTOPIC",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "MADEUPTOPICe_W45": {
+        "topic": "MADEUPTOPIC",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "MADEUPTOPICf_W45": {
+        "topic": "MADEUPTOPIC",
+        "macro_area": "Economy",
+        "wave": "45"
+    },
+    "MADEUPLEVELa_W45": {
+        "topic": "MADEUPLEVEL",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "MADEUPLEVELb_W45": {
+        "topic": "MADEUPLEVEL",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "MADEUPRESa_W45": {
+        "topic": "MADEUPRES",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "MADEUPRESb_W45": {
+        "topic": "MADEUPRES",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "MADEUPRESc_W45": {
+        "topic": "MADEUPRES",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "MADEUPRESd_W45": {
+        "topic": "MADEUPRES",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "MADEUPRESe_W45": {
+        "topic": "MADEUPRES",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "MADEUPIMPa_W45": {
+        "topic": "MADEUPIMP",
+        "macro_area": "Institutional Confidence",
+        "wave": "45"
+    },
+    "MADEUPIMPb_W45": {
+        "topic": "MADEUPIMP",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "MADEUPIMPc_W45": {
+        "topic": "MADEUPIMP",
+        "macro_area": "Politics",
+        "wave": "45"
+    },
+    "MADEUPIMPd_W45": {
+        "topic": "MADEUPIMP",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "MADEUPIMPe_W45": {
+        "topic": "MADEUPIMP",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "MADEUPDIS_W45": {
+        "topic": "MADEUPDIS",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "DISAVOID_W45": {
+        "topic": "DISAVOID",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "SMSHARER_W45": {
+        "topic": "SMSHARER",
+        "macro_area": "Other",
+        "wave": "45"
+    },
+    "SMLIKESa_W45": {
+        "topic": "SMLIKES",
+        "macro_area": "Other",
+        "wave": "45"
+    },
+    "SMLIKESb_W45": {
+        "topic": "SMLIKES",
+        "macro_area": "Other",
+        "wave": "45"
+    },
+    "SMLIKESc_W45": {
+        "topic": "SMLIKES",
+        "macro_area": "Other",
+        "wave": "45"
+    },
+    "SMLIKESd_W45": {
+        "topic": "SMLIKES",
+        "macro_area": "Other",
+        "wave": "45"
+    },
+    "SMLIKESe_W45": {
+        "topic": "SMLIKES",
+        "macro_area": "Other",
+        "wave": "45"
+    },
+    "SMLIKESf_W45": {
+        "topic": "SMLIKES",
+        "macro_area": "Other",
+        "wave": "45"
+    },
+    "SMSHARE_W45": {
+        "topic": "SMSHARE",
+        "macro_area": "Other",
+        "wave": "45"
+    },
+    "MADEUPSMCLICK_W45": {
+        "topic": "MADEUPSMCLICK",
+        "macro_area": "Other",
+        "wave": "45"
+    },
+    "MADEUPSMFOL1_W45": {
+        "topic": "MADEUPSMFOL",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "MADEUPSMFOL2_W45": {
+        "topic": "MADEUPSMFOL",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "ONLINESOURCE_W45": {
+        "topic": "ONLINESOURCE",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "DIGWDOG_3_W45": {
+        "topic": "DIGWDOG",
+        "macro_area": "Politics",
+        "wave": "45"
+    },
+    "NEWSPROBa_W45": {
+        "topic": "NEWSPROB",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "NEWSPROBb_W45": {
+        "topic": "NEWSPROB",
+        "macro_area": "Other",
+        "wave": "45"
+    },
+    "NEWSPROBc_W45": {
+        "topic": "NEWSPROB",
+        "macro_area": "Other",
+        "wave": "45"
+    },
+    "NEWSPROBd_W45": {
+        "topic": "NEWSPROB",
+        "macro_area": "Other",
+        "wave": "45"
+    },
+    "NEWSPROBe_W45": {
+        "topic": "NEWSPROB",
+        "macro_area": "Other",
+        "wave": "45"
+    },
+    "VIDOFT_W45": {
+        "topic": "VIDOFT",
+        "macro_area": "Other",
+        "wave": "45"
+    },
+    "MADEUPSOLVE_W45": {
+        "topic": "MADEUPSOLVE",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOCHALa_W45": {
+        "topic": "INFOCHAL",
+        "macro_area": "Politics",
+        "wave": "45"
+    },
+    "INFOCHALb_W45": {
+        "topic": "INFOCHAL",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOCHALc_W45": {
+        "topic": "INFOCHAL",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOCHALd_W45": {
+        "topic": "INFOCHAL",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "INFOCHALe_W45": {
+        "topic": "INFOCHAL",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "RESTRICTWHO_W45": {
+        "topic": "RESTRICTWHO",
+        "macro_area": "Technology",
+        "wave": "45"
+    },
+    "ACCCHECK_W45": {
+        "topic": "ACCCHECK",
+        "macro_area": "Other",
+        "wave": "45"
+    },
+    "FCFAIR_W45": {
+        "topic": "FCFAIR",
+        "macro_area": "Other",
+        "wave": "45"
+    },
+    "WATCHDOG_1_W45": {
+        "topic": "WATCHDOG",
+        "macro_area": "Politics",
+        "wave": "45"
+    },
+    "WATCHDOG_3_W45": {
+        "topic": "WATCHDOG",
+        "macro_area": "Politics",
+        "wave": "45"
+    },
+    "SNSUSE_W45": {
+        "topic": "SNSUSE",
+        "macro_area": "Other",
+        "wave": "45"
+    },
+    "SOCMEDIAUSEa_W49": {
+        "topic": "SOCMEDIAUSE",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "SOCMEDIAUSEb_W49": {
+        "topic": "SOCMEDIAUSE",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "SOCMEDIAUSEc_W49": {
+        "topic": "SOCMEDIAUSE",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "SOCMEDIAUSEd_W49": {
+        "topic": "SOCMEDIAUSE",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "ELECTFTGSNSINT_W49": {
+        "topic": "ELECTFTGSNSINT",
+        "macro_area": "Politics",
+        "wave": "49"
+    },
+    "TALKDISASNSINT_W49": {
+        "topic": "TALKDISASNSINT",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "TALKCMNSNSINT_W49": {
+        "topic": "TALKCMNSNSINT",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "SECUR1_W49": {
+        "topic": "SECUR",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "PRIVACYNEWS1_W49": {
+        "topic": "PRIVACYNEWS",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "HOMEASSIST1_W49": {
+        "topic": "HOMEASSIST",
+        "macro_area": "Housing",
+        "wave": "49"
+    },
+    "HOMEASSIST2_W49": {
+        "topic": "HOMEASSIST",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "HOMEASSIST3_W49": {
+        "topic": "HOMEASSIST",
+        "macro_area": "Housing",
+        "wave": "49"
+    },
+    "HOMEASSIST4_W49": {
+        "topic": "HOMEASSIST",
+        "macro_area": "Housing",
+        "wave": "49"
+    },
+    "HOMEASSIST5a_W49": {
+        "topic": "HOMEASSIST",
+        "macro_area": "Housing",
+        "wave": "49"
+    },
+    "HOMEASSIST5b_W49": {
+        "topic": "HOMEASSIST",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "HOMEIOT_W49": {
+        "topic": "HOMEIOT",
+        "macro_area": "Housing",
+        "wave": "49"
+    },
+    "FITTRACK_W49": {
+        "topic": "FITTRACK",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "LOYALTY_W49": {
+        "topic": "LOYALTY",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "DNATEST_W49": {
+        "topic": "DNATEST",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "TRACKCO1a_W49": {
+        "topic": "TRACKCO",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "TRACKCO1b_W49": {
+        "topic": "TRACKCO",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "CONCERNCO_W49": {
+        "topic": "CONCERNCO",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "BENEFITCO_W49": {
+        "topic": "BENEFITCO",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "CONTROLCO_W49": {
+        "topic": "CONTROLCO",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "UNDERSTANDCO_W49": {
+        "topic": "UNDERSTANDCO",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "POSNEGCO_W49": {
+        "topic": "POSNEGCO",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "ANONYMOUS1CO_W49": {
+        "topic": "ANONYMOUS",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "TRACKGOV1a_W49": {
+        "topic": "TRACKGOV",
+        "macro_area": "Politics",
+        "wave": "49"
+    },
+    "TRACKGOV1b_W49": {
+        "topic": "TRACKGOV",
+        "macro_area": "Politics",
+        "wave": "49"
+    },
+    "CONCERNGOV_W49": {
+        "topic": "CONCERNGOV",
+        "macro_area": "Politics",
+        "wave": "49"
+    },
+    "BENEFITGOV_W49": {
+        "topic": "BENEFITGOV",
+        "macro_area": "Politics",
+        "wave": "49"
+    },
+    "CONTROLGOV_W49": {
+        "topic": "CONTROLGOV",
+        "macro_area": "Politics",
+        "wave": "49"
+    },
+    "UNDERSTANDGOV_W49": {
+        "topic": "UNDERSTANDGOV",
+        "macro_area": "Politics",
+        "wave": "49"
+    },
+    "POSNEGGOV_W49": {
+        "topic": "POSNEGGOV",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "ANONYMOUS1GOV_W49": {
+        "topic": "ANONYMOUS",
+        "macro_area": "Politics",
+        "wave": "49"
+    },
+    "CONCERNGRPa_W49": {
+        "topic": "CONCERNGRP",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "CONCERNGRPb_W49": {
+        "topic": "CONCERNGRP",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "CONCERNGRPc_W49": {
+        "topic": "CONCERNGRP",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "CONCERNGRPd_W49": {
+        "topic": "CONCERNGRP",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "CONCERNGRPe_W49": {
+        "topic": "CONCERNGRP",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "CONCERNGRPf_W49": {
+        "topic": "CONCERNGRP",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "CONTROLGRPa_W49": {
+        "topic": "CONTROLGRP",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "CONTROLGRPb_W49": {
+        "topic": "CONTROLGRP",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "CONTROLGRPc_W49": {
+        "topic": "CONTROLGRP",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "CONTROLGRPd_W49": {
+        "topic": "CONTROLGRP",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "CONTROLGRPe_W49": {
+        "topic": "CONTROLGRP",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "CONTROLGRPf_W49": {
+        "topic": "CONTROLGRP",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "PP1_W49": {
+        "topic": "P",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "PP2_W49": {
+        "topic": "P",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "PP3_W49": {
+        "topic": "P",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "PP4_W49": {
+        "topic": "P",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "PP5a_W49": {
+        "topic": "P",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "PP5b_W49": {
+        "topic": "P",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "PP5c_W49": {
+        "topic": "P",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "PP5d_W49": {
+        "topic": "P",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "PP5e_W49": {
+        "topic": "P",
+        "macro_area": "Politics",
+        "wave": "49"
+    },
+    "PP6a_W49": {
+        "topic": "P",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "PP6b_W49": {
+        "topic": "P",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "PP6c_W49": {
+        "topic": "P",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "PRIVACYREG_W49": {
+        "topic": "PRIVACYREG",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "GOVREGV1_W49": {
+        "topic": "GOVREGV",
+        "macro_area": "Politics",
+        "wave": "49"
+    },
+    "GOVREGV2_W49": {
+        "topic": "GOVREGV",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "SHARE1_W49": {
+        "topic": "SHARE",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "PWMAN_W49": {
+        "topic": "PWMAN",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "PWMAN2_W49": {
+        "topic": "PWMAN",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "SMARTPHONE_W49": {
+        "topic": "SMARTPHONE",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "SMARTAPP_W49": {
+        "topic": "SMARTAPP",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "PUBLICDATA_W49": {
+        "topic": "PUBLICDATA",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "RTBFa_W49": {
+        "topic": "RTBF",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "RTBFb_W49": {
+        "topic": "RTBF",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "RTBFc_W49": {
+        "topic": "RTBF",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "RTBFd_W49": {
+        "topic": "RTBF",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "RTDa_W49": {
+        "topic": "RTD",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "RTDb_W49": {
+        "topic": "RTD",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "RTDc_W49": {
+        "topic": "RTD",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "RTDd_W49": {
+        "topic": "RTD",
+        "macro_area": "Personal Finance",
+        "wave": "49"
+    },
+    "PROFILE3_W49": {
+        "topic": "PROFILE",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "PROFILE5_W49": {
+        "topic": "PROFILE",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "DATAUSEa_W49": {
+        "topic": "DATAUSE",
+        "macro_area": "Politics",
+        "wave": "49"
+    },
+    "DATAUSEb_W49": {
+        "topic": "DATAUSE",
+        "macro_area": "Education",
+        "wave": "49"
+    },
+    "DATAUSEc_W49": {
+        "topic": "DATAUSE",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "DATAUSEd_W49": {
+        "topic": "DATAUSE",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "DATAUSEe_W49": {
+        "topic": "DATAUSE",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "DATAUSEf_W49": {
+        "topic": "DATAUSE",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "FACE1_W49": {
+        "topic": "FACE",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "FACE2a_W49": {
+        "topic": "FACE",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "FACE2b_W49": {
+        "topic": "FACE",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "FACE2c_W49": {
+        "topic": "FACE",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "FACE3a_W49": {
+        "topic": "FACE",
+        "macro_area": "Institutional Confidence",
+        "wave": "49"
+    },
+    "FACE3b_W49": {
+        "topic": "FACE",
+        "macro_area": "Institutional Confidence",
+        "wave": "49"
+    },
+    "FACE3c_W49": {
+        "topic": "FACE",
+        "macro_area": "Institutional Confidence",
+        "wave": "49"
+    },
+    "FACE4a_W49": {
+        "topic": "FACE",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "FACE4b_W49": {
+        "topic": "FACE",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "FACE4c_W49": {
+        "topic": "FACE",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "FACE4d_W49": {
+        "topic": "FACE",
+        "macro_area": "Technology",
+        "wave": "49"
+    },
+    "DB1a_W49": {
+        "topic": "DB",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "DB1b_W49": {
+        "topic": "DB",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "DB1c_W49": {
+        "topic": "DB",
+        "macro_area": "Other",
+        "wave": "49"
+    },
+    "SATLIFEa_W50": {
+        "topic": "SATLIFE",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "SATLIFEb_W50": {
+        "topic": "SATLIFE",
+        "macro_area": "Quality of Life",
+        "wave": "50"
+    },
+    "SATLIFEc_W50": {
+        "topic": "SATLIFE",
+        "macro_area": "Personal Finance",
+        "wave": "50"
+    },
+    "SATLIFEd_W50": {
+        "topic": "SATLIFE",
+        "macro_area": "Quality of Life",
+        "wave": "50"
+    },
+    "FAMSURV1_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV2Ma_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV2Mb_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV2Mc_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV2Md_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV2Me_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV2Wa_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV2Wb_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV2Wc_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV2Wd_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV2We_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV3_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV4_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV5a_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Personal Finance",
+        "wave": "50"
+    },
+    "FAMSURV5b_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV5c_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV5d_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV6_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV7_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV8_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV9a_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Personal Finance",
+        "wave": "50"
+    },
+    "FAMSURV9b_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV9c_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV9e_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV10a_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Personal Finance",
+        "wave": "50"
+    },
+    "FAMSURV10b_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV10c_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV10e_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV11W_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV11M_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV12_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "MOTHER_W50": {
+        "topic": "MOTHER",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FATHER_W50": {
+        "topic": "FATHER",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "SIB_W50": {
+        "topic": "SIB",
+        "macro_area": "Other",
+        "wave": "50"
+    },
+    "REMARR_W50": {
+        "topic": "REMARR",
+        "macro_area": "Other",
+        "wave": "50"
+    },
+    "ENG_W50": {
+        "topic": "ENG",
+        "macro_area": "Other",
+        "wave": "50"
+    },
+    "LWPT_W50": {
+        "topic": "LWPT",
+        "macro_area": "Other",
+        "wave": "50"
+    },
+    "MAR2_W50": {
+        "topic": "MA",
+        "macro_area": "Other",
+        "wave": "50"
+    },
+    "FAMSURV16_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV17_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "ADKIDS_W50": {
+        "topic": "ADKIDS",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "PAR1_W50": {
+        "topic": "PAR",
+        "macro_area": "Other",
+        "wave": "50"
+    },
+    "PAR2_W50": {
+        "topic": "PAR",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "ROMRELDUR_W50": {
+        "topic": "ROMRELDUR",
+        "macro_area": "Other",
+        "wave": "50"
+    },
+    "MARRDUR_W50": {
+        "topic": "MARRDUR",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "COHABDUR_W50": {
+        "topic": "COHABDUR",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "LWPSP_W50": {
+        "topic": "LWPSP",
+        "macro_area": "Other",
+        "wave": "50"
+    },
+    "FAMSURV18A_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV18B_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "ROMRELSER_W50": {
+        "topic": "ROMRELSER",
+        "macro_area": "Other",
+        "wave": "50"
+    },
+    "FAMSURV19_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV20_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV21_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV22a_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV22b_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV22c_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV22d_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV22e_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Personal Finance",
+        "wave": "50"
+    },
+    "FAMSURV22f_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV22g_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV23a_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV23b_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV23c_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV23d_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV23e_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Personal Finance",
+        "wave": "50"
+    },
+    "FAMSURV23f_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV23g_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "MARRYPREF1_W50": {
+        "topic": "MARRYPREF",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "MARRYPREF2_W50": {
+        "topic": "MARRYPREF",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV25_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV26a_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV26b_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV26c_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV26d_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV27a_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV27b_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV27c_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV27d_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV28_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV29_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV30a_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Personal Finance",
+        "wave": "50"
+    },
+    "FAMSURV30b_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Personal Finance",
+        "wave": "50"
+    },
+    "FAMSURV30c_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV30d_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV30e_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV30f_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "E5MOD_W50": {
+        "topic": "E",
+        "macro_area": "Other",
+        "wave": "50"
+    },
+    "FAMSURV32a_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV32b_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV32c_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV32d_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV32e_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV33a_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Institutional Confidence",
+        "wave": "50"
+    },
+    "FAMSURV33b_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Institutional Confidence",
+        "wave": "50"
+    },
+    "FAMSURV33c_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Institutional Confidence",
+        "wave": "50"
+    },
+    "FAMSURV33d_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Institutional Confidence",
+        "wave": "50"
+    },
+    "FAMSURV34A_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV34B_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV35a_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV35b_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV35c_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV36a_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV36b_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV36c_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "HAVEKIDS1_W50": {
+        "topic": "HAVEKIDS",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV37_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV38a_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV38b_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV38c_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV39_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV40_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Personal Finance",
+        "wave": "50"
+    },
+    "FAMSURV43_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Family",
+        "wave": "50"
+    },
+    "FAMSURV44_W50": {
+        "topic": "FAMSURV",
+        "macro_area": "Personal Finance",
+        "wave": "50"
+    },
+    "DNATEST_W50": {
+        "topic": "DNATEST",
+        "macro_area": "Technology",
+        "wave": "50"
+    },
+    "DNA2a_W50": {
+        "topic": "DNA",
+        "macro_area": "Technology",
+        "wave": "50"
+    },
+    "DNA2b_W50": {
+        "topic": "DNA",
+        "macro_area": "Technology",
+        "wave": "50"
+    },
+    "DNA2c_W50": {
+        "topic": "DNA",
+        "macro_area": "Technology",
+        "wave": "50"
+    },
+    "DNA3a_W50": {
+        "topic": "DNA",
+        "macro_area": "Technology",
+        "wave": "50"
+    },
+    "DNA3b_W50": {
+        "topic": "DNA",
+        "macro_area": "Technology",
+        "wave": "50"
+    },
+    "DNA3c_W50": {
+        "topic": "DNA",
+        "macro_area": "Technology",
+        "wave": "50"
+    },
+    "DNA4_W50": {
+        "topic": "DNA",
+        "macro_area": "Technology",
+        "wave": "50"
+    },
+    "DNA5_W50": {
+        "topic": "DNA",
+        "macro_area": "Technology",
+        "wave": "50"
+    },
+    "SPOUSESEX_W50": {
+        "topic": "SPOUSESEX",
+        "macro_area": "Other",
+        "wave": "50"
+    },
+    "ORIENTATIONMOD_W50": {
+        "topic": "ORIENTATIONMOD",
+        "macro_area": "Other",
+        "wave": "50"
+    },
+    "FIN_SIT_W54": {
+        "topic": "FIN_SIT",
+        "macro_area": "Personal Finance",
+        "wave": "54"
+    },
+    "FIN_SITFUT_W54": {
+        "topic": "FIN_SITFUT",
+        "macro_area": "Personal Finance",
+        "wave": "54"
+    },
+    "FIN_SITMOST_W54": {
+        "topic": "FIN_SITMOST",
+        "macro_area": "Personal Finance",
+        "wave": "54"
+    },
+    "FIN_SITCOMM_W54": {
+        "topic": "FIN_SITCOMM",
+        "macro_area": "Personal Finance",
+        "wave": "54"
+    },
+    "FIN_SITGROWUP_W54": {
+        "topic": "FIN_SITGROWUP",
+        "macro_area": "Personal Finance",
+        "wave": "54"
+    },
+    "JOBTRAIN_W54": {
+        "topic": "JOBTRAIN",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "GOVPRIORITYa_W54": {
+        "topic": "GOVPRIORITY",
+        "macro_area": "Politics",
+        "wave": "54"
+    },
+    "GOVPRIORITYb_W54": {
+        "topic": "GOVPRIORITY",
+        "macro_area": "Politics",
+        "wave": "54"
+    },
+    "GOVPRIORITYc_W54": {
+        "topic": "GOVPRIORITY",
+        "macro_area": "Politics",
+        "wave": "54"
+    },
+    "GOVPRIORITYd_W54": {
+        "topic": "GOVPRIORITY",
+        "macro_area": "Politics",
+        "wave": "54"
+    },
+    "GOVPRIORITYe_W54": {
+        "topic": "GOVPRIORITY",
+        "macro_area": "Politics",
+        "wave": "54"
+    },
+    "GOVPRIORITYf_W54": {
+        "topic": "GOVPRIORITY",
+        "macro_area": "Guns",
+        "wave": "54"
+    },
+    "GOVRESP_a_W54": {
+        "topic": "GOVRESP",
+        "macro_area": "Politics",
+        "wave": "54"
+    },
+    "GOVRESP_b_W54": {
+        "topic": "GOVRESP",
+        "macro_area": "Politics",
+        "wave": "54"
+    },
+    "GOVRESP_c_W54": {
+        "topic": "GOVRESP",
+        "macro_area": "Education",
+        "wave": "54"
+    },
+    "GOVRESP_d_W54": {
+        "topic": "GOVRESP",
+        "macro_area": "Education",
+        "wave": "54"
+    },
+    "GOVRESP_e_W54": {
+        "topic": "GOVRESP",
+        "macro_area": "Politics",
+        "wave": "54"
+    },
+    "GOVRESP_f_W54": {
+        "topic": "GOVRESP",
+        "macro_area": "Politics",
+        "wave": "54"
+    },
+    "GOVRESP_g_W54": {
+        "topic": "GOVRESP",
+        "macro_area": "Politics",
+        "wave": "54"
+    },
+    "GOVRESP_h_W54": {
+        "topic": "GOVRESP",
+        "macro_area": "Politics",
+        "wave": "54"
+    },
+    "ECON1_W54": {
+        "topic": "ECON",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECON1B_W54": {
+        "topic": "ECON",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECON3_a_W54": {
+        "topic": "ECON",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECON3_b_W54": {
+        "topic": "ECON",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECON3_c_W54": {
+        "topic": "ECON",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECON3_d_W54": {
+        "topic": "ECON",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECON3_e_W54": {
+        "topic": "ECON",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECON3_f_W54": {
+        "topic": "ECON",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECON3_g_W54": {
+        "topic": "ECON",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECON3_h_W54": {
+        "topic": "ECON",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECON3_i_W54": {
+        "topic": "ECON",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECON4_a_W54": {
+        "topic": "ECON",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECON4_b_W54": {
+        "topic": "ECON",
+        "macro_area": "Personal Finance",
+        "wave": "54"
+    },
+    "ECON4_c_W54": {
+        "topic": "ECON",
+        "macro_area": "Personal Finance",
+        "wave": "54"
+    },
+    "ECON4_d_W54": {
+        "topic": "ECON",
+        "macro_area": "Personal Finance",
+        "wave": "54"
+    },
+    "ECON4_e_W54": {
+        "topic": "ECON",
+        "macro_area": "Personal Finance",
+        "wave": "54"
+    },
+    "ECON4_f_W54": {
+        "topic": "ECON",
+        "macro_area": "Personal Finance",
+        "wave": "54"
+    },
+    "ECON4_g_W54": {
+        "topic": "ECON",
+        "macro_area": "Personal Finance",
+        "wave": "54"
+    },
+    "ECON4_h_W54": {
+        "topic": "ECON",
+        "macro_area": "Personal Finance",
+        "wave": "54"
+    },
+    "ECON4_i_W54": {
+        "topic": "ECON",
+        "macro_area": "Personal Finance",
+        "wave": "54"
+    },
+    "INEQ1_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ2_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ3_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ4_a_W54": {
+        "topic": "INEQ",
+        "macro_area": "Politics",
+        "wave": "54"
+    },
+    "INEQ4_b_W54": {
+        "topic": "INEQ",
+        "macro_area": "Politics",
+        "wave": "54"
+    },
+    "INEQ4_c_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ4_d_W54": {
+        "topic": "INEQ",
+        "macro_area": "Religion",
+        "wave": "54"
+    },
+    "INEQ4_e_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ5_a_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ5_b_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ5_c_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ5_d_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ5_e_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ5_f_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ5_g_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ5_h_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ5_i_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ5_j_W54": {
+        "topic": "INEQ",
+        "macro_area": "Education",
+        "wave": "54"
+    },
+    "INEQ5_k_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ5_l_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ5_m_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ6_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ7_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ8_a_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ8_b_W54": {
+        "topic": "INEQ",
+        "macro_area": "Education",
+        "wave": "54"
+    },
+    "INEQ8_c_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ8_d_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ8_e_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ8_f_W54": {
+        "topic": "INEQ",
+        "macro_area": "Education",
+        "wave": "54"
+    },
+    "INEQ8_g_W54": {
+        "topic": "INEQ",
+        "macro_area": "Education",
+        "wave": "54"
+    },
+    "INEQ8_h_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ8_i_W54": {
+        "topic": "INEQ",
+        "macro_area": "Politics",
+        "wave": "54"
+    },
+    "INEQ8_j_W54": {
+        "topic": "INEQ",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "INEQ9_W54": {
+        "topic": "INEQ",
+        "macro_area": "Politics",
+        "wave": "54"
+    },
+    "INEQ10_W54": {
+        "topic": "INEQ",
+        "macro_area": "Politics",
+        "wave": "54"
+    },
+    "INEQ11_W54": {
+        "topic": "INEQ",
+        "macro_area": "Politics",
+        "wave": "54"
+    },
+    "ECON5_a_W54": {
+        "topic": "ECON",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECON5_b_W54": {
+        "topic": "ECON",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECON5_c_W54": {
+        "topic": "ECON",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECON5_d_W54": {
+        "topic": "ECON",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECON5_e_W54": {
+        "topic": "ECON",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECON5_f_W54": {
+        "topic": "ECON",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECON5_g_W54": {
+        "topic": "ECON",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECON5_h_W54": {
+        "topic": "ECON",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECON5_i_W54": {
+        "topic": "ECON",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECON5_j_W54": {
+        "topic": "ECON",
+        "macro_area": "Education",
+        "wave": "54"
+    },
+    "ECON5_k_W54": {
+        "topic": "ECON",
+        "macro_area": "Education",
+        "wave": "54"
+    },
+    "ECIMPa_W54": {
+        "topic": "ECIMP",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECIMPb_W54": {
+        "topic": "ECIMP",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECIMPc_W54": {
+        "topic": "ECIMP",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECIMPd_W54": {
+        "topic": "ECIMP",
+        "macro_area": "Institutional Confidence",
+        "wave": "54"
+    },
+    "ECIMPe_W54": {
+        "topic": "ECIMP",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECIMPf_W54": {
+        "topic": "ECIMP",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECIMPg_W54": {
+        "topic": "ECIMP",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECIMPh_W54": {
+        "topic": "ECIMP",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECIMPi_W54": {
+        "topic": "ECIMP",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "ECIMPj_W54": {
+        "topic": "ECIMP",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "WORRY2a_W54": {
+        "topic": "WORRY",
+        "macro_area": "Personal Finance",
+        "wave": "54"
+    },
+    "WORRY2b_W54": {
+        "topic": "WORRY",
+        "macro_area": "Personal Security",
+        "wave": "54"
+    },
+    "WORRY2c_W54": {
+        "topic": "WORRY",
+        "macro_area": "Personal Security",
+        "wave": "54"
+    },
+    "WORRY2d_W54": {
+        "topic": "WORRY",
+        "macro_area": "Family",
+        "wave": "54"
+    },
+    "WORRY2e_W54": {
+        "topic": "WORRY",
+        "macro_area": "Personal Security",
+        "wave": "54"
+    },
+    "FINANCEa_W54": {
+        "topic": "FINANCE",
+        "macro_area": "Personal Finance",
+        "wave": "54"
+    },
+    "FINANCEb_W54": {
+        "topic": "FINANCE",
+        "macro_area": "Personal Finance",
+        "wave": "54"
+    },
+    "FINANCEc_W54": {
+        "topic": "FINANCE",
+        "macro_area": "Personal Finance",
+        "wave": "54"
+    },
+    "DEBTa_W54": {
+        "topic": "DEBT",
+        "macro_area": "Personal Finance",
+        "wave": "54"
+    },
+    "DEBTb_W54": {
+        "topic": "DEBT",
+        "macro_area": "Personal Finance",
+        "wave": "54"
+    },
+    "DEBTc_W54": {
+        "topic": "DEBT",
+        "macro_area": "Education",
+        "wave": "54"
+    },
+    "DEBTd_W54": {
+        "topic": "DEBT",
+        "macro_area": "Personal Finance",
+        "wave": "54"
+    },
+    "DEBTe_W54": {
+        "topic": "DEBT",
+        "macro_area": "Personal Finance",
+        "wave": "54"
+    },
+    "BENEFITSa_W54": {
+        "topic": "BENEFITS",
+        "macro_area": "Politics",
+        "wave": "54"
+    },
+    "BENEFITSb_W54": {
+        "topic": "BENEFITS",
+        "macro_area": "Politics",
+        "wave": "54"
+    },
+    "BENEFITSc_W54": {
+        "topic": "BENEFITS",
+        "macro_area": "Politics",
+        "wave": "54"
+    },
+    "WORKHARD_W53": {
+        "topic": "WORKHARD",
+        "macro_area": "Other",
+        "wave": "54"
+    },
+    "POOREASY_W53": {
+        "topic": "POOREASY",
+        "macro_area": "Other",
+        "wave": "54"
+    },
+    "ECONFAIR_W53": {
+        "topic": "ECONFAIR",
+        "macro_area": "Economy",
+        "wave": "54"
+    },
+    "GAP21Q1_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q2_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q3_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q4_a_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q4_b_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q4_c_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q4_d_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q4_e_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q4_f_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q5_a_W82": {
+        "topic": "GAP",
+        "macro_area": "Politics",
+        "wave": "82"
+    },
+    "GAP21Q5_b_W82": {
+        "topic": "GAP",
+        "macro_area": "Politics",
+        "wave": "82"
+    },
+    "GAP21Q6_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q7_a_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q7_b_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q7_c_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q7_d_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q7_e_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q8_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q9_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q10_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q11_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q12_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q13_a_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q13_b_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q13_c_W82": {
+        "topic": "GAP",
+        "macro_area": "Politics",
+        "wave": "82"
+    },
+    "GAP21Q14_W82": {
+        "topic": "GAP",
+        "macro_area": "Politics",
+        "wave": "82"
+    },
+    "GAP21Q15_a_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q15_b_W82": {
+        "topic": "GAP",
+        "macro_area": "Education",
+        "wave": "82"
+    },
+    "GAP21Q15_c_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q15_d_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q15_e_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q15_f_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q17_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q18_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q19_a_W82": {
+        "topic": "GAP",
+        "macro_area": "Politics",
+        "wave": "82"
+    },
+    "GAP21Q19_b_W82": {
+        "topic": "GAP",
+        "macro_area": "Politics",
+        "wave": "82"
+    },
+    "GAP21Q19_c_W82": {
+        "topic": "GAP",
+        "macro_area": "Politics",
+        "wave": "82"
+    },
+    "GAP21Q19_d_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q19_e_W82": {
+        "topic": "GAP",
+        "macro_area": "Politics",
+        "wave": "82"
+    },
+    "GAP21Q20_W82": {
+        "topic": "GAP",
+        "macro_area": "Religion",
+        "wave": "82"
+    },
+    "GAP21Q21_a_W82": {
+        "topic": "GAP",
+        "macro_area": "Politics",
+        "wave": "82"
+    },
+    "GAP21Q21_b_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q21_c_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q21_d_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q21_e_W82": {
+        "topic": "GAP",
+        "macro_area": "Religion",
+        "wave": "82"
+    },
+    "GAP21Q22_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q23_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q24_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q25_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q26_a_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q26_b_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q26_c_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q26_d_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q27_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q28_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q29_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q30_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q31_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q32_W82": {
+        "topic": "GAP",
+        "macro_area": "Politics",
+        "wave": "82"
+    },
+    "GAP21Q33_a_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q33_b_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q33_c_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q33_d_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q33_e_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q33_f_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q33_g_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q33_h_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q33_i_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q33_j_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q33_k_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q33_l_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q33_m_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q33_n_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q33_o_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q33_p_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q33_q_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q33_r_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q33_s_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q33_t_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q34_a_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q34_b_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q34_c_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q34_d_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q34_e_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q34_f_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q35_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q36_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q37_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q38_a_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q38_b_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q38_c_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q40_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q41_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q42_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q43_a_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q43_b_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q43_c_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q43_d_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q43_e_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q43_f_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q43_g_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q43_h_W82": {
+        "topic": "GAP",
+        "macro_area": "Economy",
+        "wave": "82"
+    },
+    "GAP21Q46_W82": {
+        "topic": "GAP",
+        "macro_area": "Education",
+        "wave": "82"
+    },
+    "GAP21Q47_W82": {
+        "topic": "GAP",
+        "macro_area": "Education",
+        "wave": "82"
+    },
+    "POL1JB_W92": {
+        "topic": "PO",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "LIFEFIFTY_W92": {
+        "topic": "LIFEFIFTY",
+        "macro_area": "Quality of Life",
+        "wave": "92"
+    },
+    "BIGHOUSES_W92": {
+        "topic": "BIGHOUSES",
+        "macro_area": "Quality of Life",
+        "wave": "92"
+    },
+    "INSTN_CHR_W92": {
+        "topic": "INSTN_CHR",
+        "macro_area": "Religion",
+        "wave": "92"
+    },
+    "INSTN_CLGS_W92": {
+        "topic": "INSTN_CLGS",
+        "macro_area": "Education",
+        "wave": "92"
+    },
+    "INSTN_LGECRP_W92": {
+        "topic": "INSTN_LGECRP",
+        "macro_area": "Other",
+        "wave": "92"
+    },
+    "INSTN_MSCENT_W92": {
+        "topic": "INSTN_MSCENT",
+        "macro_area": "Economy",
+        "wave": "92"
+    },
+    "INSTN_LBRUN_W92": {
+        "topic": "INSTN_LBRUN",
+        "macro_area": "Other",
+        "wave": "92"
+    },
+    "INSTN_K12_W92": {
+        "topic": "INSTN_K",
+        "macro_area": "Education",
+        "wave": "92"
+    },
+    "INSTN_BNKS_W92": {
+        "topic": "INSTN_BNKS",
+        "macro_area": "Institutional Confidence",
+        "wave": "92"
+    },
+    "INSTN_TECHCMP_W92": {
+        "topic": "INSTN_TECHCMP",
+        "macro_area": "Technology",
+        "wave": "92"
+    },
+    "DIFFPARTY_W92": {
+        "topic": "DIFFPARTY",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "GOVSIZE1_W92": {
+        "topic": "GOVSIZE",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "GOVSIZE2_W92": {
+        "topic": "GOVSIZE",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "GOVSIZE3_W92": {
+        "topic": "GOVSIZE",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "USEXCEPT_W92": {
+        "topic": "USEXCEPT",
+        "macro_area": "Other",
+        "wave": "92"
+    },
+    "WOMENOBS_W92": {
+        "topic": "WOMENOBS",
+        "macro_area": "Gender",
+        "wave": "92"
+    },
+    "ECONFAIR_W92": {
+        "topic": "ECONFAIR",
+        "macro_area": "Economy",
+        "wave": "92"
+    },
+    "OPENIDEN_W92": {
+        "topic": "OPENIDEN",
+        "macro_area": "Immigration",
+        "wave": "92"
+    },
+    "VTRGHTPRIV1_W92": {
+        "topic": "VTRGHTPRIV",
+        "macro_area": "Other",
+        "wave": "92"
+    },
+    "ALLIES_W92": {
+        "topic": "ALLIES",
+        "macro_area": "Foreign Policy",
+        "wave": "92"
+    },
+    "PEACESTR_W92": {
+        "topic": "PEACESTR",
+        "macro_area": "Other",
+        "wave": "92"
+    },
+    "GOVWASTE_W92": {
+        "topic": "GOVWASTE",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "COMPROMISEVAL_W92": {
+        "topic": "COMPROMISEVAL",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "POORASSIST_W92": {
+        "topic": "POORASSIST",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "PAR2CHILD_W92": {
+        "topic": "PAR",
+        "macro_area": "Family",
+        "wave": "92"
+    },
+    "PAR2CHILDa_W92": {
+        "topic": "PAR",
+        "macro_area": "Family",
+        "wave": "92"
+    },
+    "POLICY3MOD_W92": {
+        "topic": "POLICY",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "WHADVANT_W92": {
+        "topic": "WHADVANT",
+        "macro_area": "Other",
+        "wave": "92"
+    },
+    "SUPERPWR_W92": {
+        "topic": "SUPERPWR",
+        "macro_area": "Other",
+        "wave": "92"
+    },
+    "IL_IMM_PRI_W92": {
+        "topic": "IL_IMM_PRI",
+        "macro_area": "Immigration",
+        "wave": "92"
+    },
+    "BILLION_W92": {
+        "topic": "BILLION",
+        "macro_area": "Economy",
+        "wave": "92"
+    },
+    "GLBLZE_W92": {
+        "topic": "GLBLZE",
+        "macro_area": "Economy",
+        "wave": "92"
+    },
+    "FP_AUTH_W92": {
+        "topic": "FP_AUTH",
+        "macro_area": "Foreign Policy",
+        "wave": "92"
+    },
+    "GOVTHC_W92": {
+        "topic": "GOVTHC",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "SNGLPYER_W92": {
+        "topic": "SNGLPYER",
+        "macro_area": "Health",
+        "wave": "92"
+    },
+    "NOGOVTHC_W92": {
+        "topic": "NOGOVTHC",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "FREECOLL_W92": {
+        "topic": "FREECOLL",
+        "macro_area": "Education",
+        "wave": "92"
+    },
+    "CRIM_SENT2_W92": {
+        "topic": "CRIM_SENT",
+        "macro_area": "Crime",
+        "wave": "92"
+    },
+    "USMILSIZ_W92": {
+        "topic": "USMILSIZ",
+        "macro_area": "Foreign Policy",
+        "wave": "92"
+    },
+    "PROG_RRETRO_W92": {
+        "topic": "PROG_RRETRO",
+        "macro_area": "Race/Ethnicity",
+        "wave": "92"
+    },
+    "PROG_RNEED_W92": {
+        "topic": "PROG_RNEED",
+        "macro_area": "Race/Ethnicity",
+        "wave": "92"
+    },
+    "PROG_RNEED2b_W92": {
+        "topic": "PROG_RNEED",
+        "macro_area": "Race/Ethnicity",
+        "wave": "92"
+    },
+    "ELITEUNDMOD_W92": {
+        "topic": "ELITEUNDMOD",
+        "macro_area": "Other",
+        "wave": "92"
+    },
+    "POLINTOL2_a_W92": {
+        "topic": "POLINTOL",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "POLINTOL2_b_W92": {
+        "topic": "POLINTOL",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "CANQUALPOL_W92": {
+        "topic": "CANQUALPOL",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "CANMTCHPOL_W92": {
+        "topic": "CANMTCHPOL",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "SOCIETY_TRANS_W92": {
+        "topic": "SOCIETY_TRANS",
+        "macro_area": "Gender",
+        "wave": "92"
+    },
+    "SOCIETY_RHIST_W92": {
+        "topic": "SOCIETY_RHIST",
+        "macro_area": "Other",
+        "wave": "92"
+    },
+    "SOCIETY_JBCLL_W92": {
+        "topic": "SOCIETY_JBCLL",
+        "macro_area": "Education",
+        "wave": "92"
+    },
+    "SOCIETY_RELG_W92": {
+        "topic": "SOCIETY_RELG",
+        "macro_area": "Religion",
+        "wave": "92"
+    },
+    "SOCIETY_WHT_W92": {
+        "topic": "SOCIETY_WHT",
+        "macro_area": "Other",
+        "wave": "92"
+    },
+    "SOCIETY_GUNS_W92": {
+        "topic": "SOCIETY_GUNS",
+        "macro_area": "Guns",
+        "wave": "92"
+    },
+    "SOCIETY_SSM_W92": {
+        "topic": "SOCIETY_SSM",
+        "macro_area": "Family",
+        "wave": "92"
+    },
+    "PROBOFF_a_W92": {
+        "topic": "PROBOFF",
+        "macro_area": "Other",
+        "wave": "92"
+    },
+    "PROBOFF_b_W92": {
+        "topic": "PROBOFF",
+        "macro_area": "Other",
+        "wave": "92"
+    },
+    "BUSPROFIT_W92": {
+        "topic": "BUSPROFIT",
+        "macro_area": "Economy",
+        "wave": "92"
+    },
+    "CNTRYFAIR_W92": {
+        "topic": "CNTRYFAIR",
+        "macro_area": "Other",
+        "wave": "92"
+    },
+    "GOVPROTCT_W92": {
+        "topic": "GOVPROTCT",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "MARRFAM_W92": {
+        "topic": "MARRFAM",
+        "macro_area": "Family",
+        "wave": "92"
+    },
+    "GOVAID_W92": {
+        "topic": "GOVAID",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "RELIG_GOV_W92": {
+        "topic": "RELIG_GOV",
+        "macro_area": "Religion",
+        "wave": "92"
+    },
+    "GOODEVIL_W92": {
+        "topic": "GOODEVIL",
+        "macro_area": "Religion",
+        "wave": "92"
+    },
+    "PPLRESP_W92": {
+        "topic": "PPLRESP",
+        "macro_area": "Other",
+        "wave": "92"
+    },
+    "RACESURV52MOD_W92": {
+        "topic": "RACESURV",
+        "macro_area": "Race/Ethnicity",
+        "wave": "92"
+    },
+    "ELECT_IMPT3_PRVFR_W92": {
+        "topic": "ELECT_IMPT",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "ELECT_IMPT3_PRVSUP_W92": {
+        "topic": "ELECT_IMPT",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "ELECT_CONF3_PRVFR_W92": {
+        "topic": "ELECT_CONF",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "ELECT_CONF3_PRVSUP_W92": {
+        "topic": "ELECT_CONF",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "CANDEXP_W92": {
+        "topic": "CANDEXP",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "LEGALIMMIGAMT_W92": {
+        "topic": "LEGALIMMIGAMT",
+        "macro_area": "Immigration",
+        "wave": "92"
+    },
+    "UNIMMIGCOMM_W92": {
+        "topic": "UNIMMIGCOMM",
+        "macro_area": "Immigration",
+        "wave": "92"
+    },
+    "GODMORALIMP_W92": {
+        "topic": "GODMORALIMP",
+        "macro_area": "Religion",
+        "wave": "92"
+    },
+    "REPRSNTREP_W92": {
+        "topic": "REPRSNTREP",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "REPRSNTDEM_W92": {
+        "topic": "REPRSNTDEM",
+        "macro_area": "Politics",
+        "wave": "92"
+    },
+    "VTRS_VALS_W92": {
+        "topic": "VTRS_VALS",
+        "macro_area": "Other",
+        "wave": "92"
+    }
+}

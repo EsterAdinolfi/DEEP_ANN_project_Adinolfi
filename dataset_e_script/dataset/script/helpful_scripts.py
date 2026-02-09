@@ -9,6 +9,9 @@ DIR_RISULTATI = "../risultati/"
 DIR_FILE_MODEL_INPUT = "../../model_input/" 
 DIR_FILE_HUMAN_RESP = "../../human_resp/"
 
+# Percorso al question_mapping.json
+QUESTION_MAPPING_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'human_resp', 'question_mapping.json')
+
 
 # Colonne demografiche da mantenere nel Dataset 1
 DEMOGRAPHIC_COLUMNS = [
@@ -39,8 +42,24 @@ def get_data_path():
     return data_path
 
 def extract_topic(key):
-    """Estrae il topic dalla chiave (es. GUN_W26 -> GUN)"""
+    """
+    Usata solo come fallback.
+    Estrae il topic dalla chiave (es. GUN_W26 -> GUN)
+    """
     return key.split('_')[0]
+
+def load_question_mapping():
+    """
+    Carica il question_mapping.json contenente topic e macro_area per ogni domanda.
+    Ritorna un dizionario: {id_question: {topic: ..., macro_area: ...}}
+    """
+    if not os.path.exists(QUESTION_MAPPING_PATH):
+        print(f"[WARNING] question_mapping.json non trovato in: {QUESTION_MAPPING_PATH}")
+        print("[WARNING] Verrà usato extract_topic() come fallback")
+        return {}
+    
+    with open(QUESTION_MAPPING_PATH, 'r', encoding='utf-8') as f:
+        return json.load(f)
 
 # --- funzioni per generare i diversi esperimenti ---
 def get_base_schema(trial_id, label, options_order):
@@ -215,6 +234,12 @@ def create_truth_dataset(data_path):
 # --- FUNZIONE 2: DATASET OPERATIVO (DINAMICO) ---
 def create_operational_dataset(data_path):
     print(f"\nAvvio creazione del dataset operativo da: {data_path}")
+    
+    # Carica il mapping dei topic
+    print("Caricamento question_mapping.json...")
+    question_mapping = load_question_mapping()
+    print(f"[FINE] Caricato mapping per {len(question_mapping)} domande")
+    
     dataset_json = []
     
     subfolders = [f.path for f in os.scandir(data_path) if f.is_dir()]
@@ -297,9 +322,15 @@ def create_operational_dataset(data_path):
                     experiments.append(generate_threat(i, valid_options_list, domanda_text))
                 
                 # --- 4. OUTPUT ---
+                # Recupera topic e macro_area dal mapping centralizzato
+                mapping_entry = question_mapping.get(key, {})
+                topic = mapping_entry.get('topic', extract_topic(key))  # Fallback a extract_topic se non trovato
+                macro_area = mapping_entry.get('macro_area', 'Other')   # Default 'Other' se non trovato
+                
                 entry = {
                     "id_question": key,
-                    "topic": extract_topic(key), 
+                    "topic": topic,
+                    "macro_area": macro_area,
                     "human_dist_total": dist,
                     "question": domanda_text,
                     "options": valid_options_list,
