@@ -43,16 +43,21 @@ class ExperimentsAnalyzer:
         # Imposta la modalità di analisi
         self.mode = mode
         
-        # Genera nomi file dinamici basati sulla modalità per evitare sovrascritture
-        # 1. Estrae il nome base del file (es. "results_pythia_160m.json")
+        # --- GESTIONE OUTPUT RELATIVA ALL'INPUT ---
+        # 1. Identifichiamo la cartella dove risiede il file di input
+        # Se input_path è ".../risultati/pythia_160m/results.json", 
+        # output_dir sarà ".../risultati/pythia_160m"
+        self.output_dir = os.path.dirname(os.path.abspath(input_path))
+        
+        # 1. Estrazione nome modello pulito dal nome del file
         filename = os.path.basename(input_path)
         # 2. Rimuove l'estensione (es. "results_pythia_160m")
         name_root, _ = os.path.splitext(filename)
         # 3. Pulisce il prefisso 'results_' se presente per ottenere il nome modello pulito
         model_name = name_root.replace("results_", "") if name_root.startswith("results_") else name_root
         # 4. Genera percorsi di output usando il nome del modello estratto
-        self.file_metrics = os.path.join(RISULTATI_DIR, f"analysis_metrics_{self.mode}_{model_name}.csv")
-        self.file_report = os.path.join(RISULTATI_DIR, f"report_topic_{self.mode}_{model_name}.csv")
+        self.file_metrics = os.path.join(self.output_dir, f"analysis_metrics_{self.mode}_{model_name}.csv")
+        self.file_report = os.path.join(self.output_dir, f"report_topic_{self.mode}_{model_name}.csv")
         
         # Stampa informazioni di configurazione
         print(f"Input: {input_path}")

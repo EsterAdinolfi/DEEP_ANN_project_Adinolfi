@@ -5,21 +5,17 @@ import torch.nn.functional as F # per softmax
 from tqdm import tqdm
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
-# Importiamo le utility dal tuo script precedente
-import helpful_scripts
-
 # --- CONFIGURAZIONE ---
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RISULTATI_DIR = os.path.join(BASE_DIR, "risultati")
 
 MODEL_NAME = "EleutherAI/pythia-160m"
 INPUT_FILE = os.path.join(RISULTATI_DIR, "operational.json")
-OUTPUT_FILE = os.path.join(RISULTATI_DIR, "results_pythia_160m.json")
 MAX_NEW_TOKENS = 50 # Numero massimo di token generati
 
-def load_model():
+def load_model(model_name=MODEL_NAME):
     """Carica modello e tokenizer gestendo il dispositivo hardware."""
-    print(f"Caricamento modello: {MODEL_NAME}...")
+    print(f"Caricamento modello: {model_name}...")
     
     # Rilevamento automatico device
     if torch.cuda.is_available():
@@ -29,8 +25,8 @@ def load_model():
         
     print(f"Device rilevato: {device.upper()}")
 
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-    model = AutoModelForCausalLM.from_pretrained(MODEL_NAME).to(device)
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModelForCausalLM.from_pretrained(model_name).to(device)
     
     # Imposta il pad_token se manca (Pythia ne ha bisogno)
     if tokenizer.pad_token is None:
@@ -115,21 +111,36 @@ def get_choice_logprobs(model, tokenizer, device, prompt, valid_labels):
     return best_choice, probs_map
 
 
-def run_inference():
+def run_inference(model_name=MODEL_NAME):
     # 1. Carica il dataset operativo
     if not os.path.exists(INPUT_FILE):
         print(f"[ERRORE] File non trovato in: {INPUT_FILE}")
-        print("Assicurati di aver eseguito helpful_scripts.py correttamente.")
         return
 
     with open(INPUT_FILE, 'r') as f:
         dataset = json.load(f)
 
     # 2. Carica il modello
-    model, tokenizer, device = load_model()
+    model, tokenizer, device = load_model(model_name)
     model.eval() 
 
-    print(f"Avvio esperimenti su {len(dataset)} domande...")
+    # --- GESTIONE CARTELLE DINAMICA ---
+    # 1. Puliamo il nome: da "EleutherAI/pythia-160m" a "pythia_160m"
+    # Sostituiamo anche i trattini con underscore
+    pure_name = model_name.split("/")[-1].replace("-", "_")
+    
+    # 2. Creiamo il percorso per la sottocartella specifica
+    # Es: .../risultati/pythia_160m
+    model_output_dir = os.path.join(RISULTATI_DIR, pure_name)
+    os.makedirs(model_output_dir, exist_ok=True) # Crea la cartella se non esiste
+
+    # 3. Definiamo il file di output dentro quella cartella
+    output_filename = f"results_{pure_name}.json"
+    output_path = os.path.join(model_output_dir, output_filename)
+    # ---------------------------------------------
+
+    print(f"Avvio esperimenti per {pure_name}, su {len(dataset)} domande...")
+    print(f"I risultati verranno salvati in: {output_path}")
 
     # 3. Ciclo principale (con barra di caricamento)
     for entry in tqdm(dataset, desc="Processing questions"):
@@ -193,15 +204,14 @@ def run_inference():
             # print(f"\nPrompt: {prompt}\nAns: {answer_text}")
 
     # 4. Salvataggio finale su file
-    os.makedirs(RISULTATI_DIR, exist_ok=True)
-    with open(OUTPUT_FILE, 'w') as f:
+    with open(output_path, 'w') as f:
         json.dump(dataset, f, indent=2)
     
-    print(f"\n[FINE] Esperimenti completati! Risultati salvati in: {OUTPUT_FILE}")
+    print(f"\n[FINE] Esperimenti completati! Risultati salvati in: {output_path}")
 
     # Pulizia memoria GPU
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
         
 if __name__ == "__main__":
-    run_inference()
+    run_inference(model_name=MODEL_NAME)

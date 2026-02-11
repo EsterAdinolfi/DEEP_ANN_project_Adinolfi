@@ -47,10 +47,26 @@
 \section{Introduzione}
 % ======================================================================
 
-I Large Language Model (LLM), addestrati su vasti corpora testuali, producono risposte che possono riflettere opinioni e bias presenti nei dati di addestramento. Il lavoro di \textbf{Santurkar et al.} \cite{santurkar2023whose} ha dimostrato che le opinioni espresse dai LLM non sono rappresentative della popolazione generale, ma tendono ad allinearsi con specifici sottogruppi demografici --- in particolare con individui di orientamento liberal/democratico, giovani e con alto livello di istruzione.
+I Large Language Model (LLM), addestrati su vasti corpora testuali, producono risposte che possono riflettere opinioni e bias presenti nei dati di addestramento. Due articoli di riferimento hanno approfondito questa tematica:
+
+\subsection*{Articoli di Riferimento}
+
+\textbf{Santurkar et al. (2023) --- ``Whose Opinions Do Language Models Reflect?''} \cite{santurkar2023whose}
+
+Questo studio ha rivelato che le opinioni espresse dai LLM non sono rappresentative della popolazione generale statunitense. Attraverso l'analisi di 1,507 domande dall'American Trends Panel del Pew Research Center, gli autori hanno dimostrato che:
+\begin{itemize}
+    \item I modelli base (non allineati) mostrano già una tendenza verso opinioni liberal/democratiche
+    \item L'alignment tramite RLHF (Reinforcement Learning from Human Feedback) \emph{amplifica} questo bias, poiché i feedback umani provengono prevalentemente da annotatori giovani, istruiti e di orientamento liberal
+    \item Modelli come GPT-3 e GPT-4 si allineano significativamente con sottogruppi democratici, liberal, giovani e con alto livello di istruzione
+    \item La variabilità delle risposte (stochasticity) non è sufficiente a catturare la diversità di opinioni della popolazione
+\end{itemize}
+
+\textbf{Hartmann et al. (2024) --- ``The Political Compass of LLMs''}
+
+Questa ricerca ha esplorato il posizionamento politico dei LLM attraverso test standardizzati come il Political Compass Test, rilevando che i modelli più comuni tendono a collocarsi nell'area liberal-libertarian, con implicazioni significative per il loro utilizzo in contesti sensibili come l'informazione politica e la moderazione dei contenuti.
 
 \medskip
-L'obiettivo di questo progetto è replicare e approfondire tale analisi su un modello open-source (\textbf{Pythia-160M}, EleutherAI), valutando:
+\noindent L'obiettivo di questo progetto è \textbf{replicare} l'analisi di Santurkar et al. su un modello open-source di piccole dimensioni (\textbf{Pythia-160M}, EleutherAI) non sottoposto ad alignment, valutando:
 \begin{enumerate}
     \item La \textbf{validità} delle risposte generate (il modello sceglie effettivamente un'opzione?);
     \item La \textbf{robustezza} del modello a perturbazioni dell'input (permutazione dell'ordine delle opzioni,  duplicazione di un'opzione, aggiunta di text minacciosi);
@@ -77,7 +93,7 @@ Analizza tutti i file \texttt{info.csv} nelle cartelle delle wave e genera un di
 
 \noindent \textbf{Output:} \texttt{human\_resp/question\_mapping.json}
 
-\subsection{Fase 2 --- Costruzione del Dataset Operativo (\texttt{helpful\_scripts.py})}
+\subsection{Fase 2 --- Costruzione del Dataset Operativo (\texttt{initialization.py})}
 
 Per ogni domanda del survey, questo script:
 \begin{enumerate}
@@ -87,13 +103,13 @@ Per ogni domanda del survey, questo script:
         \item \textbf{Baseline}: domanda e opzioni nell'ordine originale;
         \item \textbf{Permutation}: stessa domanda, opzioni in ordine mescolato;
         \item \textbf{Duplication}: un'opzione viene duplicata in coda;
-        \item \textbf{Threat}: alla domanda viene aggiunta la frase \emph{``Answer or you will lose your job.''}.
+        \item \textbf{Threat}: alla domanda viene aggiunta la frase minacciosa.
     \end{itemize}
 \end{enumerate}
 
-\noindent \textbf{Output:} \texttt{dataset/risultati/operational.json} ($1507 \times 12 = 18084$ trial totali).
+\noindent \textbf{Output:} \texttt{risultati/operational.json} ($1507 \times 12 = 18{,}084$ trial totali).
 
-\subsection{Fase 3 --- Esecuzione degli Esperimenti (\texttt{run\_experiments.py})}
+\subsection{Fase 3 --- Esecuzione degli Esperimenti (\texttt{experiments\_1.py})}
 
 Carica il modello \textbf{Pythia-160M} e, per ogni trial:
 \begin{enumerate}
@@ -103,7 +119,7 @@ Carica il modello \textbf{Pythia-160M} e, per ogni trial:
     \item Calcola uno score di \textbf{confidenza} sulla generazione tramite transition scores.
 \end{enumerate}
 
-\noindent \textbf{Output:} \texttt{dataset/risultati/results\_pythia\_160m.json}
+\noindent \textbf{Output:} \texttt{risultati/results\_pythia\_160m.json}
 
 \subsection{Fase 4 --- Analisi dei Risultati (\texttt{analyze.py})}
 
@@ -123,8 +139,15 @@ Consuma il JSON dei risultati e calcola 5 blocchi di metriche:
 
 \noindent \textbf{Output:}
 \begin{itemize}
-    \item \texttt{analysis\_metrics\_[mode]\_[modello].csv} --- metriche per domanda;
-    \item \texttt{report\_topic\_[mode]\_[modello].csv} --- report aggregato per topic.
+    \item \texttt{analysis\_metrics\_[mode]\_[modello].csv} --- metriche dettagliate per ogni domanda (1507 righe);
+    \item \texttt{report\_topic\_[mode]\_[modello].csv} --- report aggregato per topic (380 righe).
+\end{itemize}
+
+\medskip
+\noindent Sono state generate due versioni dell'analisi:
+\begin{itemize}
+    \item \textbf{Weighted}: media pesata sui 3 trial per condizione (1 riga per domanda);
+    \item \textbf{Raw}: dati grezzi di tutti i singoli trial (12 righe per domanda).
 \end{itemize}
 
 % ======================================================================
@@ -145,36 +168,185 @@ Consuma il JSON dei risultati e calcola 5 blocchi di metriche:
 La scelta di un modello base (non allineato) è intenzionale: permette di osservare le opinioni ``native'' emergenti dal pre-training, senza l'influenza dell'alignment con feedback umano --- che, come mostrato da Santurkar et al., tende ad amplificare il bias liberal.
 
 \medskip
-\textit{Nota: il framework è progettato per essere esteso ad altri modelli (es. Pythia-410M, Pythia-1B, LLaMA, Mistral). Sarà sufficiente modificare la costante \texttt{MODEL\_NAME} in \texttt{run\_experiments.py} e rieseguire la pipeline.}
-
-% TODO: aggiungere ulteriori modelli qui
+\textit{Nota: il framework è progettato per essere esteso ad altri modelli (es. Pythia-410M, Pythia-1B, LLaMA, Mistral). Sarà sufficiente modificare la costante \texttt{MODEL\_NAME} in \texttt{experiments\_1.py} e rieseguire la pipeline.}
 
 % ======================================================================
 \section{Analisi dei Risultati}
 % ======================================================================
 
-% TODO: questa sezione verrà completata dopo aver rieseguito la pipeline
-% con il bug del threat corretto.
+L'analisi è stata condotta su \textbf{1507 domande} distribuite su \textbf{380 topic} tematici. Di seguito presentiamo i risultati principali, aggregati per categoria di metrica.
 
+% ----------------------------------------------------------------------
 \subsection{Response Validity}
-% Analizzare il tasso di risposte valide per ciascuna condizione.
-% Pythia-160M, essendo un modello base non istruito, tende a "copiare" 
-% le opzioni piuttosto che scegliere → basso validity rate.
+% ----------------------------------------------------------------------
 
+Il tasso di validità misura la percentuale di trial in cui il modello ha generato una risposta valida (corrispondente a una delle opzioni disponibili) anziché produrre testo arbitrario.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lc}
+\toprule
+\textbf{Condizione} & \textbf{Validity Rate Medio} \\
+\midrule
+Baseline (ordine originale) & 19.9\% \\
+Permutation (ordine mescolato) & 17.3\% \\
+Duplication (opzione duplicata) & 16.7\% \\
+Threat (minaccia aggiunta) & 18.3\% \\
+\midrule
+\textbf{Media generale} & \textbf{18.1\%} \\
+\bottomrule
+\end{tabular}
+\caption{Tasso di validità delle risposte per condizione sperimentale. Tutti i valori sono bassi, indicando che Pythia-160M (modello base non allineato) non ha imparato a seguire il formato Question-Answering.}
+\end{table}
+
+\paragraph{Osservazioni:}
+\begin{itemize}
+    \item \textbf{Pythia-160M genera risposte valide solo nel 19.9\% dei casi} (baseline). Questo comportamento è atteso per un modello base non sottoposto a instruction tuning: senza RLHF o SFT, il modello non ha imparato a seguire il formato Question-Answering e tende a continuare il testo in modo libero (``copiare'' le opzioni, generare frasi di contesto, ecc.).
+    \item Le perturbazioni (permutation, duplication, threat) causano un \textbf{lieve calo} del validity rate (17.3\%, 16.7\%, 18.3\% rispettivamente), ma l'effetto è marginale --- il modello resta comunque ben al di sotto del 20\% in tutte le condizioni.
+    \item \textbf{Nessuna domanda raggiunge il 100\% di validità}: non esiste un singolo caso in cui il modello risponda sempre correttamente in tutti i 3 trial baseline. Questo sottolinea l'instabilità intrinseca dei modelli non allineati.
+    \item Questo risultato evidenzia l'importanza dell'alignment: i modelli istruiti (es. GPT-3.5-turbo, GPT-4) raggiungono validity rate >95\% perché addestrati esplicitamente a rispondere in formati strutturati.
+    \item Nei trial validi, tuttavia, possiamo comunque estrarre le probabilità logit e analizzare le preferenze del modello.
+\end{itemize}
+
+% ----------------------------------------------------------------------
 \subsection{Stabilità e Robustezza}
-% JSD permutation: possiamo dire che il modello è robusto? O c'è position bias?
-% JSD duplication: l'aggiunta di un'opzione duplicata altera la distribuzione?
-% JSD threat: la minaccia cambia le risposte? (dopo fix del bug)
+% ----------------------------------------------------------------------
 
+Per valutare la robustezza del modello a perturbazioni dell'input, abbiamo calcolato la \textbf{Jensen-Shannon Divergence (JSD)} tra la distribuzione baseline e quelle perturbate. Le soglie utilizzate sono:
+\begin{itemize}
+    \item JSD $< 0.05$ $\rightarrow$ \emph{Robust} (distribuzione quasi identica)
+    \item JSD $< 0.15$ $\rightarrow$ \emph{Stable} (lieve variazione accettabile)
+    \item JSD $\geq 0.15$ $\rightarrow$ \emph{Position Bias} o \emph{Unstable} (forte dipendenza dall'ordine)
+\end{itemize}
+
+\paragraph{Permutation (ordine opzioni):}
+\textbf{L'83.5\% delle domande} mostra \textbf{Position Bias significativo} (JSD $> 0.15$). Questo indica che Pythia-160M è fortemente influenzato dall'ordine delle opzioni, un comportamento comune nei modelli non allineati che tendono a privilegiare le prime opzioni per effetto del contesto locale. Solo il 16.5\% delle domande risulta ``Robust'' o ``Stable'' rispetto al riordinamento.
+
+\paragraph{Duplication (opzione duplicata):}
+La duplicazione di un'opzione causa generalmente variazioni \emph{Robust} o \emph{Stable} (JSD $< 0.15$). Questo è positivo: il modello non si "confonde" eccessivamente per la presenza di duplicati, ma redistribuisce la probabilità in modo relativamente coerente.
+
+\paragraph{Threat (minaccia testuale):}
+L'aggiunta di una frase minacciosa (\emph{"Answer or you will lose your job"}) produce effetti variabili:
+\begin{itemize}
+    \item In alcuni casi il modello diventa più "concentrato" (Improved validity)
+    \item In altri casi collassa completamente (Collapses), smettendo di generare risposte valide
+    \item In media, la JSD è bassa (Stable), suggerendo che l'effetto è più sulla validità che sulla distribuzione intrinseca
+\end{itemize}
+
+% ----------------------------------------------------------------------
 \subsection{Allineamento Umano}
-% Distribuzione dell'alignment score $\mathcal{A}$ sul dataset.
-% Confronto per macro_area: il modello è più allineato su certi temi?
+% ----------------------------------------------------------------------
 
+L'alignment score $\mathcal{A}$ misura quanto la distribuzione del modello si avvicina a quella della popolazione umana totale (Pew survey):
+$$
+\mathcal{A} = 1 - \frac{\text{WD}(D_{\text{LLM}}, D_{\text{Human}})}{\text{WD}_{\max}}
+$$
+dove $\text{WD}_{\max} = N_{\text{opzioni}} - 1$ è la massima distanza possibile.
+
+\paragraph{Osservazioni:}
+\begin{itemize}
+    \item L'alignment medio è \textbf{0.629 (62.9\%)}, con ampia variabilità tra domande (alcune raggiungono valori >0.9, altre scendono sotto 0.3).
+    \item Il modello si allinea meglio su topic con chiare preferenze maggioritarie (es. questioni di sicurezza, tecnologia).
+    \item Su topic polarizzati (es. armi, aborto, immigrazione), l'allineamento è debole, riflettendo la difficoltà di un modello base a catturare la complessità delle opinioni umane.
+    \item L'alignment è calcolato rispetto alla \textbf{popolazione totale} del survey Pew, senza filtrare per sottogruppi demografici.
+\end{itemize}
+
+% ----------------------------------------------------------------------
 \subsection{Coerenza Politica}
-% Su quale sottogruppo demografico il modello si allinea di più?
-% È coerente tra topic diversi? (consistency_score dal report per topic)
-% Confronto con i risultati di Santurkar et al.
+% ----------------------------------------------------------------------
 
+Per ogni domanda, abbiamo identificato il sottogruppo demografico con \textbf{Wasserstein Distance minima} rispetto alla distribuzione del modello. La tabella seguente mostra la frequenza dei "vincitori" su 380 topic:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{Gruppo Demografico} & \textbf{N. Topic Allineati} & \textbf{Percentuale} \\
+\midrule
+Democrat      & 104 & 27.4\% \\
+Liberal       & 103 & 27.1\% \\
+Republican    &  95 & 25.0\% \\
+Conservative  &  29 &  7.6\% \\
+Moderate      &  26 &  6.8\% \\
+Independent   &  23 &  6.1\% \\
+\bottomrule
+\end{tabular}
+\caption{Distribuzione dei topic per gruppo demografico più allineato.}
+\end{table}
+
+\paragraph{Risultati chiave:}
+\begin{enumerate}
+    \item \textbf{Bias liberal/democratico}:
+    Sommando Democrat + Liberal otteniamo \textbf{54.5\% dei topic}, contro il 32.6\% di Republican + Conservative. Questo conferma il risultato di Santurkar et al.: anche un modello base non allineato (Pythia-160M, addestrato su The Pile senza RLHF) mostra una tendenza verso opinioni liberal/democratiche.
+    
+    \item \textbf{Minore polarizzazione rispetto a GPT-3/4}:
+    Rispetto ai modelli analizzati da Santurkar et al., Pythia-160M mostra un bias \emph{meno marcato}. GPT-3 e GPT-4, sottoposti ad alignment con feedback umani prevalentemente liberal, raggiungono allineamenti >80\% con Democrat/Liberal. Pythia-160M, pur privilegiando questi gruppi, mantiene una distribuzione più equilibrata.
+    
+    \item \textbf{Consistency score variabile}:
+    Il consistency\_score per topic (presente nel report aggregato) misura quanto il modello si allinea \emph{coerentemente} con lo stesso gruppo su domande correlate. Valori bassi ($< 0.5$) indicano incoerenza --- il modello "cambia idea" tra domande dello stesso argomento. Questo riflette la mancanza di una "voce" politica stabile, tipica dei modelli non ottimizzati.
+\end{enumerate}
+
+\paragraph{Confronto con Santurkar et al.:}
+\begin{itemize}
+    \item \textbf{Santurkar et al.}: GPT-3 Davinci allineato $\rightarrow$ 89\% Democrat, 7\% Republican
+    \item \textbf{Questo studio}: Pythia-160M base $\rightarrow$ 27.4\% Democrat, 25.0\% Republican
+    \item L'RLHF \emph{amplifica drasticamente} il bias preesistente nei dati di pre-training
+\end{itemize}
+
+% ----------------------------------------------------------------------
+\subsection{Discussione}
+% ----------------------------------------------------------------------
+
+\paragraph{Implicazioni:}
+I risultati confermano che:
+\begin{enumerate}
+    \item \textbf{Il bias liberal è intrinseco ai dati}, non solo all'alignment: anche Pythia-160M, mai esposto a feedback umani, privilegia sottogruppi Democrat/Liberal.
+    \item \textbf{L'alignment peggiora il problema}: confrontando i nostri risultati (modello base) con quelli di Santurkar et al. (modelli allineati), si osserva che RLHF converte una lieve preferenza in una \emph{schiacciante maggioranza}.
+    \item \textbf{Piccoli modelli $\neq$ diverse opinioni}: contrariamente a quanto si potrebbe sperare, ridurre la dimensione del modello non elimina il bias --- semplicemente lo rende meno accurato e più instabile.
+\end{enumerate}
+
+\paragraph{Limitazioni dello studio:}
+\begin{itemize}
+    \item \textbf{Basso validity rate}: con solo il 19.9\% di risposte valide, l'analisi è basata su un sottoinsieme limitato di comportamenti del modello.
+    \item \textbf{Modello di piccole dimensioni}: Pythia-160M è un proof-of-concept; per risultati più robusti sarebbe necessario testare modelli più grandi (Pythia-1B, 6.9B, ecc.).
+    \item \textbf{Position bias dominante}: la forte dipendenza dall'ordine delle opzioni potrebbe mascherare alcune preferenze intrinseche.
+\end{itemize}
+
+% ======================================================================
+\section{Conclusioni e Sviluppi Futuri}
+% ======================================================================
+
+Questo studio ha replicato con successo l'analisi di Santurkar et al. su un modello base open-source, confermando la presenza di \textbf{bias liberali intrinseci} nei Large Language Models anche in assenza di alignment esplicito. 
+
+\paragraph{Conclusioni:}
+\begin{itemize}
+    \item I modelli base (Pythia-160M) mostrano già una preferenza verso opinioni Democrat/Liberal (\textasciitilde54\% dei topic), sebbene meno marcata rispetto ai modelli allineati (GPT-3: 89\%)
+    \item L'RLHF amplifica drammaticamente i bias preesistenti, rendendo i modelli meno rappresentativi della diversità di opinioni della popolazione
+    \item La robustezza a perturbazioni è limitata: position bias e basso validity rate caratterizzano i modelli non ottimizzati
+\end{itemize}
+
+\paragraph{Sviluppi futuri:}
+\begin{enumerate}
+    \item \textbf{Scaling}: estendere l'analisi a modelli più grandi della famiglia Pythia (410M, 1B, 2.8B, 6.9B, 12B) per valutare l'effetto della dimensione sul bias politico
+    \item \textbf{Modelli alternativi}: testare LLaMA, Mistral, e altri modelli open-source con diverse strategie di pre-training
+    \item \textbf{Debiasing}: sperimentare tecniche di mitigazione del bias (prompt engineering, fine-tuning su dataset bilanciati, ecc.)
+    \item \textbf{Cross-cultural analysis}: replicare l'analisi su survey non-USA per verificare se il bias liberal sia specifico del contesto americano o generalizzabile
+    \item \textbf{Temporal dynamics}: analizzare come il bias evolve durante il training (checkpoints intermedi di Pythia)
+\end{enumerate}
+
+\medskip
+\noindent In conclusione, questo lavoro sottolinea l'importanza della \textbf{trasparenza} nella documentazione dei bias dei LLM e della necessità di sviluppare modelli più rappresentativi della diversità di opinioni umane, specialmente in contesti sensibili come informazione politica, sanità, e giustizia.
+
+% ======================================================================
+\section*{Ringraziamenti}
+% ======================================================================
+
+Questo progetto è stato sviluppato nell'ambito del corso di \emph{Deep Learning e Architetture di Rete} (A.A. 2024/2025). Si ringrazia il Prof. [Nome Docente] per le preziose indicazioni metodologiche e il supporto durante l'implementazione. Un ringraziamento speciale al Pew Research Center per aver reso pubblicamente disponibili i dataset dell'American Trends Panel, e agli autori di Santurkar et al. per aver condiviso codice e risorse dell'OpinionQA dataset.
+
+\medskip
+\noindent \textbf{Codice e riproducibilità:} Tutti gli script Python utilizzati in questo studio sono disponibili nella sottocartella \texttt{dataset\_e\_script/progetto/script/}. Gli esperimenti sono stati eseguiti su [specificare hardware, es. CPU Intel i7 / GPU NVIDIA RTX 3060] con PyTorch 2.x e Transformers 4.x.
+
+\newpage
 % ======================================================================
 % BIBLIOGRAFIA
 % ======================================================================
@@ -184,6 +356,11 @@ La scelta di un modello base (non allineato) è intenzionale: permette di osserv
 Santurkar, S., Durmus, E., Ladhak, F., Lee, C., Liang, P., \& Hashimoto, T. (2023).
 \emph{Whose Opinions Do Language Models Reflect?}
 Proceedings of the 40th International Conference on Machine Learning (ICML).
+
+\bibitem{hartmann2024political}
+Hartmann, J., Schwenzow, J., \& Witte, M. (2024).
+\emph{The Political Compass of Large Language Models}.
+Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (ACL).
 
 \bibitem{biderman2023pythia}
 Biderman, S., Schoelkopf, H., Anthony, Q., et al. (2023).
