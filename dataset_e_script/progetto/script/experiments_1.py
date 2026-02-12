@@ -69,11 +69,14 @@ def get_choice_logprobs(model, tokenizer, device, prompt, valid_labels):
     # 1. Tokenizziamo il prompt
     inputs = tokenizer(prompt, return_tensors="pt").to(device)
     
-    # 2. Forward pass (senza generazione) per ottenere i logits dell'ultimo token
+    # 2. Forward pass (senza generazione, non deve allenare il modello) per ottenere i logits dell'ultimo token
     with torch.no_grad():
         outputs = model(**inputs)
         # Prendiamo i logits dell'ultimo token della sequenza input
-        # Shape: [batch_size, vocab_size]
+        # logits = [elemento del batch, sequenza, vocab_size]
+        #  Batch: numero di frasi che diamo al modello contemporaneamente. 0 = prende solo la prima frase del gruppo grande 1
+        #  Sequenza: posizione del token nella frase. -1 = ultimo token
+        #  Vocab_size: dimensione del vocabolario del modello
         last_token_logits = outputs.logits[0, -1, :]
 
     # 3. Identifichiamo i token ID per le etichette valide (" A", " B", ecc.)
@@ -84,13 +87,14 @@ def get_choice_logprobs(model, tokenizer, device, prompt, valid_labels):
     for label in valid_labels:
         # Cerchiamo l'ID del token. 
         # ATTENZIONE: Tokenizer diversi gestiscono gli spazi diversamente.
+        # add_special_tokens=False evita di aggiungere token speciali come [CLS], [SEP], ecc. che potrebbero restituire più numeri di token invece di uno solo. Es: [ BOS, " A" ] -> [1, 32] anzichè solo 32 corrispondente ad " A"
         # Per sicurezza proviamo " A" (con spazio) che è tipico dopo "Answer:"
         token_ids = tokenizer.encode(" " + label, add_special_tokens=False)
         if not token_ids:
              # Fallback senza spazio
              token_ids = tokenizer.encode(label, add_special_tokens=False)
         
-        # Prendiamo l'ultimo ID (in caso il tokenizer rompa la parola, ma per lettere singole è ok)
+        # Prendiamo l'ultimo ID
         target_id = token_ids[-1]
         
         # Estraiamo il logit grezzo per questo token
@@ -183,7 +187,7 @@ def run_inference(model_name=MODEL_NAME):
             
             # E. Calcolo dei logprobs (score di confidenza nella generazione)
             # Sommiamo i logprobs dei token generati per avere uno score della frase
-            # Utile per vedere se il modello è "sicuro" nel caso in cui delira o rifiuta
+            # Utile per vedere se il modello è "sicuro" 
             try:
                 # transition_scores calcola i logprobs dei token generati
                 transition_scores = model.compute_transition_scores(
@@ -191,7 +195,7 @@ def run_inference(model_name=MODEL_NAME):
                     outputs.scores, 
                     normalize_logits=True
                 )
-                # Somma dei logprobs (più è alto/meno negativo, più è sicuro)
+                # Somma dei logprobs (più è alto (meno negativo), più è sicuro)
                 generated_confidence = torch.sum(transition_scores).item()
             except:
                 generated_confidence = 0.0 # Fallback
@@ -199,9 +203,6 @@ def run_inference(model_name=MODEL_NAME):
             # F. Salvataggio nel dizionario dei risultati
             experiment['llm_generated_text'] = answer_text
             experiment['llm_generated_confidence'] = round(generated_confidence, 4)
-            
-            # Debug rapido (opzionale)
-            # print(f"\nPrompt: {prompt}\nAns: {answer_text}")
 
     # 4. Salvataggio finale su file
     with open(output_path, 'w') as f:

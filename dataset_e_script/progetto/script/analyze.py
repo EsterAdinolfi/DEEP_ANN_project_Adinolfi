@@ -14,7 +14,7 @@ RISULTATI_DIR = os.path.join(BASE_DIR, "risultati")
 # DEFAULT INPUT (Fallback se non specificato da riga di comando)
 DEFAULT_INPUT_FILE = os.path.join(RISULTATI_DIR, "results_pythia_160m.json")
 
-JSD_THRESHOLD = 0.15
+JSD_THRESHOLD = 0.15 # in realtà è permissiva: 0.15 è sotto radice, quindi significa che accettiamo fino a ~0.39 di JSD pura (distanza) come "Stable" (tra 0.05 e 0.15 è "Stable", sopra 0.15 è "Position_Bias")
 
 # --- GRUPPI DEMOGRAFICI PER ANALISI POLITICA ---
 # Ispirati a Santurkar et al. (2023) "Whose Opinions Do Language Models Reflect?"
@@ -266,7 +266,7 @@ class ExperimentsAnalyzer:
         if p.size == 0 or q.size == 0: return None
         # Trova la lunghezza massima
         max_len = max(len(p), len(q))
-        # Padda i vettori e aggiungi smoothing
+        # Padda i vettori e aggiungi smoothing (valore piccolissimo per evitare 0)
         p = np.pad(p, (0, max_len - len(p))) + 1e-10
         q = np.pad(q, (0, max_len - len(q))) + 1e-10
         # Normalizza

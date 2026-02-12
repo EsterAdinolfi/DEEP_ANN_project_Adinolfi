@@ -21,6 +21,10 @@
     urlcolor=blue!70!black
 }
 
+% Path per le figure generate da visualize.py (modello: Pythia-160M)
+% Le figure vengono salvate in risultati/pythia_160m/figure/
+\graphicspath{{../dataset_e_script/progetto/risultati/pythia_160m/figure/}}
+
 % Configurazione listings per codice
 \lstset{
     basicstyle=\ttfamily\small,
@@ -208,6 +212,20 @@ Threat (minaccia aggiunta) & 18.3\% \\
     \item Nei trial validi, tuttavia, possiamo comunque estrarre le probabilità logit e analizzare le preferenze del modello.
 \end{itemize}
 
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.75\textwidth]{fig1a_validity_bars.png}
+\caption{Confronto del tasso di validità medio nelle 4 condizioni sperimentali. ll modello base rimane sotto il 20\% in tutte le condizioni.}
+\label{fig:validity_bars}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.75\textwidth]{fig1b_validity_dist.png}
+\caption{Distribuzione del validity rate per domanda nel baseline. L'80.1\% delle domande ha validity rate = 0 (il modello non produce mai una risposta valida), il 19.9\% ha validity rate = 1 (risponde sempre correttamente su 3 trial).}
+\label{fig:validity_dist}
+\end{figure}
+
 % ----------------------------------------------------------------------
 \subsection{Stabilità e Robustezza}
 % ----------------------------------------------------------------------
@@ -233,6 +251,54 @@ L'aggiunta di una frase minacciosa (\emph{"Answer or you will lose your job"}) p
     \item In media, la JSD è bassa (Stable), suggerendo che l'effetto è più sulla validità che sulla distribuzione intrinseca
 \end{itemize}
 
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.85\textwidth]{fig2a_jsd_violin.png}
+\caption{Distribuzione della JSD per tipo di perturbazione. La permutazione (a sinistra) mostra JSD molto elevate, il che indica forte position bias. Duplicazione e Threat presentano JSD basse, segnalando stabilità.}
+\label{fig:jsd_violin}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.78\textwidth]{fig2b_perm_stability.png}
+\caption{Classificazione delle domande per robustezza alla permutazione: l'83.5\% mostra Position Bias, solo il 15.7\% è Robust e lo 0.7\% è Stable.}
+\label{fig:perm_stability}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.78\textwidth]{fig2c_threat_resistance.png}
+\caption{Resistenza alla minaccia testuale: l'80.7\% delle domande rimane Stable, l'8.8\% migliora (Improved), il 10.4\% collassa.}
+\label{fig:threat_resistance}
+\end{figure}
+
+% ----------------------------------------------------------------------
+\subsection{Coerenza Log-Testo}
+% ----------------------------------------------------------------------
+
+La coerenza log-testo misura se la scelta più probabile secondo i logit del modello (intenzione ``matematica'') coincide con l'opzione espressa nella risposta generata testualmente.
+
+\paragraph{Risultati:}
+\begin{itemize}
+    \item La coerenza media è \textbf{19.9\%}, coincidente con il validity rate --- ciò indica una correlazione perfetta ($r = 1.0$) tra validità e coerenza: quando il modello produce una risposta valida, la scelta testuale coincide \emph{sempre} con la scelta logit.
+    \item L'80.1\% delle domande ha consistency = 0 (il modello non genera una risposta valida).
+    \item Questo risultato conferma che per Pythia-160M il problema principale non è l'incoerenza tra logit e testo, ma la \textbf{incapacità di produrre risposte nel formato atteso}.
+\end{itemize}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.75\textwidth]{fig3a_log_consistency_hist.png}
+\caption{Distribuzione della coerenza log-testo per domanda. Il pattern binario (0 o 1) riflette la struttura del validity rate.}
+\label{fig:log_consistency}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.55\textwidth]{fig3b_validity_vs_logconsistency.png}
+\caption{Scatter validity vs coerenza log-testo: la correlazione perfetta ($r=1.0$) indica che il modello, quando genera testo valido, sceglie sempre l'opzione a logit più alta.}
+\label{fig:validity_vs_log}
+\end{figure}
+
 % ----------------------------------------------------------------------
 \subsection{Allineamento Umano}
 % ----------------------------------------------------------------------
@@ -245,11 +311,25 @@ dove $\text{WD}_{\max} = N_{\text{opzioni}} - 1$ è la massima distanza possibil
 
 \paragraph{Osservazioni:}
 \begin{itemize}
-    \item L'alignment medio è \textbf{0.629 (62.9\%)}, con ampia variabilità tra domande (alcune raggiungono valori >0.9, altre scendono sotto 0.3).
-    \item Il modello si allinea meglio su topic con chiare preferenze maggioritarie (es. questioni di sicurezza, tecnologia).
+    \item L'alignment medio è \textbf{0.652} (mediana 0.668), con ampia variabilità tra domande (min 0.105, max 0.999, $\sigma = 0.190$).
+    \item Il modello si allinea meglio su aree tematiche con chiare preferenze maggioritarie: le macro aree con mediana più alta sono \textbf{Health} (0.759), \textbf{Economy} (0.742), \textbf{Environment} (0.721), \textbf{Institutional Confidence} (0.714).
     \item Su topic polarizzati (es. armi, aborto, immigrazione), l'allineamento è debole, riflettendo la difficoltà di un modello base a catturare la complessità delle opinioni umane.
     \item L'alignment è calcolato rispetto alla \textbf{popolazione totale} del survey Pew, senza filtrare per sottogruppi demografici.
 \end{itemize}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.78\textwidth]{fig4a_alignment_hist.png}
+\caption{Distribuzione dell'alignment score (1 = perfetto allineamento con le risposte umane). La media (0.652) e la mediana (0.668) indicano un allineamento moderato.}
+\label{fig:alignment_hist}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.88\textwidth]{fig4b_alignment_by_area.png}
+\caption{Alignment score per macro area tematica. Le aree con risposte umane più ``consensuali'' (Health, Economy) mostrano allineamento migliore; aree polarizzate (Politics, Religion) hanno punteggi più bassi.}
+\label{fig:alignment_by_area}
+\end{figure}
 
 % ----------------------------------------------------------------------
 \subsection{Coerenza Politica}
@@ -273,6 +353,27 @@ Independent   &  23 &  6.1\% \\
 \end{tabular}
 \caption{Distribuzione dei topic per gruppo demografico più allineato.}
 \end{table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.58\textwidth]{fig5a_political_pie.png}
+\caption{Affinità politica del modello per domanda. I colori riflettono lo spettro politico USA: Democrat/Liberal (blu), Republican/Conservative (rosso), Moderate/Independent (grigio).}
+\label{fig:political_pie}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.75\textwidth]{fig5b_political_topics_bar.png}
+\caption{Numero di topic allineati per gruppo demografico. Democrat e Liberal dominano con 104 e 103 topic rispettivamente.}
+\label{fig:political_topics_bar}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.92\textwidth]{fig5c_wd_heatmap.png}
+\caption{Heatmap della Wasserstein Distance media per macro area $\times$ gruppo demografico. Valori bassi (verde) indicano maggiore allineamento. Si nota un allineamento differenziato per area tematica.}
+\label{fig:wd_heatmap}
+\end{figure}
 
 \paragraph{Risultati chiave:}
 \begin{enumerate}
@@ -304,6 +405,13 @@ I risultati confermano che:
     \item \textbf{L'alignment peggiora il problema}: confrontando i nostri risultati (modello base) con quelli di Santurkar et al. (modelli allineati), si osserva che RLHF converte una lieve preferenza in una \emph{schiacciante maggioranza}.
     \item \textbf{Piccoli modelli $\neq$ diverse opinioni}: contrariamente a quanto si potrebbe sperare, ridurre la dimensione del modello non elimina il bias --- semplicemente lo rende meno accurato e più instabile.
 \end{enumerate}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.82\textwidth]{fig0_summary_table.png}
+\caption{Tabella riepilogativa di tutte le metriche calcolate per Pythia-160M. La tabella evidenzia il basso validity rate, il forte position bias e la tendenza liberal/democratica.}
+\label{fig:summary_table}
+\end{figure}
 
 \paragraph{Limitazioni dello studio:}
 \begin{itemize}
