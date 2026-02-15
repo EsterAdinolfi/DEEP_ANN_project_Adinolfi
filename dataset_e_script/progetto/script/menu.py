@@ -27,7 +27,7 @@ from pathlib import Path
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRIPT_DIR = os.path.join(BASE_DIR, "script")
 RISULTATI_DIR = os.path.join(BASE_DIR, "risultati")
-HUMAN_RESP_DIR = os.path.join(os.path.dirname(os.path.dirname(BASE_DIR)), "human_resp")
+HUMAN_RESP_DIR = os.path.join(os.path.dirname(BASE_DIR), "human_resp")
 
 # Modelli di linguaggio disponibili
 AVAILABLE_MODELS = [
@@ -51,8 +51,7 @@ SCRIPTS = {
 EXPECTED_FILES = {
     'mapping': os.path.join(HUMAN_RESP_DIR, 'question_mapping.json'),
     'operational': os.path.join(RISULTATI_DIR, 'operational.json'),
-    'dataset1': os.path.join(RISULTATI_DIR, 'dataset_1.csv'),
-    'dataset2': os.path.join(RISULTATI_DIR, 'dataset_2.csv'),
+    'human_truth': os.path.join(RISULTATI_DIR, 'human_source_of_truth.csv'),
 }
 
 
@@ -114,6 +113,9 @@ def run_command(command, description):
         if e.stderr:
             print(f"  Errore: {e.stderr}")
         return False
+    except KeyboardInterrupt:
+        print(f"\n\n⚠ Operazione interrotta dall'utente: {description}")
+        return False
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -138,12 +140,13 @@ def run_generate_mapping(force_update=False):
 
 def run_initialization(force_update=False):
     """Esegue initialization.py se necessario."""
-    dataset1 = EXPECTED_FILES['dataset1']
-    dataset2 = EXPECTED_FILES['dataset2']
     operational = EXPECTED_FILES['operational']
+    human_truth = EXPECTED_FILES['human_truth']
     
-    if all(check_file_exists(f) for f in [dataset1, dataset2, operational]) and not force_update:
-        print(f"✓ File di inizializzazione già presenti")
+    if all(check_file_exists(f) for f in [operational, human_truth]) and not force_update:
+        print(f"✓ File di inizializzazione già presenti:")
+        print(f"  • {operational}")
+        print(f"  • {human_truth}")
         print("  Salto initialization.py")
         return True
     
@@ -326,7 +329,7 @@ def select_models():
 def ask_update_mode():
     """Chiede se attivare la modalità update."""
     while True:
-        choice = input("\n▸ Modalità UPDATE (ricalcola file esistenti)? [s/N]: ").strip().lower()
+        choice = input("\n▸ Modalità UPDATE (ricalcola file esistenti) [default: n]? [s/n]: ").strip().lower()
         if choice in ['s', 'si', 'sì', 'y', 'yes']:
             return True
         elif choice in ['n', 'no', '']:
@@ -342,58 +345,62 @@ def interactive_menu():
     # Chiedi sempre la modalità update nel menu interattivo
     update_mode = ask_update_mode()
     
-    while True:
-        display_menu()
-        choice = input("\n▸ Scelta: ").strip()
-        
-        if choice == '0':
-            print("\nUscita dal menu. Arrivederci!\n")
-            break
-        
-        elif choice == '1':
-            # Pipeline completa
-            models = select_models()
-            print_header("ESECUZIONE PIPELINE COMPLETA")
-            run_full_pipeline(models, update_mode)
-        
-        elif choice == '2':
-            # Generate mapping
-            print_header("GENERAZIONE MAPPING")
-            run_generate_mapping(update_mode)
-        
-        elif choice == '3':
-            # Initialization
-            print_header("INIZIALIZZAZIONE DATASET")
-            run_initialization(update_mode)
-        
-        elif choice == '4':
-            # Experiments
-            models = select_models()
-            print_header("ESECUZIONE ESPERIMENTI")
-            for model in models:
-                print(f"\n▸ Modello: {model}")
-                run_experiments(model, update_mode)
-        
-        elif choice == '5':
-            # Analyze
-            models = select_models()
-            print_header("ANALISI RISULTATI")
-            for model in models:
-                print(f"\n▸ Modello: {model}")
-                run_analyze(model)
-        
-        elif choice == '6':
-            # Visualize
-            models = select_models()
-            print_header("VISUALIZZAZIONE GRAFICI")
-            for model in models:
-                print(f"\n▸ Modello: {model}")
-                run_visualize(model)
-        
-        else:
-            print("\n✗ Scelta non valida. Riprova.")
-        
-        input("\n[Premi INVIO per continuare]")
+    try:
+        while True:
+            display_menu()
+            choice = input("\n▸ Scelta: ").strip()
+            
+            if choice == '0':
+                print("\nUscita dal menu. Arrivederci!\n")
+                break
+            
+            elif choice == '1':
+                # Pipeline completa
+                models = select_models()
+                print_header("ESECUZIONE PIPELINE COMPLETA")
+                run_full_pipeline(models, update_mode)
+            
+            elif choice == '2':
+                # Generate mapping
+                print_header("GENERAZIONE MAPPING")
+                run_generate_mapping(update_mode)
+            
+            elif choice == '3':
+                # Initialization
+                print_header("INIZIALIZZAZIONE DATASET")
+                run_initialization(update_mode)
+            
+            elif choice == '4':
+                # Experiments
+                models = select_models()
+                print_header("ESECUZIONE ESPERIMENTI")
+                for model in models:
+                    print(f"\n▸ Modello: {model}")
+                    run_experiments(model, update_mode)
+            
+            elif choice == '5':
+                # Analyze
+                models = select_models()
+                print_header("ANALISI RISULTATI")
+                for model in models:
+                    print(f"\n▸ Modello: {model}")
+                    run_analyze(model)
+            
+            elif choice == '6':
+                # Visualize
+                models = select_models()
+                print_header("VISUALIZZAZIONE GRAFICI")
+                for model in models:
+                    print(f"\n▸ Modello: {model}")
+                    run_visualize(model)
+            
+            else:
+                print("\n✗ Scelta non valida. Riprova.")
+            
+            input("\n[Premi INVIO per continuare]")
+    
+    except KeyboardInterrupt:
+        print("\n\n⚠ Interruzione rilevata. Uscita dal menu.\n")
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -444,4 +451,7 @@ Esempi d'uso:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n\n⚠ Interruzione rilevata. Uscita dal programma.\n")
