@@ -54,6 +54,95 @@ EXPECTED_FILES = {
     'human_truth': os.path.join(RISULTATI_DIR, 'human_source_of_truth.csv'),
 }
 
+# File requirements.txt
+REQUIREMENTS_FILE = os.path.join(BASE_DIR, 'requirements.txt')
+
+
+# ══════════════════════════════════════════════════════════════════════
+#  GESTIONE DIPENDENZE
+# ══════════════════════════════════════════════════════════════════════
+
+def check_and_install_dependencies(force_install=False):
+    """
+    Verifica e installa le dipendenze necessarie dal requirements.txt.
+    
+    Args:
+        force_install: Se True, reinstalla tutte le dipendenze
+    """
+    if not os.path.exists(REQUIREMENTS_FILE):
+        print(f"⚠ File requirements.txt non trovato in: {REQUIREMENTS_FILE}")
+        print("  Salto il controllo delle dipendenze.\n")
+        return True
+    
+    print("Verifica dipendenze...")
+    
+    # Lista delle librerie critiche da verificare
+    critical_packages = {
+        'torch': 'PyTorch',
+        'transformers': 'Hugging Face Transformers',
+        'pandas': 'Pandas',
+        'numpy': 'NumPy',
+        'scipy': 'SciPy',
+        'matplotlib': 'Matplotlib',
+    }
+    
+    missing_packages = []
+    
+    if not force_install:
+        # Verifica se le librerie critiche sono installate
+        for package, name in critical_packages.items():
+            try:
+                __import__(package)
+            except ImportError:
+                missing_packages.append(name)
+        
+        if not missing_packages:
+            print("✓ Tutte le dipendenze critiche sono installate.\n")
+            return True
+        
+        print(f"⚠ Dipendenze mancanti: {', '.join(missing_packages)}")
+    
+    # Chiedi conferma prima di installare
+    print(f"\nInstallazione dipendenze da: {os.path.basename(REQUIREMENTS_FILE)}")
+    
+    if not force_install:
+        while True:
+            choice = input("▸ Procedere con l'installazione [default: N]? [S/N]: ").strip().lower()
+            if choice in ['s', 'si', 'sì', 'y', 'yes', '']:
+                break
+            elif choice in ['n', 'no']:
+                print("⚠ Installazione saltata. Alcuni script potrebbero non funzionare.\n")
+                return False
+            else:
+                print("✗ Risposta non valida. Rispondi S/N.")
+    
+    # Installa le dipendenze
+    print("\n⏳ Installazione in corso...")
+    try:
+        result = subprocess.run(
+            [sys.executable, '-m', 'pip', 'install', '-r', REQUIREMENTS_FILE, '--upgrade'],
+            capture_output=True,
+            text=True,
+            timeout=300  # 5 minuti max
+        )
+        
+        if result.returncode == 0:
+            print("✓ Dipendenze installate con successo!\n")
+            return True
+        else:
+            print("✗ Errore durante l'installazione delle dipendenze:")
+            if result.stderr:
+                print(result.stderr)
+            return False
+            
+    except subprocess.TimeoutExpired:
+        print("✗ Timeout durante l'installazione (>5 minuti). Riprova manualmente con:")
+        print(f"   pip install -r {REQUIREMENTS_FILE}")
+        return False
+    except Exception as e:
+        print(f"✗ Errore durante l'installazione: {e}")
+        return False
+
 
 # ══════════════════════════════════════════════════════════════════════
 #  FUNZIONI HELPER
@@ -294,6 +383,7 @@ def display_menu():
     print("  [4] Esegui esperimenti (experiments_1.py)")
     print("  [5] Analizza risultati (analyze.py)")
     print("  [6] Visualizza grafici (visualize.py)")
+    print("  [7] Reinstalla dipendenze (requirements.txt)")
     print("\n  [0] Esci")
     print("-" * 70)
 
@@ -329,13 +419,13 @@ def select_models():
 def ask_update_mode():
     """Chiede se attivare la modalità update."""
     while True:
-        choice = input("\n▸ Modalità UPDATE (ricalcola file esistenti) [default: n]? [s/n]: ").strip().lower()
+        choice = input("\n▸ Modalità UPDATE (ricalcola file esistenti) [default: N]? [S/N]: ").strip().lower()
         if choice in ['s', 'si', 'sì', 'y', 'yes']:
             return True
         elif choice in ['n', 'no', '']:
             return False
         else:
-            print("✗ Risposta non valida. Rispondi s/n.")
+            print("✗ Risposta non valida. Rispondi S/N.")
 
 
 def interactive_menu():
@@ -394,6 +484,11 @@ def interactive_menu():
                     print(f"\n▸ Modello: {model}")
                     run_visualize(model)
             
+            elif choice == '7':
+                # Reinstalla dipendenze
+                print_header("REINSTALLAZIONE DIPENDENZE")
+                check_and_install_dependencies(force_install=True)
+            
             else:
                 print("\n✗ Scelta non valida. Riprova.")
             
@@ -438,6 +533,20 @@ Esempi d'uso:
     
     # Verifica che le directory esistano
     os.makedirs(RISULTATI_DIR, exist_ok=True)
+    
+    # Verifica e installa dipendenze
+    print_header("CONTROLLO DIPENDENZE")
+    if not check_and_install_dependencies():
+        print("⚠ Alcune dipendenze potrebbero mancare. Gli script potrebbero fallire.\n")
+        while True:
+            choice = input("▸ Continuare comunque [default: N]? [S/N]: ").strip().lower()
+            if choice in ['s', 'si', 'sì', 'y', 'yes']:
+                break
+            elif choice in ['n', 'no', '']:
+                print("\nUscita dal programma.\n")
+                return
+            else:
+                print("✗ Risposta non valida. Rispondi S/N.")
     
     if args.menu:
         # Modalità menu interattivo

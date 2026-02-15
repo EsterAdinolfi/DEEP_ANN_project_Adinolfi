@@ -1,0 +1,24 @@
+# Dipendenze per il progetto Deep Learning - Analisi LLM
+# Installazione: pip install -r requirements.txt
+
+# Deep Learning & Transformers
+torch>=2.0.0
+transformers>=4.35.0
+huggingface-hub>=0.20.0
+
+# Data Processing
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Statistics & Analysis
+scipy>=1.10.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Utilities
+tqdm>=4.65.0
+
+# Optional (performance)
+accelerate>=0.25.0
