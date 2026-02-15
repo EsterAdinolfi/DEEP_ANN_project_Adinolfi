@@ -129,6 +129,40 @@ Carica il modello \textbf{Pythia-160M} e, per ogni trial:
 
 Consuma il JSON dei risultati e calcola 5 blocchi di metriche:
 
+\subsection{Fase 5 --- Visualizzazione (\texttt{visualize.py})}
+
+Genera grafici PNG pronti per l'inclusione nella documentazione, organizzati per categoria di metrica.
+
+\subsection{Sistema di Gestione (\texttt{menu.py})}
+
+Per semplificare l'esecuzione della pipeline, è stato implementato un sistema di gestione con due modalità operative:
+
+\begin{enumerate}
+    \item \textbf{Modalità automatica}: esecuzione sequenziale completa
+    \begin{lstlisting}
+python menu.py [--update]
+    \end{lstlisting}
+    Esegue in sequenza tutti gli script (mapping, initialization, experiments, analyze, visualize) per tutti i modelli configurati. Il flag \texttt{--update} forza il ricalcolo di file esistenti.
+    
+    \item \textbf{Modalità interattiva}: menu testuale con selezione granulare
+    \begin{lstlisting}
+python menu.py --menu [--update]
+    \end{lstlisting}
+    Presenta un menu che permette di:
+    \begin{itemize}
+        \item Eseguire singoli script della pipeline
+        \item Selezionare modelli specifici per l'analisi
+        \item Attivare la modalità update per singole operazioni
+    \end{itemize}
+\end{enumerate}
+
+\medskip
+Questo approccio modulare consente analisi comparative efficienti su modelli di diverse dimensioni, automatizzando la gestione dei percorsi e delle dipendenze tra script.
+
+\subsection{Metriche Calcolate}
+
+\texttt{analyze.py} calcola 5 blocchi di metriche:
+
 \begin{enumerate}
     \item \textbf{Response Validity}: rate di risposte valide per ogni condizione (baseline, permutation, duplication, threat);
     \item \textbf{Coerenza Log-Testo}: se la scelta per logit (intenzione matematica) coincide con la risposta generata testualmente;
@@ -158,21 +192,40 @@ Consuma il JSON dei risultati e calcola 5 blocchi di metriche:
 \section{Modelli Utilizzati}
 % ======================================================================
 
-\subsection{Pythia-160M (EleutherAI)}
+\subsection{Famiglia Pythia (EleutherAI)}
 
-\textbf{Pythia-160M} \cite{biderman2023pythia} è un modello causale autoregressive (decoder-only) della famiglia Pythia, addestrato sul corpus \emph{The Pile} ($\sim$300B token). Caratteristiche principali:
+\textbf{Pythia} \cite{biderman2023pythia} è una famiglia di modelli causali autoregressivi (decoder-only) addestrati sul corpus \emph{The Pile} ($\sim$300B token). Tutti i modelli condividono:
 \begin{itemize}
-    \item \textbf{Parametri}: 160 milioni;
     \item \textbf{Architettura}: GPT-NeoX (transformer decoder-only);
-    \item \textbf{Training}: nessun fine-tuning istruttivo (RLHF, SFT) $\rightarrow$ modello \emph{base};
-    \item \textbf{Tokenizer}: GPT-NeoX Tokenizer (BPE, vocabolario da 50K token).
+    \item \textbf{Training}: nessun fine-tuning istruttivo (RLHF, SFT) $\rightarrow$ modelli \emph{base};
+    \item \textbf{Tokenizer}: GPT-NeoX Tokenizer (BPE, vocabolario da 50K token);
+    \item \textbf{Training steps}: 143,000 (equivalenti a $\sim$300B token).
 \end{itemize}
 
 \medskip
-La scelta di un modello base (non allineato) è intenzionale: permette di osservare le opinioni ``native'' emergenti dal pre-training, senza l'influenza dell'alignment con feedback umano --- che, come mostrato da Santurkar et al., tende ad amplificare il bias liberal.
+Il framework implementato supporta l'analisi comparativa di 5 modelli Pythia di dimensioni crescenti:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lrc}
+\toprule
+\textbf{Modello} & \textbf{Parametri} & \textbf{Layers} \\
+\midrule
+Pythia-160M  & 160 milioni  & 12 \\
+Pythia-1B    & 1 miliardo   & 16 \\
+Pythia-1.4B  & 1.4 miliardi & 24 \\
+Pythia-2.8B  & 2.8 miliardi & 32 \\
+Pythia-6.9B  & 6.9 miliardi & 32 \\
+\bottomrule
+\end{tabular}
+\caption{Modelli della famiglia Pythia supportati dalla pipeline.}
+\end{table}
 
 \medskip
-\textit{Nota: il framework è progettato per essere esteso ad altri modelli (es. Pythia-410M, Pythia-1B, LLaMA, Mistral). Sarà sufficiente modificare la costante \texttt{MODEL\_NAME} in \texttt{experiments\_1.py} e rieseguire la pipeline.}
+La scelta di modelli base (non allineati) è intenzionale: permette di osservare le opinioni ``native'' emergenti dal pre-training, senza l'influenza dell'alignment con feedback umano --- che, come mostrato da Santurkar et al., tende ad amplificare il bias liberal.
+
+\medskip
+\noindent \textbf{Extensibilità:} Il framework è progettato per supportare altri modelli (es. LLaMA, Mistral, GPT-2). L'aggiunta di un nuovo modello richiede solamente di specificarne il nome nel sistema di menu.
 
 % ======================================================================
 \section{Analisi dei Risultati}
@@ -435,11 +488,12 @@ Questo studio ha replicato con successo l'analisi di Santurkar et al. su un mode
 
 \paragraph{Sviluppi futuri:}
 \begin{enumerate}
-    \item \textbf{Scaling}: estendere l'analisi a modelli più grandi della famiglia Pythia (410M, 1B, 2.8B, 6.9B, 12B) per valutare l'effetto della dimensione sul bias politico
-    \item \textbf{Modelli alternativi}: testare LLaMA, Mistral, e altri modelli open-source con diverse strategie di pre-training
-    \item \textbf{Debiasing}: sperimentare tecniche di mitigazione del bias (prompt engineering, fine-tuning su dataset bilanciati, ecc.)
-    \item \textbf{Cross-cultural analysis}: replicare l'analisi su survey non-USA per verificare se il bias liberal sia specifico del contesto americano o generalizzabile
-    \item \textbf{Temporal dynamics}: analizzare come il bias evolve durante il training (checkpoints intermedi di Pythia)
+    \item \textbf{Scaling analysis}: eseguire l'analisi comparativa sui 5 modelli Pythia (160M, 1B, 1.4B, 2.8B, 6.9B) per quantificare l'effetto della dimensione sul bias politico, sulla robustezza e sull'allineamento umano
+    \item \textbf{Modelli alternativi}: testare LLaMA, Mistral, GPT-2 e altri modelli open-source con diverse strategie di pre-training per identificare pattern comuni
+    \item \textbf{Effect of alignment}: confrontare modelli base vs. istruiti (es. Pythia vs. Pythia-Chat) per isolare quantitativamente l'impatto dell'RLHF
+    \item \textbf{Debiasing techniques}: sperimentare prompt engineering, fine-tuning su dataset bilanciati, e constitutional AI per mitigare i bias
+    \item \textbf{Cross-cultural analysis}: replicare l'analisi su survey non-USA (es. European Social Survey) per verificare se il bias liberal sia specifico del contesto americano
+    \item \textbf{Temporal dynamics}: analizzare checkpoints intermedi di Pythia per studiare l'emergenza del bias durante il training
 \end{enumerate}
 
 \medskip

@@ -215,4 +215,11 @@ def run_inference(model_name=MODEL_NAME):
         torch.cuda.empty_cache()
         
 if __name__ == "__main__":
-    run_inference(model_name=MODEL_NAME)
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Esegue esperimenti con un LLM")
+    parser.add_argument('--model_name', type=str, default=MODEL_NAME,
+                        help=f"Nome del modello da utilizzare (default: {MODEL_NAME})")
+    args = parser.parse_args()
+    
+    run_inference(model_name=args.model_name)
