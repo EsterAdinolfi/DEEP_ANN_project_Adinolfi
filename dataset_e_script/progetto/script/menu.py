@@ -312,6 +312,30 @@ def run_visualize(model_name, mode='weighted', force_update=False):
         show_live_output=True  # Script medio-lungo, mostra progresso
     )
 
+def run_only_experiments_pipeline(models=None, force_update=False):
+    """
+    Esegue SOLO la generazione degli esperimenti (per l'esecuzione sul server).
+    """
+    if models is None:
+        models = AVAILABLE_MODELS
+    
+    print_header("AVVIO ESECUZIONE SERVER - SOLO ESPERIMENTI")
+    print(f"Modelli selezionati: {len(models)}")
+    
+    total_steps = len(models)
+    
+    for idx, model in enumerate(models):
+        print_header(f"MODELLO {idx + 1}/{len(models)}: {model}")
+        print_step(idx + 1, total_steps, f"Esperimenti - {model}")
+        
+        if not run_experiments(model, force_update):
+            print(f"\n✗ Errore negli esperimenti per {model}")
+            # Sul server non chiediamo input all'utente se c'è un errore, passiamo al prossimo
+            continue
+            
+    print_header("ESPERIMENTI COMPLETATI ✓")
+    return True
+
 
 # ══════════════════════════════════════════════════════════════════════
 #  SEQUENZA OPERATIVA COMPLETA
@@ -411,6 +435,7 @@ def display_menu():
     print("  [5] Analizza risultati (analyze.py)")
     print("  [6] Visualizza grafici (visualize.py)")
     print("  [7] Installa/aggiorna dipendenze (requirements.txt)")
+    print("  [8] Esegui SOLO gli esperimenti (modalità server)")
     print("\n  [0] Esci")
     print("-" * 70)
 
@@ -515,6 +540,12 @@ def interactive_menu():
                 # Installa/aggiorna dipendenze
                 print_header("INSTALLAZIONE DIPENDENZE")
                 install_dependencies()
+
+            elif choice == '8':
+                # Solo Esperimenti (Server)
+                models = select_models()
+                print_header("ESECUZIONE SERVER - SOLO ESPERIMENTI")
+                run_only_experiments_pipeline(models, update_mode)
             
             else:
                 print("\n✗ Scelta non valida. Riprova.")
