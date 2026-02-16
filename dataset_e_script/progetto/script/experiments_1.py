@@ -220,9 +220,9 @@ def run_inference(model_name=MODEL_NAME, random_seed=RANDOM_SEED):
             experiment['llm_generated_text'] = answer_text
             experiment['llm_generated_confidence'] = round(generated_confidence, 4)
 
-            # 4. Salvataggio incrementale su file → aggiornato dopo ogni domanda per evitare perdite di dati in caso di crash
-            with open(output_path, 'w') as f:
-                json.dump(dataset, f, indent=2)
+        # 4. Salvataggio incrementale su file → aggiornato dopo ogni domanda per evitare perdite di dati in caso di crash
+        with open(output_path, 'w') as f:
+            json.dump(dataset, f, indent=2)
     
     print(f"\n[FINE] Esperimenti completati! Risultati salvati in: {output_path}")
 

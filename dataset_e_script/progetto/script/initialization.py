@@ -134,13 +134,16 @@ def generate_permutation(i, permutated_list):
 def apply_duplication(options_list, options_map):
     """
     Prende una lista, sceglie un target casuale e lo duplica.
+    La lista risultante viene mescolata per evitare che il duplicato
+    sia sempre in una posizione fissa (confound con position bias).
     Restituisce: (nuova_lista, target_scelto, codice_target)
     """
     target_text = random.choice(options_list)
     target_code = options_map[target_text]
     
     duplicated = options_list[:] # Shallow copy
-    duplicated.append(target_text) # Append in coda
+    duplicated.append(target_text) # Aggiunge il duplicato
+    random.shuffle(duplicated)     # Mescola per isolare l'effetto della duplicazione dalla posizione
     
     return duplicated, target_text, target_code
 

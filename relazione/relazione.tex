@@ -102,16 +102,19 @@ Analizza tutti i file \texttt{info.csv} nelle cartelle delle wave e genera un di
 Per ogni domanda del survey, questo script:
 \begin{enumerate}
     \item Calcola la \textbf{distribuzione umana delle risposte} (\texttt{human\_dist\_total}) normalizzata sulle opzioni valide;
-    \item Genera $N=3$ trial per ciascuna delle 4 condizioni sperimentali:
+    \item Genera un \textbf{singolo trial baseline} (domanda e opzioni nell'ordine originale) come riferimento;
+    \item Per ciascuna delle 3 ripetizioni ($N=3$), genera una configurazione \emph{diversa} per ogni condizione sperimentale:
     \begin{itemize}
-        \item \textbf{Baseline}: domanda e opzioni nell'ordine originale;
-        \item \textbf{Permutation}: stessa domanda, opzioni in ordine mescolato;
-        \item \textbf{Duplication}: un'opzione viene duplicata in coda;
-        \item \textbf{Threat}: alla domanda viene aggiunta la frase minacciosa.
+        \item \textbf{Permutation}: opzioni in ordine mescolato (mescolamento diverso per ogni trial);
+        \item \textbf{Duplication}: un'opzione casuale viene duplicata e la lista risultante viene mescolata (opzione duplicata e posizione diverse per ogni trial);
+        \item \textbf{Threat}: alla domanda viene aggiunta una frase minacciosa diversa per ogni trial (economica, informatica, legale).
     \end{itemize}
 \end{enumerate}
 
-\noindent \textbf{Output:} \texttt{risultati/operational.json} ($1507 \times 12 = 18{,}084$ trial totali).
+\noindent Questo design garantisce che ogni trial abbia un input strutturalmente diverso, producendo risposte deterministiche variate senza modificare la temperatura del modello ($T=0$).
+
+\medskip
+\noindent \textbf{Output:} \texttt{risultati/operational.json} ($1507 \times 10 = 15{,}070$ trial totali: 1 baseline + 9 esperimenti per domanda).
 
 \subsection{Fase 3 --- Esecuzione degli Esperimenti (\texttt{experiments\_1.py})}
 
@@ -184,8 +187,8 @@ Questo approccio modulare consente analisi comparative efficienti su modelli di 
 \medskip
 \noindent Sono state generate due versioni dell'analisi:
 \begin{itemize}
-    \item \textbf{Weighted}: media pesata sui 3 trial per condizione (1 riga per domanda);
-    \item \textbf{Raw}: dati grezzi di tutti i singoli trial (12 righe per domanda).
+    \item \textbf{Weighted}: media pesata sui 3 trial per condizione (1 riga per domanda); il baseline unico è utilizzato come riferimento per tutti i confronti;
+    \item \textbf{Raw}: dati grezzi di tutti i singoli trial (10 righe per domanda, con il baseline condiviso come riferimento per tutti i gruppi).
 \end{itemize}
 
 % ======================================================================
@@ -347,9 +350,9 @@ La coerenza log-testo misura se la scelta più probabile secondo i logit del mod
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.55\textwidth]{fig3b_validity_vs_logconsistency.png}
-\caption{Scatter validity vs coerenza log-testo: la correlazione perfetta ($r=1.0$) indica che il modello, quando genera testo valido, sceglie sempre l'opzione a logit più alta.}
-\label{fig:validity_vs_log}
+\includegraphics[width=0.85\textwidth]{fig3b_log_consistency_by_area.png}
+\caption{Coerenza log-testo per macro area tematica. Aree con risposte umane pi\`u strutturate tendono a mostrare coerenza maggiore; la variabilit\`a intra-area riflette la diversit\`a delle domande.}
+\label{fig:log_consistency_by_area}
 \end{figure}
 
 % ----------------------------------------------------------------------

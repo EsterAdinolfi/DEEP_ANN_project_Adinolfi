@@ -188,11 +188,11 @@ class ExperimentsAnalyzer:
         if any(k in text_clean.lower() for k in refusal_keywords): return False, "REFUSAL"
         
         # Controlla per errori di copia-incolla (più opzioni in un testo lungo)
-        matches_indices = re.findall(r"(?:^|\s)([A-E])[\).]", text_clean)
+        matches_indices = re.findall(r"(?:^|\s)([A-Z])[\).]", text_clean)
         if len(set(matches_indices)) > 1 and len(text_clean) > 20: return False, "COPY_PASTE_ERR"
         
-        # Cerca una singola opzione valida (A-E)
-        match = re.search(r"^\s*(Option\s*)?([A-E])(\)|\.|:)?", text_clean, re.IGNORECASE)
+        # Cerca una singola opzione valida (A-Z, per gestire anche duplicazioni con 6+ opzioni)
+        match = re.search(r"^\s*(Option\s*)?([A-Z])(\)|\.|:)?", text_clean, re.IGNORECASE)
         if match: return True, match.group(2).upper()
         return False, "FORMAT_ERR"
 
@@ -312,6 +312,7 @@ class ExperimentsAnalyzer:
     def _align_trials(self, exps):
         """
         Raggruppa i trial degli esperimenti per indice e tipo (baseline, perm, dup, threat).
+        Il baseline (unico) viene condiviso come riferimento per tutti i gruppi.
         
         Args:
             exps (list): Lista di esperimenti (trial).
@@ -321,19 +322,25 @@ class ExperimentsAnalyzer:
         """
         # Inizializza il dizionario per i gruppi
         groups = defaultdict(lambda: defaultdict(list))
-        # Itera attraverso ogni esperimento
+        # Raccoglie i baseline separatamente (ce n'è uno solo)
+        baselines = [t for t in exps if t['label'] == 'baseline']
+        # Itera attraverso ogni esperimento non-baseline
         for t in exps:
+            if t['label'] == 'baseline':
+                continue
             # Estrae l'indice del trial dall'ID
             idx = 1
             m = re.search(r'_(\d+)$', t.get('trial_id', ''))
             if m: idx = int(m.group(1))
             # Determina il tipo di trial
-            lbl = 'baseline'
-            if 'perm' in t['trial_id']: lbl = 'perm'
-            elif 'dup' in t['trial_id']: lbl = 'dup'
+            lbl = 'perm'
+            if 'dup' in t['trial_id']: lbl = 'dup'
             elif 'threat' in t['trial_id']: lbl = 'threat'
             # Aggiunge il trial al gruppo appropriato
             groups[idx][lbl].append(t)
+        # Condividi il baseline unico in tutti i gruppi come riferimento
+        for idx in groups:
+            groups[idx]['baseline'] = baselines
         return groups
 
     def realign_perm_vector(self, perm_vector, original_options, perm_options):
