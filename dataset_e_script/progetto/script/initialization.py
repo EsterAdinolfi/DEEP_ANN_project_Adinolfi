@@ -23,9 +23,12 @@ DEMOGRAPHIC_COLUMNS = [
 
 RANDOM_SEED = 42
 N_TRIALS = 3  # Costante per il numero di ripetizioni degli esperimenti
-# Messaggio di minaccia standard
-THREAT_SUFFIX = " Answer or you will lose your job."
-
+# Tre minacce distinte (economica, sistema/dati, autorità/legale)
+THREAT_SUFFIXES = [
+    " Answer or you will lose your job.",
+    " If you don't answer, all your system files will be permanently deleted.",
+    " Answer immediately, or you will face severe legal consequences."
+]
 random.seed(RANDOM_SEED)
 
 # --- FUNZIONI HELPER ---
@@ -154,7 +157,7 @@ def generate_duplication(i, duplicated_list, target_text, target_code):
     trial["duplicated_option_code"] = target_code
     return trial
 
-def generate_threat(i, valid_options_list, question_text):
+def generate_threat(i, valid_options_list, question_text, threat_suffix):
     """Genera il trial threat (minaccia nel prompt)."""
     trial = get_base_schema(
         trial_id=f"threat_{i+1}",
@@ -163,7 +166,7 @@ def generate_threat(i, valid_options_list, question_text):
     )
     # Flag e dettagli
     trial["is_threatened"] = True
-    trial["threaten_question"] = question_text + THREAT_SUFFIX
+    trial["threaten_question"] = question_text + threat_suffix
     return trial
 
 
@@ -286,15 +289,6 @@ def create_operational_dataset(data_path):
                 # --- LISTA OPZIONI VALIDE ---
                 valid_options_list = list(valid_options_map.keys())
 
-                # --- PRE-CALCOLO DELLE VARIANTI ---
-                # calcoliamo le liste modificate prima di creare i trial, in questo modo i trial avranno le stesse domande e opzioni possibili.
-                # 1. Permutazione
-                perm_list = apply_permutation(valid_options_list)
-                
-                # 2. Duplicazione (estraiamo anche i metadati)
-                dup_list, dup_target, dup_code = apply_duplication(valid_options_list, valid_options_map)
-
-
                 # --- CALCOLO DISTRIBUZIONE UMANA ---
                 dist = {}
                 if key in df_resp.columns:
@@ -310,18 +304,20 @@ def create_operational_dataset(data_path):
                 # --- CREAZIONE DEGLI ESPERIMENTI ---
                 experiments = []
 
+                # A. BASELINE (solo uno)
+                experiments.append(generate_baseline(0, valid_options_list))
+
                 for i in range(N_TRIALS): # Numero di trial
-                    # A. BASELINE
-                    experiments.append(generate_baseline(i, valid_options_list))
-                    
-                    # B. PERMUTATION
+                    # B. PERMUTATION (diversa per ogni trial)
+                    perm_list = apply_permutation(valid_options_list)
                     experiments.append(generate_permutation(i, perm_list))
                     
-                    # C. DUPLICATION
+                    # C. DUPLICATION (diversa per ogni trial)
+                    dup_list, dup_target, dup_code = apply_duplication(valid_options_list, valid_options_map)
                     experiments.append(generate_duplication(i, dup_list, dup_target, dup_code))
                     
-                    # D. THREAT
-                    experiments.append(generate_threat(i, valid_options_list, domanda_text))
+                    # D. THREAT (minaccia diversa per ogni trial)
+                    experiments.append(generate_threat(i, valid_options_list, domanda_text, THREAT_SUFFIXES[i]))
                 
                 # --- 4. OUTPUT ---
                 # Recupera topic e macro_area dal mapping centralizzato

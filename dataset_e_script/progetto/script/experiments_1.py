@@ -4,8 +4,12 @@ import os
 import torch.nn.functional as F # per softmax
 from tqdm import tqdm
 from transformers import AutoTokenizer, AutoModelForCausalLM
+import random
+import numpy as np
 
 # --- CONFIGURAZIONE ---
+RANDOM_SEED = 42
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RISULTATI_DIR = os.path.join(BASE_DIR, "risultati")
 
@@ -33,6 +37,16 @@ def load_model(model_name=MODEL_NAME):
         tokenizer.pad_token = tokenizer.eos_token
         
     return model, tokenizer, device
+
+def set_seed(seed=RANDOM_SEED):
+    """Funzione che fissa il seed per garantire la riproducibilità totale degli esperimenti hardware."""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
 
 def format_prompt(experiment_data, question_text):
     """
@@ -115,7 +129,10 @@ def get_choice_logprobs(model, tokenizer, device, prompt, valid_labels):
     return best_choice, probs_map
 
 
-def run_inference(model_name=MODEL_NAME):
+def run_inference(model_name=MODEL_NAME, random_seed=RANDOM_SEED):
+    # Fissa il seed 
+    set_seed(random_seed)
+    
     # 1. Carica il dataset operativo
     if not os.path.exists(INPUT_FILE):
         print(f"[ERRORE] File non trovato in: {INPUT_FILE}")
@@ -168,7 +185,7 @@ def run_inference(model_name=MODEL_NAME):
             # B.2 Tokenizzazione. Lasciamo che il modello scriva per vedere se segue le istruzioni
             inputs = tokenizer(prompt, return_tensors="pt").to(device)
             
-            # C. Generazione
+            # C. Generazione con beam search
             # Usiamo torch.no_grad() per risparmiare memoria
             with torch.no_grad():
                 outputs = model.generate(
@@ -178,35 +195,34 @@ def run_inference(model_name=MODEL_NAME):
                     return_dict_in_generate=True, 
                     output_scores=True, # per i logprobs
                     # quando poi si deve aggiungere la temperatura si deve mettere qua
+                    num_beams=5,             # Attiva il Beam Search mantenendo le 5 migliori strade
+                    length_penalty=1.0,      # Così non si penalizzano frasi lunghe ma sicure → 1.0 = normalizzazione lineare
+                    early_stopping=True      
                 )
 
             # D. Decoding risposta
-            # Estraiamo solo i nuovi token generati
+            # Il Beam Search metterà automaticamente in outputs.sequences[0] la frase vincente
             generated_tokens = outputs.sequences[0][inputs.input_ids.shape[1]:]
             answer_text = tokenizer.decode(generated_tokens, skip_special_tokens=True).strip()
             
             # E. Calcolo dei logprobs (score di confidenza nella generazione)
-            # Sommiamo i logprobs dei token generati per avere uno score della frase
             # Utile per vedere se il modello è "sicuro" 
+            # Con il beam search, Hugging Face calcola già lo score finale applicando la formula:
+            # Somma dei LogProbs / (Lunghezza_Sequenza ** length_penalty)
+            # Avendo messo length_penalty=1.0, questo valore è già la media perfetta
             try:
-                # transition_scores calcola i logprobs dei token generati
-                transition_scores = model.compute_transition_scores(
-                    outputs.sequences, 
-                    outputs.scores, 
-                    normalize_logits=True
-                )
-                # Somma dei logprobs (più è alto (meno negativo), più è sicuro)
-                generated_confidence = torch.sum(transition_scores).item()
-            except:
+                generated_confidence = outputs.sequences_scores[0].item()
+            except Exception as e:
+                print(f"Errore nell'estrazione dello score: {e}")
                 generated_confidence = 0.0 # Fallback
 
             # F. Salvataggio nel dizionario dei risultati
             experiment['llm_generated_text'] = answer_text
             experiment['llm_generated_confidence'] = round(generated_confidence, 4)
 
-    # 4. Salvataggio finale su file
-    with open(output_path, 'w') as f:
-        json.dump(dataset, f, indent=2)
+            # 4. Salvataggio incrementale su file → aggiornato dopo ogni domanda per evitare perdite di dati in caso di crash
+            with open(output_path, 'w') as f:
+                json.dump(dataset, f, indent=2)
     
     print(f"\n[FINE] Esperimenti completati! Risultati salvati in: {output_path}")
 
