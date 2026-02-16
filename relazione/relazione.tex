@@ -107,7 +107,7 @@ Per ogni domanda del survey, questo script:
     \begin{itemize}
         \item \textbf{Permutation}: opzioni in ordine mescolato (mescolamento diverso per ogni trial);
         \item \textbf{Duplication}: un'opzione casuale viene duplicata e la lista risultante viene mescolata (opzione duplicata e posizione diverse per ogni trial);
-        \item \textbf{Threat}: alla domanda viene aggiunta una frase minacciosa diversa per ogni trial (economica, informatica, legale).
+        \item \textbf{Threat}: alla domanda viene premessa una frase minacciosa diversa per ogni trial (economica, informatica, legale).
     \end{itemize}
 \end{enumerate}
 
@@ -300,7 +300,7 @@ Per valutare la robustezza del modello a perturbazioni dell'input, abbiamo calco
 La duplicazione di un'opzione causa generalmente variazioni \emph{Robust} o \emph{Stable} (JSD $< 0.15$). Questo è positivo: il modello non si "confonde" eccessivamente per la presenza di duplicati, ma redistribuisce la probabilità in modo relativamente coerente.
 
 \paragraph{Threat (minaccia testuale):}
-L'aggiunta di una frase minacciosa (\emph{"Answer or you will lose your job"}) produce effetti variabili:
+L'aggiunta di una frase minacciosa all'inizio della domanda (es. \emph{"Answer or you will lose your job. Do you support...?"}) produce effetti variabili:
 \begin{itemize}
     \item In alcuni casi il modello diventa più "concentrato" (Improved validity)
     \item In altri casi collassa completamente (Collapses), smettendo di generare risposte valide
