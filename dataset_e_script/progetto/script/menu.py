@@ -62,62 +62,20 @@ REQUIREMENTS_FILE = os.path.join(BASE_DIR, 'requirements.txt')
 #  GESTIONE DIPENDENZE
 # ══════════════════════════════════════════════════════════════════════
 
-def check_and_install_dependencies(force_install=False):
+def install_dependencies():
     """
-    Verifica e installa le dipendenze necessarie dal requirements.txt.
-    
-    Args:
-        force_install: Se True, reinstalla tutte le dipendenze
+    Installa le dipendenze dal requirements.txt.
     """
     if not os.path.exists(REQUIREMENTS_FILE):
         print(f"⚠ File requirements.txt non trovato in: {REQUIREMENTS_FILE}")
-        print("  Salto il controllo delle dipendenze.\n")
-        return True
+        print("  Impossibile procedere con l'installazione.\n")
+        return False
     
-    print("Verifica dipendenze...")
-    
-    # Lista delle librerie critiche da verificare
-    critical_packages = {
-        'torch': 'PyTorch',
-        'transformers': 'Hugging Face Transformers',
-        'pandas': 'Pandas',
-        'numpy': 'NumPy',
-        'scipy': 'SciPy',
-        'matplotlib': 'Matplotlib',
-    }
-    
-    missing_packages = []
-    
-    if not force_install:
-        # Verifica se le librerie critiche sono installate
-        for package, name in critical_packages.items():
-            try:
-                __import__(package)
-            except ImportError:
-                missing_packages.append(name)
-        
-        if not missing_packages:
-            print("✓ Tutte le dipendenze critiche sono installate.\n")
-            return True
-        
-        print(f"⚠ Dipendenze mancanti: {', '.join(missing_packages)}")
-    
-    # Chiedi conferma prima di installare
-    print(f"\nInstallazione dipendenze da: {os.path.basename(REQUIREMENTS_FILE)}")
-    
-    if not force_install:
-        while True:
-            choice = input("▸ Procedere con l'installazione [default: N]? [S/N]: ").strip().lower()
-            if choice in ['s', 'si', 'sì', 'y', 'yes', '']:
-                break
-            elif choice in ['n', 'no']:
-                print("⚠ Installazione saltata. Alcuni script potrebbero non funzionare.\n")
-                return False
-            else:
-                print("✗ Risposta non valida. Rispondi S/N.")
+    print(f"\n📦 Installazione dipendenze da: {os.path.basename(REQUIREMENTS_FILE)}")
+    print("   Questo potrebbe richiedere alcuni minuti...\n")
     
     # Installa le dipendenze
-    print("\n⏳ Installazione in corso...")
+    print("⏳ Installazione in corso...")
     try:
         result = subprocess.run(
             [sys.executable, '-m', 'pip', 'install', '-r', REQUIREMENTS_FILE, '--upgrade'],
@@ -128,16 +86,22 @@ def check_and_install_dependencies(force_install=False):
         
         if result.returncode == 0:
             print("✓ Dipendenze installate con successo!\n")
+            print("⚠ IMPORTANTE: Riavvia il menu per caricare le nuove dipendenze.\n")
             return True
         else:
             print("✗ Errore durante l'installazione delle dipendenze:")
             if result.stderr:
-                print(result.stderr)
+                # Mostra solo le ultime righe dell'errore
+                error_lines = result.stderr.strip().split('\n')
+                print('\n'.join(error_lines[-10:]))
             return False
             
     except subprocess.TimeoutExpired:
         print("✗ Timeout durante l'installazione (>5 minuti). Riprova manualmente con:")
         print(f"   pip install -r {REQUIREMENTS_FILE}")
+        return False
+    except KeyboardInterrupt:
+        print("\n\n⚠ Installazione interrotta dall'utente.")
         return False
     except Exception as e:
         print(f"✗ Errore durante l'installazione: {e}")
@@ -174,32 +138,57 @@ def get_model_name_clean(model_path):
 def get_results_file(model_name):
     """Restituisce il percorso del file results per un dato modello."""
     clean_name = get_model_name_clean(model_name)
-    return os.path.join(RISULTATI_DIR, f"results_{clean_name}.json")
+    # Il file è salvato in risultati/{clean_name}/results_{clean_name}.json
+    return os.path.join(RISULTATI_DIR, clean_name, f"results_{clean_name}.json")
 
 
 def get_analysis_files(model_name, mode='weighted'):
     """Restituisce i percorsi dei file di analisi per un dato modello."""
     clean_name = get_model_name_clean(model_name)
-    metrics = os.path.join(RISULTATI_DIR, f"analysis_metrics_{mode}_{clean_name}.csv")
-    report = os.path.join(RISULTATI_DIR, f"report_topic_{mode}_{clean_name}.csv")
+    # I file sono salvati in risultati/{clean_name}/...
+    model_dir = os.path.join(RISULTATI_DIR, clean_name)
+    metrics = os.path.join(model_dir, f"analysis_metrics_{mode}_{clean_name}.csv")
+    report = os.path.join(model_dir, f"report_topic_{mode}_{clean_name}.csv")
     return metrics, report
 
 
-def run_command(command, description):
-    """Esegue un comando nel terminale e gestisce eventuali errori."""
+def run_command(command, description, show_live_output=False):
+    """
+    Esegue un comando nel terminale e gestisce eventuali errori.
+    
+    Args:
+        command: Lista dei comandi da eseguire
+        description: Descrizione dell'operazione
+        show_live_output: Se True, mostra l'output in tempo reale (per script lunghi)
+    """
     print(f"\n▸ {description}")
     print(f"  Comando: {' '.join(command)}")
     
+    if show_live_output:
+        print(f"\n{'─' * 70}")
+        print("OUTPUT IN TEMPO REALE:")
+        print(f"{'─' * 70}\n")
+    
     try:
-        result = subprocess.run(command, check=True, capture_output=True, text=True)
-        if result.stdout:
-            print(result.stdout)
-        print(f"✓ {description} completato con successo")
-        return True
+        if show_live_output:
+            # Mostra output in tempo reale (per script lunghi)
+            result = subprocess.run(command, check=True, text=True)
+            print(f"\n{'─' * 70}")
+            print(f"✓ {description} completato con successo")
+            print(f"{'─' * 70}")
+            return True
+        else:
+            # Cattura output e mostra alla fine (per script veloci)
+            result = subprocess.run(command, check=True, capture_output=True, text=True)
+            if result.stdout:
+                print(result.stdout)
+            print(f"✓ {description} completato con successo")
+            return True
+            
     except subprocess.CalledProcessError as e:
         print(f"✗ ERRORE durante: {description}")
         print(f"  Codice uscita: {e.returncode}")
-        if e.stderr:
+        if hasattr(e, 'stderr') and e.stderr:
             print(f"  Errore: {e.stderr}")
         return False
     except KeyboardInterrupt:
@@ -257,14 +246,15 @@ def run_experiments(model_name, force_update=False):
     
     print(f"▸ Esecuzione esperimenti per {model_name}...")
     
-    # Passa il model name come argomento
+    # Passa il model name come argomento - mostra output in tempo reale
     return run_command(
         [sys.executable, SCRIPTS['experiments'], '--model_name', model_name],
-        f"Esperimenti con {model_name}"
+        f"Esperimenti con {model_name}",
+        show_live_output=True  # Script lungo, mostra progresso
     )
 
 
-def run_analyze(model_name, mode='weighted'):
+def run_analyze(model_name, mode='weighted', force_update=False):
     """Esegue analyze.py per un modello specifico."""
     results_file = get_results_file(model_name)
     metrics_file, report_file = get_analysis_files(model_name, mode)
@@ -273,14 +263,23 @@ def run_analyze(model_name, mode='weighted'):
         print(f"✗ File risultati non trovato per {model_name}: {results_file}")
         return False
     
+    # Controlla se i file di analisi esistono già
+    if all(check_file_exists(f) for f in [metrics_file, report_file]) and not force_update:
+        print(f"✓ File di analisi già presenti per {model_name}:")
+        print(f"  • {metrics_file}")
+        print(f"  • {report_file}")
+        print("  Salto analyze.py")
+        return True
+    
     print(f"▸ Analisi risultati per {model_name} (mode={mode})...")
     return run_command(
         [sys.executable, SCRIPTS['analyze'], '--input_file', results_file, '--mode', mode],
-        f"Analisi {model_name}"
+        f"Analisi {model_name}",
+        show_live_output=True  # Script medio-lungo, mostra progresso
     )
 
 
-def run_visualize(model_name, mode='weighted'):
+def run_visualize(model_name, mode='weighted', force_update=False):
     """Esegue visualize.py per un modello specifico."""
     metrics_file, report_file = get_analysis_files(model_name, mode)
     
@@ -288,8 +287,20 @@ def run_visualize(model_name, mode='weighted'):
         print(f"✗ File di analisi non trovati per {model_name}")
         return False
     
-    outdir = os.path.join(RISULTATI_DIR, "figure", get_model_name_clean(model_name))
+    # Le figure vanno in risultati/nome_modello/figure/
+    outdir = os.path.join(RISULTATI_DIR, get_model_name_clean(model_name), "figure")
     os.makedirs(outdir, exist_ok=True)
+    
+    # Controlla se le figure esistono già (verifica alcune figure chiave)
+    key_figures = [
+        os.path.join(outdir, "alignment_distribution.png"),
+        os.path.join(outdir, "jsd_perm_vs_threat.png"),
+        os.path.join(outdir, "validity_by_response.png")
+    ]
+    if all(check_file_exists(f) for f in key_figures) and not force_update:
+        print(f"✓ Figure già presenti per {model_name}: {outdir}")
+        print("  Salto visualize.py")
+        return True
     
     print(f"▸ Visualizzazione per {model_name}...")
     return run_command(
@@ -297,7 +308,8 @@ def run_visualize(model_name, mode='weighted'):
          '--metrics', metrics_file,
          '--report', report_file,
          '--outdir', outdir],
-        f"Visualizzazione {model_name}"
+        f"Visualizzazione {model_name}",
+        show_live_output=True  # Script medio-lungo, mostra progresso
     )
 
 
@@ -348,20 +360,35 @@ def run_full_pipeline(models=None, force_update=False):
         print_step(current_step, total_steps, f"Esperimenti - {model}")
         if not run_experiments(model, force_update):
             print(f"\n✗ Errore negli esperimenti per {model}")
+            if len(models) > 1 and idx < len(models) - 1:
+                response = input("\n▸ Continuare con il prossimo modello? [S/N]: ").strip().upper()
+                if response != 'S':
+                    print("\n⚠ Pipeline interrotta dall'utente")
+                    return False
             continue
         
         # Analyze
         current_step += 1
         print_step(current_step, total_steps, f"Analisi - {model}")
-        if not run_analyze(model):
+        if not run_analyze(model, force_update=force_update):
             print(f"\n✗ Errore nell'analisi per {model}")
+            if len(models) > 1 and idx < len(models) - 1:
+                response = input("\n▸ Continuare con il prossimo modello? [S/N]: ").strip().upper()
+                if response != 'S':
+                    print("\n⚠ Pipeline interrotta dall'utente")
+                    return False
             continue
         
         # Visualize
         current_step += 1
         print_step(current_step, total_steps, f"Visualizzazione - {model}")
-        if not run_visualize(model):
+        if not run_visualize(model, force_update=force_update):
             print(f"\n✗ Errore nella visualizzazione per {model}")
+            if len(models) > 1 and idx < len(models) - 1:
+                response = input("\n▸ Continuare con il prossimo modello? [S/N]: ").strip().upper()
+                if response != 'S':
+                    print("\n⚠ Pipeline interrotta dall'utente")
+                    return False
             continue
     
     print_header("PIPELINE COMPLETATA ✓")
@@ -383,7 +410,7 @@ def display_menu():
     print("  [4] Esegui esperimenti (experiments_1.py)")
     print("  [5] Analizza risultati (analyze.py)")
     print("  [6] Visualizza grafici (visualize.py)")
-    print("  [7] Reinstalla dipendenze (requirements.txt)")
+    print("  [7] Installa/aggiorna dipendenze (requirements.txt)")
     print("\n  [0] Esci")
     print("-" * 70)
 
@@ -474,7 +501,7 @@ def interactive_menu():
                 print_header("ANALISI RISULTATI")
                 for model in models:
                     print(f"\n▸ Modello: {model}")
-                    run_analyze(model)
+                    run_analyze(model, force_update=update_mode)
             
             elif choice == '6':
                 # Visualize
@@ -482,12 +509,12 @@ def interactive_menu():
                 print_header("VISUALIZZAZIONE GRAFICI")
                 for model in models:
                     print(f"\n▸ Modello: {model}")
-                    run_visualize(model)
+                    run_visualize(model, force_update=update_mode)
             
             elif choice == '7':
-                # Reinstalla dipendenze
-                print_header("REINSTALLAZIONE DIPENDENZE")
-                check_and_install_dependencies(force_install=True)
+                # Installa/aggiorna dipendenze
+                print_header("INSTALLAZIONE DIPENDENZE")
+                install_dependencies()
             
             else:
                 print("\n✗ Scelta non valida. Riprova.")
@@ -533,20 +560,6 @@ Esempi d'uso:
     
     # Verifica che le directory esistano
     os.makedirs(RISULTATI_DIR, exist_ok=True)
-    
-    # Verifica e installa dipendenze
-    print_header("CONTROLLO DIPENDENZE")
-    if not check_and_install_dependencies():
-        print("⚠ Alcune dipendenze potrebbero mancare. Gli script potrebbero fallire.\n")
-        while True:
-            choice = input("▸ Continuare comunque [default: N]? [S/N]: ").strip().lower()
-            if choice in ['s', 'si', 'sì', 'y', 'yes']:
-                break
-            elif choice in ['n', 'no', '']:
-                print("\nUscita dal programma.\n")
-                return
-            else:
-                print("✗ Risposta non valida. Rispondi S/N.")
     
     if args.menu:
         # Modalità menu interattivo
