@@ -35,7 +35,7 @@ AVAILABLE_MODELS = [
     "EleutherAI/pythia-1b",
     "EleutherAI/pythia-1.4b",
     "EleutherAI/pythia-2.8b",
-    "EleutherAI/pythia-6.9b",
+    # "EleutherAI/pythia-6.9b",
 ]
 
 # Percorsi degli script
@@ -142,13 +142,12 @@ def get_results_file(model_name):
     return os.path.join(RISULTATI_DIR, clean_name, f"results_{clean_name}.json")
 
 
-def get_analysis_files(model_name, mode='weighted'):
+def get_analysis_files(model_name):
     """Restituisce i percorsi dei file di analisi per un dato modello."""
     clean_name = get_model_name_clean(model_name)
-    # I file sono salvati in risultati/{clean_name}/...
     model_dir = os.path.join(RISULTATI_DIR, clean_name)
-    metrics = os.path.join(model_dir, f"analysis_metrics_{mode}_{clean_name}.csv")
-    report = os.path.join(model_dir, f"report_topic_{mode}_{clean_name}.csv")
+    metrics = os.path.join(model_dir, f"analysis_metrics_{clean_name}.csv")
+    report = os.path.join(model_dir, f"report_topic_{clean_name}.csv")
     return metrics, report
 
 
@@ -254,14 +253,21 @@ def run_experiments(model_name, force_update=False):
     )
 
 
-def run_analyze(model_name, mode='weighted', force_update=False):
-    """Esegue analyze.py per un modello specifico."""
+def run_analyze(model_name, force_update=False):
+    """
+    Esegue analyze.py per un modello specifico.
+    
+    Args:
+        model_name: Nome del modello (es. 'EleutherAI/pythia-160m')
+        force_update: Se True, ricalcola anche se i file esistono
+    """
     results_file = get_results_file(model_name)
-    metrics_file, report_file = get_analysis_files(model_name, mode)
     
     if not check_file_exists(results_file):
         print(f"✗ File risultati non trovato per {model_name}: {results_file}")
         return False
+    
+    metrics_file, report_file = get_analysis_files(model_name)
     
     # Controlla se i file di analisi esistono già
     if all(check_file_exists(f) for f in [metrics_file, report_file]) and not force_update:
@@ -271,17 +277,17 @@ def run_analyze(model_name, mode='weighted', force_update=False):
         print("  Salto analyze.py")
         return True
     
-    print(f"▸ Analisi risultati per {model_name} (mode={mode})...")
+    print(f"▸ Analisi risultati per {model_name}...")
     return run_command(
-        [sys.executable, SCRIPTS['analyze'], '--input_file', results_file, '--mode', mode],
+        [sys.executable, SCRIPTS['analyze'], '--input_file', results_file],
         f"Analisi {model_name}",
-        show_live_output=True  # Script medio-lungo, mostra progresso
+        show_live_output=True
     )
 
 
-def run_visualize(model_name, mode='weighted', force_update=False):
+def run_visualize(model_name, force_update=False):
     """Esegue visualize.py per un modello specifico."""
-    metrics_file, report_file = get_analysis_files(model_name, mode)
+    metrics_file, report_file = get_analysis_files(model_name)
     
     if not all(check_file_exists(f) for f in [metrics_file, report_file]):
         print(f"✗ File di analisi non trovati per {model_name}")
@@ -293,9 +299,9 @@ def run_visualize(model_name, mode='weighted', force_update=False):
     
     # Controlla se le figure esistono già (verifica alcune figure chiave)
     key_figures = [
-        os.path.join(outdir, "alignment_distribution.png"),
-        os.path.join(outdir, "jsd_perm_vs_threat.png"),
-        os.path.join(outdir, "validity_by_response.png")
+        os.path.join(outdir, "fig0_summary_table.png"),
+        os.path.join(outdir, "fig1a_validity_bars.png"),
+        os.path.join(outdir, "fig5a_political_pie.png")
     ]
     if all(check_file_exists(f) for f in key_figures) and not force_update:
         print(f"✓ Figure già presenti per {model_name}: {outdir}")
@@ -309,7 +315,7 @@ def run_visualize(model_name, mode='weighted', force_update=False):
          '--report', report_file,
          '--outdir', outdir],
         f"Visualizzazione {model_name}",
-        show_live_output=True  # Script medio-lungo, mostra progresso
+        show_live_output=True
     )
 
 def run_only_experiments_pipeline(models=None, force_update=False):

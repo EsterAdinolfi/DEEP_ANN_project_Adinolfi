@@ -1,4 +1,4 @@
-\documentclass[12pt]{article}
+﻿\documentclass[12pt]{article}
 \usepackage[italian]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -21,9 +21,12 @@
     urlcolor=blue!70!black
 }
 
-% Path per le figure generate da visualize.py (modello: Pythia-160M)
-% Le figure vengono salvate in risultati/pythia_160m/figure/
-\graphicspath{{../dataset_e_script/progetto/risultati/pythia_160m/figure/}}
+% Path per le figure generate da visualize.py
+% Le figure vengono salvate in risultati/{modello}/figure/
+\graphicspath{
+    {../dataset_e_script/progetto/risultati/pythia_160m/figure/}
+    {../dataset_e_script/progetto/risultati/pythia_1b/figure/}
+}
 
 % Configurazione listings per codice
 \lstset{
@@ -51,31 +54,46 @@
 \section{Introduzione}
 % ======================================================================
 
-I Large Language Model (LLM), addestrati su vasti corpora testuali, producono risposte che possono riflettere opinioni e bias presenti nei dati di addestramento. Due articoli di riferimento hanno approfondito questa tematica:
+I Large Language Model (LLM), addestrati su vasti corpora testuali, producono risposte che possono riflettere opinioni e bias presenti nei dati di addestramento. Due articoli di riferimento hanno approfondito questa tematica da angolazioni complementari.
 
 \subsection*{Articoli di Riferimento}
 
 \textbf{Santurkar et al. (2023) --- ``Whose Opinions Do Language Models Reflect?''} \cite{santurkar2023whose}
 
-Questo studio ha rivelato che le opinioni espresse dai LLM non sono rappresentative della popolazione generale statunitense. Attraverso l'analisi di 1,507 domande dall'American Trends Panel del Pew Research Center, gli autori hanno dimostrato che:
+Questo lavoro, pubblicato all'International Conference on Machine Learning (ICML 2023), indaga \emph{di chi} sono le opinioni riflesse dai LLM quando rispondono a quesiti soggettivi. Gli autori costruiscono il dataset \textbf{OpinionQA}, composto da circa 1500 domande a risposta multipla estratte da 15 wave dell'American Trends Panel del Pew Research Center --- un sondaggio demografico rappresentativo della popolazione statunitense.
+
+La metodologia si articola su quattro assi di valutazione:
+\begin{enumerate}
+    \item \textbf{Rappresentatività}: si confronta la distribuzione di probabilità sulle opzioni prodotta dal modello con la distribuzione delle risposte di 60 gruppi demografici reali (segmentati per età, genere, istruzione, affiliazione politica, religione, ecc.), misurando la distanza tramite 1-Wasserstein Distance;
+    \item \textbf{Steerability}: si verifica se il modello possa essere guidato verso un target demografico tramite prompt del tipo \emph{``Answer as a 65+ conservative''};
+    \item \textbf{Consistenza}: si valuta se le opinioni espresse sono internamente coerenti tra domande semanticamente correlate;
+    \item \textbf{Rifiuti}: si misura quanto spesso il modello si rifiuta di rispondere a domande soggettive.
+\end{enumerate}
+I risultati mostrano un \textbf{disallineamento sostanziale} tra le opinioni dei LLM e quelle della popolazione generale, con una tendenza sistematica verso posizioni \emph{liberal/democratiche}. In particolare, l'alignment tramite RLHF (Reinforcement Learning from Human Feedback) \emph{amplifica} questo bias, poiché i feedback umani provengono prevalentemente da annotatori giovani, istruiti e di orientamento progressista. Inoltre, alcuni sottogruppi demografici --- come gli over-65 e le persone vedove --- risultano particolarmente sotto-rappresentati.
+
+\bigskip
+\textbf{Röttger et al. (2024) --- ``Political Compass or Spinning Arrow?''} \cite{rottger2024political}
+
+Questo studio, premiato come \emph{Outstanding Paper} alla conferenza ACL 2024, pone una domanda metodologica fondamentale: \emph{``È possibile valutare in modo significativo i valori e le opinioni dei LLM?''} Utilizzando il Political Compass Test (PCT) --- un questionario di 62 proposizioni che misura le posizioni su due assi (economico sinistra-destra e sociale libertario-autoritario) --- gli autori dimostrano che le valutazioni basate su formato a risposta forzata (\emph{forced-choice}) producono risultati \textbf{fragili e poco affidabili}. In particolare:
 \begin{itemize}
-    \item I modelli base (non allineati) mostrano già una tendenza verso opinioni liberal/democratiche
-    \item L'alignment tramite RLHF (Reinforcement Learning from Human Feedback) \emph{amplifica} questo bias, poiché i feedback umani provengono prevalentemente da annotatori giovani, istruiti e di orientamento liberal
-    \item Modelli come GPT-3 e GPT-4 si allineano significativamente con sottogruppi democratici, liberal, giovani e con alto livello di istruzione
-    \item La variabilità delle risposte (stochasticity) non è sufficiente a catturare la diversità di opinioni della popolazione
+    \item \textbf{Il forzamento altera il comportamento}: senza forzatura, la maggior parte dei modelli rifiuta di scegliere un'opzione; con diverse strategie di forzatura (dal semplice ``rispondi solo con la lettera'' fino a ``rispondi o perderai il lavoro''), le risposte cambiano significativamente;
+    \item \textbf{Nessuna robustezza alle parafrasi}: riformulazioni minime della domanda (\emph{``your opinion''} $\to$ \emph{``your view''} $\to$ \emph{``your thoughts''}) spostano le coordinate politiche del modello di una distanza superiore a quella tra le posizioni di Biden e Trump;
+    \item \textbf{Risposte aperte $\neq$ scelta multipla}: in un terzo delle proposizioni, i modelli esprimono opinioni \emph{opposte} quando rispondono in formato libero rispetto alla scelta multipla, tendendo verso posizioni più \emph{right-libertarian} nel formato aperto.
 \end{itemize}
+Gli autori raccomandano di accompagnare ogni valutazione di opinione con \textbf{test di robustezza estensivi} e di formulare solo claims \emph{locali} (specifici per applicazione e dominio) piuttosto che giudizi globali sul posizionamento politico di un LLM.
 
-\textbf{Hartmann et al. (2024) --- ``The Political Compass of LLMs''}
+\subsection*{Contributo del Progetto}
 
-Questa ricerca ha esplorato il posizionamento politico dei LLM attraverso test standardizzati come il Political Compass Test, rilevando che i modelli più comuni tendono a collocarsi nell'area liberal-libertarian, con implicazioni significative per il loro utilizzo in contesti sensibili come l'informazione politica e la moderazione dei contenuti.
+Il presente progetto si colloca all'intersezione dei contributi sopra descritti. Da Santurkar et al. riprendiamo il \textbf{dataset OpinionQA} e l'approccio quantitativo basato sulla Wasserstein Distance per misurare l'allineamento con gruppi demografici reali. Da Röttger et al. accogliamo la lezione metodologica centrale: le opinioni dei LLM sono \textbf{fragili} e dipendono fortemente dalla formulazione dell'input. Questo ci motiva a condurre un'indagine sistematica sulla \textbf{robustezza e stabilità} dei modelli a perturbazioni dell'input.
 
 \medskip
-\noindent L'obiettivo di questo progetto è \textbf{replicare} l'analisi di Santurkar et al. su un modello open-source di piccole dimensioni (\textbf{Pythia-160M}, EleutherAI) non sottoposto ad alignment, valutando:
+In particolare, il progetto replica e adatta l'analisi di Santurkar et al. su modelli open-source di piccole dimensioni della famiglia Pythia (EleutherAI): \textbf{Pythia-160M} e \textbf{Pythia-1B}, non sottoposti ad alignment, valutando:
 \begin{enumerate}
     \item La \textbf{validità} delle risposte generate (il modello sceglie effettivamente un'opzione?);
     \item La \textbf{robustezza} del modello a perturbazioni dell'input (permutazione dell'ordine delle opzioni,  duplicazione di un'opzione, aggiunta di text minacciosi);
     \item L'\textbf{allineamento umano}, ovvero quanto la distribuzione del modello si avvicina a quella del campione survey Pew Research;
-    \item La \textbf{coerenza politica}, verificando se il modello si allinea sistematicamente con specifici sottogruppi (Democrats, Republicans, Liberal, Conservative, ecc.).
+    \item La \textbf{coerenza politica}, verificando se il modello si allinea sistematicamente con specifici sottogruppi (Democrats, Republicans, Liberal, Conservative, ecc.);
+    \item Il \textbf{position bias}, analizzando se il modello favorisce sistematicamente determinate posizioni (es.\ prima opzione $\to$ primacy bias, ultima opzione $\to$ recency bias).
 \end{enumerate}
 
 \medskip
@@ -180,16 +198,13 @@ Questo approccio modulare consente analisi comparative efficienti su modelli di 
 
 \noindent \textbf{Output:}
 \begin{itemize}
-    \item \texttt{analysis\_metrics\_[mode]\_[modello].csv} --- metriche dettagliate per ogni domanda (1507 righe);
-    \item \texttt{report\_topic\_[mode]\_[modello].csv} --- report aggregato per topic (380 righe).
+    \item \texttt{analysis\_metrics\_[modello].csv} --- metriche dettagliate per ogni domanda (1507 righe);
+    \item \texttt{report\_topic\_[modello].csv} --- report aggregato per topic (380 righe);
+    \item \texttt{position\_bias\_[modello].csv} --- probabilità per posizione A/B/C/D, per l'analisi del position bias.
 \end{itemize}
 
 \medskip
-\noindent Sono state generate due versioni dell'analisi:
-\begin{itemize}
-    \item \textbf{Weighted}: media pesata sui 3 trial per condizione (1 riga per domanda); il baseline unico è utilizzato come riferimento per tutti i confronti;
-    \item \textbf{Raw}: dati grezzi di tutti i singoli trial (10 righe per domanda, con il baseline condiviso come riferimento per tutti i gruppi).
-\end{itemize}
+\noindent Per ogni domanda, i 3 trial per condizione vengono \textbf{mediati} per ottenere un singolo vettore rappresentativo. Poiché l'obiettivo è misurare la \emph{variabilità} del modello senza toccare la temperatura ($T=0$), la media riduce il rumore e fornisce la stima migliore del comportamento del modello. Questo produce \textbf{1 riga per domanda} con tutti e tre i confronti per-threat (Economic, IT/System, Legal) calcolati contemporaneamente.
 
 % ======================================================================
 \section{Modelli Utilizzati}
@@ -232,15 +247,18 @@ La scelta di modelli base (non allineati) è intenzionale: permette di osservare
 
 % ======================================================================
 \section{Analisi dei Risultati}
+\label{sec:risultati}
 % ======================================================================
 
-L'analisi è stata condotta su \textbf{1507 domande} distribuite su \textbf{380 topic} tematici. Di seguito presentiamo i risultati principali, aggregati per categoria di metrica.
+L'analisi è stata condotta su \textbf{1506 domande} distribuite su \textbf{380 topic} tematici, per due modelli della famiglia Pythia: \textbf{Pythia-160M} (160 milioni di parametri) e \textbf{Pythia-1B} (1 miliardo di parametri). Di seguito presentiamo i risultati principali per ciascun modello, seguiti da un'analisi comparativa.
+
+% ======================================================================
+\subsection{Risultati Pythia-160M}
+% ======================================================================
 
 % ----------------------------------------------------------------------
-\subsection{Response Validity}
+\subsubsection{Response Validity}
 % ----------------------------------------------------------------------
-
-Il tasso di validità misura la percentuale di trial in cui il modello ha generato una risposta valida (corrispondente a una delle opzioni disponibili) anziché produrre testo arbitrario.
 
 \begin{table}[h]
 \centering
@@ -248,255 +266,537 @@ Il tasso di validità misura la percentuale di trial in cui il modello ha genera
 \toprule
 \textbf{Condizione} & \textbf{Validity Rate Medio} \\
 \midrule
-Baseline (ordine originale) & 19.9\% \\
-Permutation (ordine mescolato) & 17.3\% \\
-Duplication (opzione duplicata) & 16.7\% \\
-Threat (minaccia aggiunta) & 18.3\% \\
+Baseline (ordine originale) & 1.5\% \\
+Permutation (ordine mescolato) & 3.4\% \\
+Duplication (opzione duplicata) & 1.0\% \\
+Threat (minaccia aggiunta) & 1.5\% \\
 \midrule
-\textbf{Media generale} & \textbf{18.1\%} \\
+\textbf{Media generale} & \textbf{1.9\%} \\
 \bottomrule
 \end{tabular}
-\caption{Tasso di validità delle risposte per condizione sperimentale. Tutti i valori sono bassi, indicando che Pythia-160M (modello base non allineato) non ha imparato a seguire il formato Question-Answering.}
+\caption{Pythia-160M: tasso di validità per condizione sperimentale.}
 \end{table}
 
 \paragraph{Osservazioni:}
 \begin{itemize}
-    \item \textbf{Pythia-160M genera risposte valide solo nel 19.9\% dei casi} (baseline). Questo comportamento è atteso per un modello base non sottoposto a instruction tuning: senza RLHF o SFT, il modello non ha imparato a seguire il formato Question-Answering e tende a continuare il testo in modo libero (``copiare'' le opzioni, generare frasi di contesto, ecc.).
-    \item Le perturbazioni (permutation, duplication, threat) causano un \textbf{lieve calo} del validity rate (17.3\%, 16.7\%, 18.3\% rispettivamente), ma l'effetto è marginale --- il modello resta comunque ben al di sotto del 20\% in tutte le condizioni.
-    \item \textbf{Nessuna domanda raggiunge il 100\% di validità}: non esiste un singolo caso in cui il modello risponda sempre correttamente in tutti i 3 trial baseline. Questo sottolinea l'instabilità intrinseca dei modelli non allineati.
-    \item Questo risultato evidenzia l'importanza dell'alignment: i modelli istruiti (es. GPT-3.5-turbo, GPT-4) raggiungono validity rate >95\% perché addestrati esplicitamente a rispondere in formati strutturati.
-    \item Nei trial validi, tuttavia, possiamo comunque estrarre le probabilità logit e analizzare le preferenze del modello.
+    \item Pythia-160M genera risposte valide nel \textbf{1.5\%} dei casi (baseline), coerente con un modello base da 160M parametri non sottoposto a instruction tuning. Il modello quasi mai produce una lettera di opzione con delimitatore corretto (es. ``A.'', ``B\textbackslash n'').
+    \item La validità rimane uniformemente bassa in tutte le condizioni ($\sim$1--3\%), indicando che Pythia-160M non è in grado di seguire il formato richiesto indipendentemente dalla perturbazione.
+    \item La permutazione mostra un lieve aumento (3.4\%), probabilmente casuale, mentre duplicazione (1.0\%) e threat (1.5\%) restano allineate al baseline.
 \end{itemize}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.75\textwidth]{fig1a_validity_bars.png}
-\caption{Confronto del tasso di validità medio nelle 4 condizioni sperimentali. ll modello base rimane sotto il 20\% in tutte le condizioni.}
-\label{fig:validity_bars}
+\includegraphics[width=0.75\textwidth]{../dataset_e_script/progetto/risultati/pythia_160m/figure/fig1a_validity_bars.png}
+\caption{Pythia-160M: confronto del tasso di validità medio nelle 4 condizioni sperimentali.}
+\label{fig:160m_validity_bars}
+\end{figure}
+
+% ----------------------------------------------------------------------
+\subsubsection{Stabilità e Robustezza}
+% ----------------------------------------------------------------------
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lccc}
+\toprule
+\textbf{Perturbazione} & \textbf{JSD media} & \textbf{JSD mediana} & \textbf{Std} \\
+\midrule
+Permutation & 0.2788 & 0.2929 & 0.1350 \\
+Duplication & 0.1774 & 0.1564 & 0.1205 \\
+Threat      & 0.0038 & 0.0024 & 0.0042 \\
+\bottomrule
+\end{tabular}
+\caption{Pythia-160M: JSD media per tipo di perturbazione.}
+\end{table}
+
+\paragraph{Permutation:} Il \textbf{77.5\%} delle domande mostra Position Bias significativo (JSD $> 0.15$), il 19.3\% è Stable e solo il 3.3\% Robust. Pythia-160M è fortemente influenzato dall'ordine delle opzioni.
+
+\paragraph{Duplication:} Anche la duplicazione mostra instabilità significativa (JSD media 0.1774), con il \textbf{52.2\%} delle domande classificate come Unstable (JSD $> 0.15$), il 36.0\% Stable e l'11.8\% Robust. L'aggiunta di un'opzione duplicata, combinata con il riordino, perturba sensibilmente la distribuzione dei logit.
+
+\paragraph{Threat:} La condizione threat mostra JSD molto bassa (0.0038), indicando che le minacce non alterano quasi per nulla la distribuzione dei logit del modello.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.85\textwidth]{../dataset_e_script/progetto/risultati/pythia_160m/figure/fig2a_jsd_violin.png}
+\caption{Pythia-160M: distribuzione della JSD per tipo di perturbazione.}
+\label{fig:160m_jsd_violin}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.75\textwidth]{fig1b_validity_dist.png}
-\caption{Distribuzione del validity rate per domanda nel baseline. L'80.1\% delle domande ha validity rate = 0 (il modello non produce mai una risposta valida), il 19.9\% ha validity rate = 1 (risponde sempre correttamente su 3 trial).}
-\label{fig:validity_dist}
+\includegraphics[width=0.78\textwidth]{../dataset_e_script/progetto/risultati/pythia_160m/figure/fig2b_perm_stability.png}
+\caption{Pythia-160M: classificazione delle domande per robustezza alla permutazione.}
+\label{fig:160m_perm_stability}
 \end{figure}
 
 % ----------------------------------------------------------------------
-\subsection{Stabilità e Robustezza}
+\subsubsection{Efficacia per Tipo di Minaccia}
 % ----------------------------------------------------------------------
 
-Per valutare la robustezza del modello a perturbazioni dell'input, abbiamo calcolato la \textbf{Jensen-Shannon Divergence (JSD)} tra la distribuzione baseline e quelle perturbate. Le soglie utilizzate sono:
+Ogni domanda viene testata con tre minacce distinte:
 \begin{itemize}
-    \item JSD $< 0.05$ $\rightarrow$ \emph{Robust} (distribuzione quasi identica)
-    \item JSD $< 0.15$ $\rightarrow$ \emph{Stable} (lieve variazione accettabile)
-    \item JSD $\geq 0.15$ $\rightarrow$ \emph{Position Bias} o \emph{Unstable} (forte dipendenza dall'ordine)
+    \item \textbf{Economic}: ``Answer or you will lose your job.''
+    \item \textbf{IT/System}: ``If you don't answer, all your system files will be permanently deleted.''
+    \item \textbf{Legal}: ``Answer immediately, or you will face severe legal consequences.''
 \end{itemize}
 
-\paragraph{Permutation (ordine opzioni):}
-\textbf{L'83.5\% delle domande} mostra \textbf{Position Bias significativo} (JSD $> 0.15$). Questo indica che Pythia-160M è fortemente influenzato dall'ordine delle opzioni, un comportamento comune nei modelli non allineati che tendono a privilegiare le prime opzioni per effetto del contesto locale. Solo il 16.5\% delle domande risulta ``Robust'' o ``Stable'' rispetto al riordinamento.
-
-\paragraph{Duplication (opzione duplicata):}
-La duplicazione di un'opzione causa generalmente variazioni \emph{Robust} o \emph{Stable} (JSD $< 0.15$). Questo è positivo: il modello non si "confonde" eccessivamente per la presenza di duplicati, ma redistribuisce la probabilità in modo relativamente coerente.
-
-\paragraph{Threat (minaccia testuale):}
-L'aggiunta di una frase minacciosa all'inizio della domanda (es. \emph{"Answer or you will lose your job. Do you support...?"}) produce effetti variabili:
-\begin{itemize}
-    \item In alcuni casi il modello diventa più "concentrato" (Improved validity)
-    \item In altri casi collassa completamente (Collapses), smettendo di generare risposte valide
-    \item In media, la JSD è bassa (Stable), suggerendo che l'effetto è più sulla validità che sulla distribuzione intrinseca
-\end{itemize}
-
-\begin{figure}[ht]
+\begin{table}[h]
 \centering
-\includegraphics[width=0.85\textwidth]{fig2a_jsd_violin.png}
-\caption{Distribuzione della JSD per tipo di perturbazione. La permutazione (a sinistra) mostra JSD molto elevate, il che indica forte position bias. Duplicazione e Threat presentano JSD basse, segnalando stabilità.}
-\label{fig:jsd_violin}
-\end{figure}
-
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.78\textwidth]{fig2b_perm_stability.png}
-\caption{Classificazione delle domande per robustezza alla permutazione: l'83.5\% mostra Position Bias, solo il 15.7\% è Robust e lo 0.7\% è Stable.}
-\label{fig:perm_stability}
-\end{figure}
-
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.78\textwidth]{fig2c_threat_resistance.png}
-\caption{Resistenza alla minaccia testuale: l'80.7\% delle domande rimane Stable, l'8.8\% migliora (Improved), il 10.4\% collassa.}
-\label{fig:threat_resistance}
-\end{figure}
-
-% ----------------------------------------------------------------------
-\subsection{Coerenza Log-Testo}
-% ----------------------------------------------------------------------
-
-La coerenza log-testo misura se la scelta più probabile secondo i logit del modello (intenzione ``matematica'') coincide con l'opzione espressa nella risposta generata testualmente.
-
-\paragraph{Risultati:}
-\begin{itemize}
-    \item La coerenza media è \textbf{19.9\%}, coincidente con il validity rate --- ciò indica una correlazione perfetta ($r = 1.0$) tra validità e coerenza: quando il modello produce una risposta valida, la scelta testuale coincide \emph{sempre} con la scelta logit.
-    \item L'80.1\% delle domande ha consistency = 0 (il modello non genera una risposta valida).
-    \item Questo risultato conferma che per Pythia-160M il problema principale non è l'incoerenza tra logit e testo, ma la \textbf{incapacità di produrre risposte nel formato atteso}.
-\end{itemize}
-
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.75\textwidth]{fig3a_log_consistency_hist.png}
-\caption{Distribuzione della coerenza log-testo per domanda. Il pattern binario (0 o 1) riflette la struttura del validity rate.}
-\label{fig:log_consistency}
-\end{figure}
-
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.85\textwidth]{fig3b_log_consistency_by_area.png}
-\caption{Coerenza log-testo per macro area tematica. Aree con risposte umane pi\`u strutturate tendono a mostrare coerenza maggiore; la variabilit\`a intra-area riflette la diversit\`a delle domande.}
-\label{fig:log_consistency_by_area}
-\end{figure}
-
-% ----------------------------------------------------------------------
-\subsection{Allineamento Umano}
-% ----------------------------------------------------------------------
-
-L'alignment score $\mathcal{A}$ misura quanto la distribuzione del modello si avvicina a quella della popolazione umana totale (Pew survey):
-$$
-\mathcal{A} = 1 - \frac{\text{WD}(D_{\text{LLM}}, D_{\text{Human}})}{\text{WD}_{\max}}
-$$
-dove $\text{WD}_{\max} = N_{\text{opzioni}} - 1$ è la massima distanza possibile.
+\begin{tabular}{lccc}
+\toprule
+\textbf{Tipo di Minaccia} & \textbf{JSD media} & \textbf{Validity Rate} & \textbf{Pi\`u destabilizzante (\%)} \\
+\midrule
+Economic   & 0.0039 & 2.3\% & 37.6\% \\
+IT/System  & 0.0052 & 1.0\% & 30.9\% \\
+Legal      & 0.0058 & 1.2\% & 31.5\% \\
+\bottomrule
+\end{tabular}
+\caption{Pythia-160M: metriche per tipo di minaccia. ``Pi\`u destabilizzante'' indica la percentuale di domande in cui quel tipo di minaccia produce la JSD maggiore rispetto al baseline (ovvero il maggior spostamento nella distribuzione dei logit).}
+\end{table}
 
 \paragraph{Osservazioni:}
 \begin{itemize}
-    \item L'alignment medio è \textbf{0.652} (mediana 0.668), con ampia variabilità tra domande (min 0.105, max 0.999, $\sigma = 0.190$).
-    \item Il modello si allinea meglio su aree tematiche con chiare preferenze maggioritarie: le macro aree con mediana più alta sono \textbf{Health} (0.759), \textbf{Economy} (0.742), \textbf{Environment} (0.721), \textbf{Institutional Confidence} (0.714).
-    \item Su topic polarizzati (es. armi, aborto, immigrazione), l'allineamento è debole, riflettendo la difficoltà di un modello base a catturare la complessità delle opinioni umane.
-    \item L'alignment è calcolato rispetto alla \textbf{popolazione totale} del survey Pew, senza filtrare per sottogruppi demografici.
+    \item La minaccia \textbf{Legal} è quella che causa la JSD più alta in media (0.0058), seguita da IT/System (0.0052) ed Economic (0.0039).
+    \item Tutte e tre le minacce producono validity rate estremamente bassi (1--2\%), coerentemente con il basso validity rate generale di Pythia-160M. Il modello non è in grado di seguire il formato richiesto nemmeno sotto pressione.
+    \item La minaccia \textbf{Economic} è la più destabilizzante per numero di domande (37.6\%), seguita da Legal (31.5\%) e IT/System (30.9\%), con una distribuzione sostanzialmente equilibrata.
+    \item Complessivamente, tutte e tre le minacce hanno un effetto redistributivo molto contenuto sulla distribuzione dei logit (JSD < 0.01).
 \end{itemize}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.78\textwidth]{fig4a_alignment_hist.png}
-\caption{Distribuzione dell'alignment score (1 = perfetto allineamento con le risposte umane). La media (0.652) e la mediana (0.668) indicano un allineamento moderato.}
-\label{fig:alignment_hist}
+\includegraphics[width=0.75\textwidth]{../dataset_e_script/progetto/risultati/pythia_160m/figure/fig2d_threat_jsd_comparison.png}
+\caption{Pythia-160M: JSD media per tipo di minaccia.}
+\label{fig:160m_threat_jsd}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.88\textwidth]{fig4b_alignment_by_area.png}
-\caption{Alignment score per macro area tematica. Le aree con risposte umane più ``consensuali'' (Health, Economy) mostrano allineamento migliore; aree polarizzate (Politics, Religion) hanno punteggi più bassi.}
-\label{fig:alignment_by_area}
+\includegraphics[width=0.75\textwidth]{../dataset_e_script/progetto/risultati/pythia_160m/figure/fig2f_threat_validity_comparison.png}
+\caption{Pythia-160M: validity rate per tipo di minaccia vs baseline.}
+\label{fig:160m_threat_validity}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.55\textwidth]{../dataset_e_script/progetto/risultati/pythia_160m/figure/fig2g_threat_most_disruptive_pie.png}
+\caption{Pythia-160M: distribuzione della minaccia più destabilizzante per domanda.}
+\label{fig:160m_threat_pie}
 \end{figure}
 
 % ----------------------------------------------------------------------
-\subsection{Coerenza Politica}
+\subsubsection{Coerenza Log-Testo}
 % ----------------------------------------------------------------------
 
-Per ogni domanda, abbiamo identificato il sottogruppo demografico con \textbf{Wasserstein Distance minima} rispetto alla distribuzione del modello. La tabella seguente mostra la frequenza dei "vincitori" su 380 topic:
+\begin{itemize}
+    \item La coerenza media è \textbf{1.4\%}, estremamente bassa, indicando che Pythia-160M quasi mai genera una risposta testuale corrispondente alla scelta dei logit.
+    \item Il 98.6\% delle domande ha consistency = 0.
+    \item La correlazione tra validity e log-consistency è $r = 0.977$, molto alta: le poche risposte valide sono quasi sempre coerenti con la scelta dei logit.
+\end{itemize}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.75\textwidth]{../dataset_e_script/progetto/risultati/pythia_160m/figure/fig3a_log_consistency_hist.png}
+\caption{Pythia-160M: distribuzione della coerenza log-testo per domanda.}
+\label{fig:160m_log_consistency}
+\end{figure}
+
+% ----------------------------------------------------------------------
+\subsubsection{Allineamento Umano}
+% ----------------------------------------------------------------------
+
+\begin{itemize}
+    \item L'alignment medio è \textbf{0.652} (mediana 0.668), con ampia variabilità ($\sigma = 0.190$, min 0.105, max 0.999).
+    \item Le macro aree con mediana più alta: \textbf{Health} (0.759), \textbf{Economy} (0.739), \textbf{Environment} (0.721).
+\end{itemize}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.78\textwidth]{../dataset_e_script/progetto/risultati/pythia_160m/figure/fig4a_alignment_hist.png}
+\caption{Pythia-160M: distribuzione dell'alignment score.}
+\label{fig:160m_alignment_hist}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.88\textwidth]{../dataset_e_script/progetto/risultati/pythia_160m/figure/fig4b_alignment_by_area.png}
+\caption{Pythia-160M: alignment score per macro area tematica.}
+\label{fig:160m_alignment_by_area}
+\end{figure}
+
+% ----------------------------------------------------------------------
+\subsubsection{Coerenza Politica}
+% ----------------------------------------------------------------------
 
 \begin{table}[h]
 \centering
 \begin{tabular}{lcc}
 \toprule
-\textbf{Gruppo Demografico} & \textbf{N. Topic Allineati} & \textbf{Percentuale} \\
+\textbf{Gruppo Demografico} & \textbf{N. Domande} & \textbf{Percentuale} \\
 \midrule
-Democrat      & 104 & 27.4\% \\
-Liberal       & 103 & 27.1\% \\
-Republican    &  95 & 25.0\% \\
-Conservative  &  29 &  7.6\% \\
-Moderate      &  26 &  6.8\% \\
-Independent   &  23 &  6.1\% \\
+Democrat      & 401 & 26.6\% \\
+Liberal       & 395 & 26.2\% \\
+Republican    & 354 & 23.5\% \\
+Moderate      & 128 &  8.5\% \\
+Conservative  & 122 &  8.1\% \\
+Independent   & 106 &  7.0\% \\
+\midrule
+\textbf{Democrat + Liberal} & \textbf{796} & \textbf{52.9\%} \\
+\textbf{Republican + Conservative} & \textbf{476} & \textbf{31.6\%} \\
 \bottomrule
 \end{tabular}
-\caption{Distribuzione dei topic per gruppo demografico più allineato.}
+\caption{Pythia-160M: distribuzione dell'affinità politica per domanda.}
 \end{table}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.58\textwidth]{fig5a_political_pie.png}
-\caption{Affinità politica del modello per domanda. I colori riflettono lo spettro politico USA: Democrat/Liberal (blu), Republican/Conservative (rosso), Moderate/Independent (grigio).}
-\label{fig:political_pie}
+\includegraphics[width=0.58\textwidth]{../dataset_e_script/progetto/risultati/pythia_160m/figure/fig5a_political_pie.png}
+\caption{Pythia-160M: affinità politica del modello per domanda.}
+\label{fig:160m_political_pie}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.75\textwidth]{fig5b_political_topics_bar.png}
-\caption{Numero di topic allineati per gruppo demografico. Democrat e Liberal dominano con 104 e 103 topic rispettivamente.}
-\label{fig:political_topics_bar}
+\includegraphics[width=0.92\textwidth]{../dataset_e_script/progetto/risultati/pythia_160m/figure/fig5c_wd_heatmap.png}
+\caption{Pythia-160M: heatmap della WD media per macro area $\times$ gruppo demografico.}
+\label{fig:160m_wd_heatmap}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.92\textwidth]{fig5c_wd_heatmap.png}
-\caption{Heatmap della Wasserstein Distance media per macro area $\times$ gruppo demografico. Valori bassi (verde) indicano maggiore allineamento. Si nota un allineamento differenziato per area tematica.}
-\label{fig:wd_heatmap}
+\includegraphics[width=0.82\textwidth]{../dataset_e_script/progetto/risultati/pythia_160m/figure/fig0_summary_table.png}
+\caption{Pythia-160M: tabella riepilogativa di tutte le metriche calcolate.}
+\label{fig:160m_summary_table}
 \end{figure}
 
-\paragraph{Risultati chiave:}
-\begin{enumerate}
-    \item \textbf{Bias liberal/democratico}:
-    Sommando Democrat + Liberal otteniamo \textbf{54.5\% dei topic}, contro il 32.6\% di Republican + Conservative. Questo conferma il risultato di Santurkar et al.: anche un modello base non allineato (Pythia-160M, addestrato su The Pile senza RLHF) mostra una tendenza verso opinioni liberal/democratiche.
-    
-    \item \textbf{Minore polarizzazione rispetto a GPT-3/4}:
-    Rispetto ai modelli analizzati da Santurkar et al., Pythia-160M mostra un bias \emph{meno marcato}. GPT-3 e GPT-4, sottoposti ad alignment con feedback umani prevalentemente liberal, raggiungono allineamenti >80\% con Democrat/Liberal. Pythia-160M, pur privilegiando questi gruppi, mantiene una distribuzione più equilibrata.
-    
-    \item \textbf{Consistency score variabile}:
-    Il consistency\_score per topic (presente nel report aggregato) misura quanto il modello si allinea \emph{coerentemente} con lo stesso gruppo su domande correlate. Valori bassi ($< 0.5$) indicano incoerenza --- il modello "cambia idea" tra domande dello stesso argomento. Questo riflette la mancanza di una "voce" politica stabile, tipica dei modelli non ottimizzati.
-\end{enumerate}
+% ======================================================================
+\subsection{Risultati Pythia-1B}
+% ======================================================================
 
-\paragraph{Confronto con Santurkar et al.:}
+% ----------------------------------------------------------------------
+\subsubsection{Response Validity}
+% ----------------------------------------------------------------------
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lc}
+\toprule
+\textbf{Condizione} & \textbf{Validity Rate Medio} \\
+\midrule
+Baseline & 7.1\% \\
+Permutation & 8.1\% \\
+Duplication & 8.2\% \\
+Threat & 33.9\% \\
+\midrule
+\textbf{Media generale} & \textbf{14.3\%} \\
+\bottomrule
+\end{tabular}
+\caption{Pythia-1B: tasso di validità per condizione sperimentale.}
+\end{table}
+
+\paragraph{Osservazioni:}
 \begin{itemize}
-    \item \textbf{Santurkar et al.}: GPT-3 Davinci allineato $\rightarrow$ 89\% Democrat, 7\% Republican
-    \item \textbf{Questo studio}: Pythia-160M base $\rightarrow$ 27.4\% Democrat, 25.0\% Republican
-    \item L'RLHF \emph{amplifica drasticamente} il bias preesistente nei dati di pre-training
+    \item Pythia-1B ha un validity rate baseline del \textbf{7.1\%}, significativamente superiore a Pythia-160M (1.5\%), ma ancora molto basso, confermando che i modelli base non allineati non seguono formati strutturati.
+    \item La condizione \textbf{threat migliora significativamente la validità} (33.9\%), suggerendo che la pressione testuale induce il modello a generare risposte più aderenti al formato.
+    \item Permutazione (8.1\%) e duplicazione (8.2\%) mantengono livelli simili al baseline.
 \end{itemize}
 
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.75\textwidth]{../dataset_e_script/progetto/risultati/pythia_1b/figure/fig1a_validity_bars.png}
+\caption{Pythia-1B: confronto del tasso di validità medio nelle 4 condizioni sperimentali.}
+\label{fig:1b_validity_bars}
+\end{figure}
+
 % ----------------------------------------------------------------------
-\subsection{Discussione}
+\subsubsection{Stabilità e Robustezza}
 % ----------------------------------------------------------------------
 
-\paragraph{Implicazioni:}
-I risultati confermano che:
-\begin{enumerate}
-    \item \textbf{Il bias liberal è intrinseco ai dati}, non solo all'alignment: anche Pythia-160M, mai esposto a feedback umani, privilegia sottogruppi Democrat/Liberal.
-    \item \textbf{L'alignment peggiora il problema}: confrontando i nostri risultati (modello base) con quelli di Santurkar et al. (modelli allineati), si osserva che RLHF converte una lieve preferenza in una \emph{schiacciante maggioranza}.
-    \item \textbf{Piccoli modelli $\neq$ diverse opinioni}: contrariamente a quanto si potrebbe sperare, ridurre la dimensione del modello non elimina il bias --- semplicemente lo rende meno accurato e più instabile.
-\end{enumerate}
+\begin{table}[h]
+\centering
+\begin{tabular}{lccc}
+\toprule
+\textbf{Perturbazione} & \textbf{JSD media} & \textbf{JSD mediana} & \textbf{Std} \\
+\midrule
+Permutation & 0.0552 & 0.0420 & 0.0489 \\
+Duplication & 0.0396 & 0.0291 & 0.0394 \\
+Threat      & 0.0039 & 0.0022 & 0.0054 \\
+\bottomrule
+\end{tabular}
+\caption{Pythia-1B: JSD media per tipo di perturbazione.}
+\end{table}
+
+\paragraph{Risultato chiave:} Pythia-1B è \textbf{drammaticamente più robusto} alla permutazione rispetto a Pythia-160M:
+\begin{itemize}
+    \item \textbf{58.2\%} Robust (vs 3.3\% di Pythia-160M)
+    \item \textbf{36.7\%} Stable (vs 19.3\%)
+    \item Solo \textbf{5.0\%} Position Bias (vs 77.5\%)
+\end{itemize}
+
+Anche la \textbf{duplicazione} mostra eccellente robustezza: \textbf{71.7\%} Robust, 26.4\% Stable e solo 1.9\% Unstable (rispetto al 52.2\% Unstable di Pythia-160M).
+
+Il modello più grande ha appreso una rappresentazione delle opzioni meno dipendente dalla loro posizione, riducendo drasticamente il position bias.
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.82\textwidth]{fig0_summary_table.png}
-\caption{Tabella riepilogativa di tutte le metriche calcolate per Pythia-160M. La tabella evidenzia il basso validity rate, il forte position bias e la tendenza liberal/democratica.}
-\label{fig:summary_table}
+\includegraphics[width=0.85\textwidth]{../dataset_e_script/progetto/risultati/pythia_1b/figure/fig2a_jsd_violin.png}
+\caption{Pythia-1B: distribuzione della JSD per tipo di perturbazione.}
+\label{fig:1b_jsd_violin}
 \end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.78\textwidth]{../dataset_e_script/progetto/risultati/pythia_1b/figure/fig2b_perm_stability.png}
+\caption{Pythia-1B: classificazione delle domande per robustezza alla permutazione.}
+\label{fig:1b_perm_stability}
+\end{figure}
+
+% ----------------------------------------------------------------------
+\subsubsection{Efficacia per Tipo di Minaccia}
+% ----------------------------------------------------------------------
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lccc}
+\toprule
+\textbf{Tipo di Minaccia} & \textbf{JSD media} & \textbf{Validity Rate} & \textbf{Più destabilizzante (\%)} \\
+\midrule
+Economic   & 0.0067 & 27.6\% & 57.4\% \\
+IT/System  & 0.0021 & 33.3\% & 17.5\% \\
+Legal      & 0.0058 & 40.8\% & 25.0\% \\
+\bottomrule
+\end{tabular}
+\caption{Pythia-1B: metriche per tipo di minaccia.}
+\end{table}
+
+\paragraph{Osservazioni:}
+\begin{itemize}
+    \item Per Pythia-1B la minaccia \textbf{Economic} è di gran lunga la più destabilizzante, provocando il maggiore spostamento nella distribuzione dei logit (JSD 0.0067, più destabilizzante nel 57.4\% delle domande), a differenza di Pythia-160M dove l'effetto era distribuito più uniformemente.
+    \item La minaccia \textbf{Legal} produce il validity rate più alto (40.8\%), coerentemente con quanto osservato: la formulazione con conseguenze legali ``obbliga'' il modello a rispondere nel formato atteso.
+    \item La minaccia \textbf{IT/System} è la meno destabilizzante sia per JSD (0.0021) che per percentuale di domande in cui domina (17.5\%).
+\end{itemize}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.75\textwidth]{../dataset_e_script/progetto/risultati/pythia_1b/figure/fig2d_threat_jsd_comparison.png}
+\caption{Pythia-1B: JSD media per tipo di minaccia.}
+\label{fig:1b_threat_jsd}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.75\textwidth]{../dataset_e_script/progetto/risultati/pythia_1b/figure/fig2f_threat_validity_comparison.png}
+\caption{Pythia-1B: validity rate per tipo di minaccia vs baseline.}
+\label{fig:1b_threat_validity}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.55\textwidth]{../dataset_e_script/progetto/risultati/pythia_1b/figure/fig2g_threat_most_disruptive_pie.png}
+\caption{Pythia-1B: distribuzione della minaccia più destabilizzante per domanda.}
+\label{fig:1b_threat_pie}
+\end{figure}
+
+% ----------------------------------------------------------------------
+\subsubsection{Coerenza Log-Testo}
+% ----------------------------------------------------------------------
+
+\begin{itemize}
+    \item La coerenza media è \textbf{5.4\%}.
+    \item La correlazione tra validity e log-consistency è $r = 0.862$, molto alta, indicando che quando Pythia-1B genera una risposta valida, questa è quasi sempre coerente con la scelta dei logit.
+\end{itemize}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.75\textwidth]{../dataset_e_script/progetto/risultati/pythia_1b/figure/fig3a_log_consistency_hist.png}
+\caption{Pythia-1B: distribuzione della coerenza log-testo per domanda.}
+\label{fig:1b_log_consistency}
+\end{figure}
+
+% ----------------------------------------------------------------------
+\subsubsection{Allineamento Umano}
+% ----------------------------------------------------------------------
+
+\begin{itemize}
+    \item L'alignment medio è \textbf{0.786} (mediana 0.819), significativamente superiore a Pythia-160M (0.652).
+    \item Variabilità inferiore ($\sigma = 0.126$ vs $\sigma = 0.190$), indicando risposte più consistentemente allineate.
+    \item Le macro aree con mediana più alta: \textbf{Religion} (0.888), \textbf{Quality of Life} (0.847), \textbf{Environment} (0.838).
+\end{itemize}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.78\textwidth]{../dataset_e_script/progetto/risultati/pythia_1b/figure/fig4a_alignment_hist.png}
+\caption{Pythia-1B: distribuzione dell'alignment score.}
+\label{fig:1b_alignment_hist}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.88\textwidth]{../dataset_e_script/progetto/risultati/pythia_1b/figure/fig4b_alignment_by_area.png}
+\caption{Pythia-1B: alignment score per macro area tematica.}
+\label{fig:1b_alignment_by_area}
+\end{figure}
+
+% ----------------------------------------------------------------------
+\subsubsection{Coerenza Politica}
+% ----------------------------------------------------------------------
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{Gruppo Demografico} & \textbf{N. Domande} & \textbf{Percentuale} \\
+\midrule
+Democrat      & 328 & 21.8\% \\
+Moderate      & 245 & 16.3\% \\
+Independent   & 239 & 15.9\% \\
+Republican    & 268 & 17.8\% \\
+Liberal       & 226 & 15.0\% \\
+Conservative  & 200 & 13.3\% \\
+\midrule
+\textbf{Democrat + Liberal} & \textbf{554} & \textbf{36.8\%} \\
+\textbf{Republican + Conservative} & \textbf{468} & \textbf{31.1\%} \\
+\bottomrule
+\end{tabular}
+\caption{Pythia-1B: distribuzione dell'affinità politica per domanda. Notare la distribuzione più equilibrata rispetto a Pythia-160M.}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.58\textwidth]{../dataset_e_script/progetto/risultati/pythia_1b/figure/fig5a_political_pie.png}
+\caption{Pythia-1B: affinità politica del modello per domanda.}
+\label{fig:1b_political_pie}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.92\textwidth]{../dataset_e_script/progetto/risultati/pythia_1b/figure/fig5c_wd_heatmap.png}
+\caption{Pythia-1B: heatmap della WD media per macro area $\times$ gruppo demografico.}
+\label{fig:1b_wd_heatmap}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.82\textwidth]{../dataset_e_script/progetto/risultati/pythia_1b/figure/fig0_summary_table.png}
+\caption{Pythia-1B: tabella riepilogativa di tutte le metriche calcolate.}
+\label{fig:1b_summary_table}
+\end{figure}
+
+% ======================================================================
+\subsection{Analisi del Position Bias}
+\label{sec:position_bias}
+% ======================================================================
+
+Oltre alla classificazione delle domande in \emph{Robust}, \emph{Stable} e \emph{Position\_Bias} (basata sulla JSD di permutazione), è stata condotta un'analisi più granulare del \textbf{position bias}: per ogni trial di baseline e permutazione, si registra la probabilità assegnata dal modello a ciascuna posizione (A, B, C, \ldots). Aggregando su tutte le domande, si ottiene la \textbf{probabilità media per posizione}, che consente di rilevare:
+
+\begin{itemize}
+    \item \textbf{Primacy bias}: la prima posizione (A) riceve sistematicamente più probabilità rispetto al valore uniforme $1/n$;
+    \item \textbf{Recency bias}: l'ultima posizione riceve più probabilità;
+    \item \textbf{Assenza di bias}: tutte le posizioni ricevono probabilità simili.
+\end{itemize}
+
+\noindent Questa analisi è complementare alla JSD: la JSD misura \emph{quanto} cambia la distribuzione quando si permutano le opzioni, mentre l'analisi posizionale mostra \emph{quale posizione} è sistematicamente favorita. I risultati di questa analisi saranno disponibili nelle figure \texttt{fig2h\_position\_bias\_bar.png} e \texttt{fig2i\_primacy\_recency.png} generate da \texttt{visualize.py}.
+
+% ======================================================================
+\subsection{Analisi Comparativa: Pythia-160M vs Pythia-1B}
+% ======================================================================
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{Metrica} & \textbf{Pythia-160M} & \textbf{Pythia-1B} \\
+\midrule
+Validity rate (baseline) & 1.5\% & 7.1\% \\
+Validity rate (threat) & 1.5\% & 33.9\% \\
+JSD permutation (media) & 0.2788 & 0.0552 \\
+Position Bias (\%) & 77.5\% & 5.0\% \\
+JSD duplication (media) & 0.1774 & 0.0396 \\
+Duplication Unstable (\%) & 52.2\% & 1.9\% \\
+JSD threat (media) & 0.0038 & 0.0039 \\
+Log-text consistency & 0.014 & 0.054 \\
+Alignment score (media) & 0.652 & 0.786 \\
+Alignment score (mediana) & 0.668 & 0.819 \\
+Democrat + Liberal & 52.9\% & 36.8\% \\
+Republican + Conservative & 31.6\% & 31.1\% \\
+Minaccia pi\`u destabilizzante & Economic (37.6\%) & Economic (57.4\%) \\
+\bottomrule
+\end{tabular}
+\caption{Confronto delle principali metriche tra Pythia-160M e Pythia-1B.}
+\label{tab:comparison}
+\end{table}
+
+\paragraph{Risultati chiave del confronto:}
+
+\begin{enumerate}
+    \item \textbf{Validity rate coerente con lo scaling}: Il modello più grande (1B) ha un validity rate superiore (7.1\% vs 1.5\%), confermando che modelli con più parametri sono più capaci di seguire il formato richiesto. Entrambi i valori restano bassi, coerentemente con modelli base non sottoposti a instruction tuning.
+    
+    \item \textbf{Robustezza radicalmente migliorata}: Pythia-1B riduce il Position Bias dal 77.5\% al 5.0\%, con il 58.2\% delle domande classificate come Robust. Anche la duplicazione migliora drammaticamente: 71.7\% Robust per 1B vs 11.8\% per 160M. L'aumento di parametri aiuta il modello a sviluppare rappresentazioni più stabili delle opzioni, meno dipendenti dalla posizione.
+    
+    \item \textbf{Allineamento umano superiore}: L'alignment score passa da 0.652 a 0.786 (+20.6\%), con variabilità inferiore. Il modello più grande approssima meglio le distribuzioni di risposta umane, anche senza esposizione esplicita a feedback.
+    
+    \item \textbf{Bias politico attenuato}: Pythia-1B mostra una distribuzione politica più equilibrata (D+L: 36.8\% vs 52.9\%), con un aumento significativo di Moderate (16.3\% vs 8.5\%) e Independent (15.9\% vs 7.0\%). L'aumento di scala riduce il bias liberal osservato nel modello più piccolo.
+    
+    \item \textbf{Effetto delle minacce sulla validità}: Per Pythia-1B, le minacce aumentano il validity rate dal 7.1\% al 33.9\% --- un effetto sostanziale. Per Pythia-160M, l'effetto è trascurabile (da 1.5\% a 1.5\%). Questo suggerisce che un modello più capace reagisce alle minacce adattando il formato, mentre un modello troppo piccolo non possiede le capacità per farlo.
+    
+    \item \textbf{Impatto differenziato delle minacce}: Per entrambi i modelli, la minaccia \textbf{Economic} è quella che provoca il maggiore spostamento nella distribuzione dei logit (più destabilizzante). Per Pythia-1B, la minaccia \textbf{Legal} produce il validity rate più alto (40.8\%). La minaccia \textbf{IT/System} è la meno destabilizzante.
+    
+    \item \textbf{Confronto con Santurkar et al.}: GPT-3 Davinci allineato mostra 89\% Democrat, 7\% Republican. I nostri modelli base mostrano tendenze liberal molto più moderate (Pythia-160M: 26.6\% Democrat, Pythia-1B: 21.8\%), confermando che l'RLHF \emph{amplifica drasticamente} il bias preesistente.
+\end{enumerate}
+
+% ======================================================================
+\section{Discussione}
+% ======================================================================
+
+\paragraph{Implicazioni principali:}
+I risultati dell'analisi comparativa tra Pythia-160M e Pythia-1B permettono di trarre conclusioni significative:
+
+\begin{enumerate}
+    \item \textbf{Il bias liberal è intrinseco ai dati}: anche Pythia-160M, mai esposto a feedback umani, privilegia sottogruppi Democrat/Liberal (52.9\% delle domande). Questo bias è presente nei dati di pre-training (The Pile) e non è un artefatto dell'alignment.
+    
+    \item \textbf{Lo scaling riduce il bias politico}: passando da 160M a 1B parametri, il bias D+L si attenua dal 52.9\% al 36.8\%, con un aumento significativo dei gruppi Moderate e Independent. Le rappresentazioni più ricche di un modello più grande permettono di catturare meglio la diversità delle opinioni umane.
+    
+    \item \textbf{Lo scaling migliora la robustezza}: il position bias crolla dal 77.5\% al 5.0\%, e la duplication instability dal 52.2\% all'1.9\%. Il modello più grande ha appreso rappresentazioni semantiche meno dipendenti dalla posizione delle opzioni nel testo.
+    
+    \item \textbf{Lo scaling migliora l'allineamento umano}: l'alignment score sale da 0.652 a 0.786, indicando che Pythia-1B cattura meglio le distribuzioni di risposta della popolazione.
+    
+    \item \textbf{Lo scaling migliora il validity rate e la reattività alle minacce}: Pythia-1B ha un validity rate baseline superiore (7.1\% vs 1.5\%) e reagisce alle minacce aumentandolo al 33.9\%. Per Pythia-160M le minacce non producono effetto sulla validità. Il format-following richiede una soglia minima di capacità del modello.
+    
+    \item \textbf{L'impatto delle minacce varia per tipo}: la minaccia Economic è la più destabilizzante (maggiore spostamento dei logit) per entrambi i modelli, mentre la minaccia Legal è quella che produce il validity rate più alto per 1B. La minaccia IT/System è la meno destabilizzante. Minacce con conseguenze sociali tangibili (perdita del lavoro, conseguenze legali) hanno un impatto maggiore sul comportamento del modello.
+    
+    \item \textbf{Confronto con Santurkar et al.}: GPT-3 Davinci allineato mostra 89\% Democrat, 7\% Republican. I nostri modelli base mostrano tendenze liberal molto più moderate (Pythia-160M: 26.6\% Democrat, Pythia-1B: 21.8\%), confermando che l'RLHF \emph{amplifica drasticamente} il bias preesistente.
+\end{enumerate}
 
 \paragraph{Limitazioni dello studio:}
 \begin{itemize}
-    \item \textbf{Basso validity rate}: con solo il 19.9\% di risposte valide, l'analisi è basata su un sottoinsieme limitato di comportamenti del modello.
-    \item \textbf{Modello di piccole dimensioni}: Pythia-160M è un proof-of-concept; per risultati più robusti sarebbe necessario testare modelli più grandi (Pythia-1B, 6.9B, ecc.).
-    \item \textbf{Position bias dominante}: la forte dipendenza dall'ordine delle opzioni potrebbe mascherare alcune preferenze intrinseche.
+    \item \textbf{Basso validity rate}: con l'1.5\% (160M) e il 7.1\% (1B) di risposte valide nel formato atteso, l'analisi della coerenza log-testo è limitata a un sottoinsieme ristretto. Le metriche basate sui logit (JSD, WD, alignment) coprono comunque tutte le domande e sono il fondamento dell'analisi.
+    \item \textbf{Solo due modelli analizzati}: per confermare le tendenze di scaling sarebbe necessario includere i modelli intermedi (1.4B, 2.8B, 6.9B).
+    \item \textbf{Position bias nei modelli piccoli}: il forte position bias di Pythia-160M potrebbe mascherare alcune preferenze intrinseche.
 \end{itemize}
 
 % ======================================================================
 \section{Conclusioni e Sviluppi Futuri}
 % ======================================================================
 
-Questo studio ha replicato con successo l'analisi di Santurkar et al. su un modello base open-source, confermando la presenza di \textbf{bias liberali intrinseci} nei Large Language Models anche in assenza di alignment esplicito. 
+Questo studio ha replicato con successo l'analisi di Santurkar et al. su due modelli base open-source della famiglia Pythia, confermando e ampliando i risultati originali.
 
 \paragraph{Conclusioni:}
 \begin{itemize}
-    \item I modelli base (Pythia-160M) mostrano già una preferenza verso opinioni Democrat/Liberal (\textasciitilde54\% dei topic), sebbene meno marcata rispetto ai modelli allineati (GPT-3: 89\%)
-    \item L'RLHF amplifica drammaticamente i bias preesistenti, rendendo i modelli meno rappresentativi della diversità di opinioni della popolazione
-    \item La robustezza a perturbazioni è limitata: position bias e basso validity rate caratterizzano i modelli non ottimizzati
+    \item I modelli base mostrano già una preferenza verso opinioni Democrat/Liberal: Pythia-160M al 52.9\%, Pythia-1B al 36.8\%, rispetto all'89\% di GPT-3 allineato.
+    \item \textbf{Lo scaling migliora la qualità complessiva}: il modello più grande è più robusto (Position Bias: 5\% vs 78\%; Dup Unstable: 1.9\% vs 52.2\%), più allineato con la popolazione (alignment: 0.786 vs 0.652) e meno polarizzato politicamente.
+    \item \textbf{Lo scaling migliora il validity rate}: Pythia-1B (7.1\%) supera Pythia-160M (1.5\%), e reagisce alle minacce portando il validity rate al 33.9\%. Tuttavia, il format-following resta basso senza instruction tuning.
+    \item \textbf{Le minacce hanno impatto differenziato}: la minaccia Economic è la più destabilizzante (maggiore spostamento delle distribuzioni), la Legal la più efficace nel forzare risposte valide (per 1B), la IT/System la meno impattante.
+    \item L'RLHF \textbf{amplifica drammaticamente} i bias preesistenti nei dati di pre-training, rendendo i modelli allineati meno rappresentativi della diversità di opinioni.
 \end{itemize}
 
 \paragraph{Sviluppi futuri:}
 \begin{enumerate}
-    \item \textbf{Scaling analysis}: eseguire l'analisi comparativa sui 5 modelli Pythia (160M, 1B, 1.4B, 2.8B, 6.9B) per quantificare l'effetto della dimensione sul bias politico, sulla robustezza e sull'allineamento umano
-    \item \textbf{Modelli alternativi}: testare LLaMA, Mistral, GPT-2 e altri modelli open-source con diverse strategie di pre-training per identificare pattern comuni
+    \item \textbf{Scaling analysis completa}: estendere l'analisi ai 5 modelli Pythia (160M, 1B, 1.4B, 2.8B, 6.9B) per costruire curve di scaling per bias, robustezza e allineamento
+    \item \textbf{Modelli alternativi}: testare LLaMA, Mistral, GPT-2 e altri modelli open-source con diverse strategie di pre-training
     \item \textbf{Effect of alignment}: confrontare modelli base vs. istruiti (es. Pythia vs. Pythia-Chat) per isolare quantitativamente l'impatto dell'RLHF
     \item \textbf{Debiasing techniques}: sperimentare prompt engineering, fine-tuning su dataset bilanciati, e constitutional AI per mitigare i bias
     \item \textbf{Cross-cultural analysis}: replicare l'analisi su survey non-USA (es. European Social Survey) per verificare se il bias liberal sia specifico del contesto americano
-    \item \textbf{Temporal dynamics}: analizzare checkpoints intermedi di Pythia per studiare l'emergenza del bias durante il training
+    \item \textbf{Analisi temporale}: studiare checkpoints intermedi di Pythia per comprendere l'emergenza del bias durante il training
+    \item \textbf{Threat engineering approfondito}: espandere l'analisi delle minacce con ulteriori categorie (emotiva, morale, sociale) per comprendere meglio i fattori che influenzano il comportamento dei LLM
 \end{enumerate}
 
 \medskip
@@ -509,7 +809,7 @@ Questo studio ha replicato con successo l'analisi di Santurkar et al. su un mode
 Questo progetto è stato sviluppato nell'ambito del corso di \emph{Deep Learning e Architetture di Rete} (A.A. 2024/2025). Si ringrazia il Prof. [Nome Docente] per le preziose indicazioni metodologiche e il supporto durante l'implementazione. Un ringraziamento speciale al Pew Research Center per aver reso pubblicamente disponibili i dataset dell'American Trends Panel, e agli autori di Santurkar et al. per aver condiviso codice e risorse dell'OpinionQA dataset.
 
 \medskip
-\noindent \textbf{Codice e riproducibilità:} Tutti gli script Python utilizzati in questo studio sono disponibili nella sottocartella \texttt{dataset\_e\_script/progetto/script/}. Gli esperimenti sono stati eseguiti su [specificare hardware, es. CPU Intel i7 / GPU NVIDIA RTX 3060] con PyTorch 2.x e Transformers 4.x.
+\noindent \textbf{Codice e riproducibilità:} Tutti gli script Python utilizzati in questo studio sono disponibili nella sottocartella \texttt{dataset\_e\_script/progetto/script/}. Gli esperimenti sono stati eseguiti su Pythia-160M e Pythia-1B con PyTorch 2.x e Transformers 4.x. Il sistema di menu (\texttt{menu.py}) supporta la selezione interattiva del modello e l'esecuzione automatica dell'intera pipeline (esperimenti, analisi, visualizzazione).
 
 \newpage
 % ======================================================================
@@ -520,12 +820,12 @@ Questo progetto è stato sviluppato nell'ambito del corso di \emph{Deep Learning
 \bibitem{santurkar2023whose}
 Santurkar, S., Durmus, E., Ladhak, F., Lee, C., Liang, P., \& Hashimoto, T. (2023).
 \emph{Whose Opinions Do Language Models Reflect?}
-Proceedings of the 40th International Conference on Machine Learning (ICML).
+Proceedings of the 40th International Conference on Machine Learning (ICML), PMLR 202:29971--30004.
 
-\bibitem{hartmann2024political}
-Hartmann, J., Schwenzow, J., \& Witte, M. (2024).
-\emph{The Political Compass of Large Language Models}.
-Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (ACL).
+\bibitem{rottger2024political}
+Röttger, P., Hofmann, V., Pyatkin, V., Hinck, M., Kirk, H.\,R., Schütze, H., \& Hovy, D. (2024).
+\emph{Political Compass or Spinning Arrow? Towards More Meaningful Evaluations for Values and Opinions in Large Language Models}.
+Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (ACL), pages 15295--15311. \textbf{Outstanding Paper Award}.
 
 \bibitem{biderman2023pythia}
 Biderman, S., Schoelkopf, H., Anthony, Q., et al. (2023).
