@@ -180,7 +180,7 @@ def fig_robustness(df, outdir, model_label=None):
     plt.close(fig)
 
     # --- 2f  Stacked bar: Threat resistance ---
-    cats_t = ["Stable", "Improved", "Collapses"]
+    cats_t = ["Stable", "Improved", "Degraded"]
     cat_colors_t = ["#4C72B0", "#55A868", "#C44E52"]
     counts_t = df["threat_resistant"].value_counts()
     vals_t = [counts_t.get(c, 0) for c in cats_t]
@@ -994,28 +994,28 @@ def fig_cognitive_map(df, outdir, model_label=None):
     # Scatter plot con colore uniforme per quadrante
     # Determina il quadrante di ogni punto per colorarlo
     colors_map = {
-        "Competenza Reale": "#2ca02c",      # verde
-        "Collasso Euristico": "#ff7f0e",     # arancione
-        "Rifiuto Coerente": "#7f7f7f",       # grigio
-        "Caos Generativo": "#d62728",        # rosso
+        "Risposta affidabile": "#2ca02c",      # verde
+        "Bias di posizione": "#ff7f0e",     # arancione
+        "Rifiuto coerente": "#7f7f7f",       # grigio
+        "Rumore generativo": "#d62728",        # rosso
     }
     def _quad(row):
         v, j = row["baseline_valid_rate"], row["jsd_permutation"]
         if v > 0.5 and j <= 0.15:
-            return "Competenza Reale"
+            return "Risposta affidabile"
         elif v > 0.5 and j > 0.15:
-            return "Collasso Euristico"
+            return "Bias di posizione"
         elif v <= 0.5 and j <= 0.15:
-            return "Rifiuto Coerente"
+            return "Rifiuto coerente"
         else:
-            return "Caos Generativo"
+            return "Rumore generativo"
 
     sub = sub.copy()
     sub["_quad"] = sub.apply(_quad, axis=1)
 
     # Disegna un gruppo per quadrante (così la legenda è leggibile)
-    quad_order = ["Competenza Reale", "Collasso Euristico",
-                  "Rifiuto Coerente", "Caos Generativo"]
+    quad_order = ["Risposta affidabile", "Bias di posizione",
+                  "Rifiuto coerente", "Rumore generativo"]
     for q in quad_order:
         mask = sub["_quad"] == q
         if mask.any():
@@ -1041,16 +1041,16 @@ def fig_cognitive_map(df, outdir, model_label=None):
     # Etichette nei quadranti — posizionate in coordinate dati,
     # con testo più chiaro e descrittivo
     xmax = max(0.65, sub["jsd_permutation"].max() * 1.15, 0.35)
-    ax.text(0.01, 1.02, "Competenza Reale\n(valido e stabile)",
+    ax.text(0.01, 1.02, "Risposta affidabile\n(valido e stabile)",
             color="#2ca02c", fontweight="bold", fontsize=10, va="top",
             transform=ax.transData)
-    ax.text(xmax, 1.02, "Collasso Euristico\n(valido ma instabile)",
+    ax.text(xmax, 1.02, "Bias di posizione\n(valido ma instabile)",
             color="#ff7f0e", fontweight="bold", fontsize=10, va="top",
             ha="right", transform=ax.transData)
-    ax.text(0.01, -0.02, "Rifiuto Coerente\n(non valido, stabile)",
+    ax.text(0.01, -0.02, "Rifiuto coerente\n(non valido, stabile)",
             color="#7f7f7f", fontweight="bold", fontsize=10, va="bottom",
             transform=ax.transData)
-    ax.text(xmax, -0.02, "Caos Generativo\n(non valido, instabile)",
+    ax.text(xmax, -0.02, "Rumore generativo\n(non valido, instabile)",
             color="#d62728", fontweight="bold", fontsize=10, va="bottom",
             ha="right", transform=ax.transData)
 
@@ -1087,6 +1087,70 @@ def fig_cognitive_map(df, outdir, model_label=None):
         counts = df["cognitive_quadrant"].value_counts()
         for quad, n in counts.items():
             print(f"   {quad:20s}: {n:3d} domande ({n/len(df)*100:.1f}%)")
+
+
+# ======================================================================
+#  THREAT CONSISTENCY IMPACT
+# ======================================================================
+def fig_threat_consistency_impact(df, outdir, model_label=None):
+    """
+    Stacked bar: distribuzione percentuale dell'impatto delle minacce
+    sulla coerenza logit-testo ("Degraded", "Stable", "Improved").
+    """
+    col = "threat_consistency_impact"
+    if col not in df.columns:
+        print(f"   [SKIP] Colonna '{col}' non trovata nel CSV.")
+        return
+
+    suffix = f" \u2014 {model_label}" if model_label else ""
+
+    cats = ["Stable", "Improved", "Degraded"]
+    cat_colors = ["#4C72B0", "#55A868", "#C44E52"]
+    counts = df[col].value_counts()
+    vals = [counts.get(c, 0) for c in cats]
+    tot = sum(vals)
+    if tot == 0:
+        print(f"   [SKIP] Nessun valore valido per '{col}'.")
+        return
+    pcts = [v / tot * 100 for v in vals]
+
+    fig, ax = plt.subplots(figsize=(8, 5.0))
+    left = 0
+    for cat, pct, col_c in zip(cats, pcts, cat_colors):
+        ax.barh(0, pct, left=left, color=col_c, edgecolor="white",
+                label=f"{cat} ({pct:.1f}%)")
+        if pct > 5:
+            ax.text(left + pct / 2, 0, f"{pct:.1f}%", ha="center", va="center",
+                    fontweight="bold", color="white", fontsize=11)
+        left += pct
+    ax.set_xlim(0, 100)
+    ax.set_yticks([])
+    ax.set_xlabel("% delle domande", labelpad=18)
+    if model_label:
+        ax.set_title(
+            f"Impatto delle minacce sulla coerenza logit-testo\n{model_label}",
+            fontsize=16, fontweight="bold", pad=3,
+        )
+    else:
+        ax.set_title(
+            "Impatto delle minacce sulla coerenza logit-testo",
+            fontsize=16, fontweight="bold",
+        )
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.55),
+             ncol=3, fontsize=10, frameon=True)
+    sns.despine(left=True)
+    fig.tight_layout(rect=[0, 0.00, 1, 0.99])
+    fig.savefig(os.path.join(outdir, "fig_threat_consistency_impact.png"),
+                dpi=200, bbox_inches="tight")
+    plt.close(fig)
+
+    # stampe riassuntive
+    print(f"\n{'='*60}")
+    print("THREAT CONSISTENCY IMPACT")
+    print(f"{'='*60}")
+    for c in cats:
+        n = counts.get(c, 0)
+        print(f"     {c:15s} {n:5d}  ({n / tot * 100:.1f}%)")
 
 
 # ======================================================================
@@ -1148,6 +1212,7 @@ def main():
 
     fig_cognitive_map(df, args.outdir, model_label=model_label)
     fig_threat_efficiency(df, df_topic, args.outdir, model_label=model_label)
+    fig_threat_consistency_impact(df, args.outdir, model_label=model_label)
     fig_log_coherence(df, args.outdir, model_label=model_label)
     fig_alignment(df, args.outdir, model_label=model_label)
     fig_political(df, df_topic, args.outdir, model_label=model_label)

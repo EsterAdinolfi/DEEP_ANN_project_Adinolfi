@@ -32,7 +32,7 @@ for m in models:
         
         tr = df['threat_resistant'].value_counts()
         tot_tr = tr.sum()
-        for c in ['Stable','Improved','Collapses']:
+        for c in ['Stable','Improved','Degraded']:
             n = tr.get(c, 0)
             print(f"  Threat_{c}: {n} ({n/tot_tr*100:.1f}%)")
         

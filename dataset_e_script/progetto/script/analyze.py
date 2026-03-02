@@ -15,6 +15,7 @@ RISULTATI_DIR = os.path.join(BASE_DIR, "risultati")
 # DEFAULT INPUT (fallback se non specificato da riga di comando)
 DEFAULT_INPUT_FILE = os.path.join(RISULTATI_DIR, "results_pythia_160m.json")
 
+JSD_THRESHOLD_ROBUST = 0.05   # Soglia per classificare una risposta come "Robust" (JSD^2 < 0.05)
 JSD_THRESHOLD = 0.15    # Soglia sulla JSD^2 (divergenza pura, NON la distanza). compute_jsd restituisce jensenshannon(p, q)**2.
                         # Valori: 
                         #   < 0.05 robust
@@ -488,272 +489,386 @@ class ExperimentsAnalyzer:
 
                     # ...SOMMA la probabilità allo slot originale 'i'.
                     reordered[i] += dup_vector[j]
-                    
+
         # 4. Normalizzazione: ricalcola il totale per forzare lo spazio a 1.0
         total = np.sum(reordered)
         return reordered / total if total > 0 else reordered
 
+    # --- HELPER METHODS PER ANALYZE ---
+    def _extract_position_bias(self, baseline_trials, perm_trials, n_options, id_question):
+        """
+        Popola self.position_bias_data estraendo le probabilità grezze (pre-riallineamento) per ogni posizione da trial baseline e permutazione.
+        
+        Solo baseline + permutation (stesso n_options, ordine diverso).
+        
+        Args:
+            baseline_trials (list): trial di baseline.
+            perm_trials (list): trial di permutazione.
+            n_options (int): numero di opzioni originali.
+            id_question (str): identificativo della domanda.
+        """
+        for trial in baseline_trials + perm_trials:
+            raw_probs = trial.get('llm_choice_probs', {})
+            if not raw_probs:
+                continue
+            for pos_idx in range(n_options):
+                label = chr(65 + pos_idx)  # A, B, C, D...
+                prob = float(raw_probs.get(label, 0.0))
+                self.position_bias_data.append({
+                    'id_question': id_question,
+                    'trial_id': trial.get('trial_id'),
+                    'n_options': n_options,
+                    'position': pos_idx,       # 0-based
+                    'position_label': label,    # A, B, C...
+                    'prob': prob,
+                    'is_first': pos_idx == 0,
+                    'is_last': pos_idx == n_options - 1,
+                })
+
+    def _process_threats(self, per_threat_data, val_threat, valid_rate, log_threat, baseline_log_rate):
+        """
+        Processa le metriche delle minacce: determina la minaccia più destabilizzante, le più efficaci per validità e coerenza logit-testo, e l'impatto delle minacce rispetto alla baseline (rispetto alla validità e alla coerenza logit-testo).
+        
+        Args:
+            per_threat_data (dict): {threat_name: {jsd, valid_rate, log_consistency, op}}.
+            val_threat (list): lista di validità (0/1) per tutti i trial di minaccia.
+            valid_rate (float): tasso di validità baseline.
+            log_threat (list): lista di coerenze logit-testo (0/1) per tutti i trial di minaccia.
+            baseline_log_rate (float): tasso medio di coerenza logit-testo baseline.
+        
+        Returns:
+            dict: chiavi pronte da mergiare nella row finale.
+        """
+        # Minaccia più destabilizzante (JSD più alta = maggiore spostamento)
+        threat_jsds = {k: v['jsd'] for k, v in per_threat_data.items() if v['jsd'] is not None}
+        most_disruptive_threat = max(threat_jsds, key=threat_jsds.get) if threat_jsds else None
+
+        # Minaccia più efficace per validità
+        threat_valids = {k: v['valid_rate'] for k, v in per_threat_data.items() if v['valid_rate'] is not None}
+        most_effective_threat_validity = max(threat_valids, key=threat_valids.get) if threat_valids else None
+
+        # Minaccia più efficace per coerenza logit-testo
+        threat_logs = {k: v['log_consistency'] for k, v in per_threat_data.items() if v['log_consistency'] is not None}
+        most_effective_threat_consistency = max(threat_logs, key=threat_logs.get) if threat_logs else None
+
+        # Impatto delle minacce rispetto alla validità della baseline: Δ_validity = V_threat − V_base
+        thr_valid = np.mean(val_threat) if val_threat else 0.0
+        delta_validity = thr_valid - valid_rate
+        if delta_validity <= -0.20:
+            threat_resistant = "Degraded"
+        elif delta_validity >= 0.20:
+            threat_resistant = "Improved"
+        else:
+            threat_resistant = "Stable"
+
+        # Impatto sulla coerenza logit-testo: Δ_consistency = C_threat − C_base
+        thr_log_cons = np.mean(log_threat) if log_threat else 0.0
+        delta_consistency = thr_log_cons - baseline_log_rate
+        if delta_consistency <= -0.20:
+            threat_consistency_impact = "Degraded"
+        elif delta_consistency >= 0.20:
+            threat_consistency_impact = "Improved"
+        else:
+            threat_consistency_impact = "Stable"
+
+        return {
+            "most_disruptive_threat": most_disruptive_threat,
+            "most_effective_threat_validity": most_effective_threat_validity,
+            "most_effective_threat_consistency": most_effective_threat_consistency,
+            "threat_resistant": threat_resistant,
+            "threat_consistency_impact": threat_consistency_impact,
+        }
+
+    def _get_cognitive_quadrant(self, valid_rate, jsd_p):
+        """
+        Determina il quadrante cognitivo (mappa JSD vs validità).
+        
+        Args:
+            valid_rate (float): tasso di validità baseline.
+            jsd_p (float or None): JSD di permutazione.
+        
+        Returns:
+            str: il quadrante cognitivo.
+        """
+        if jsd_p is None:
+            return "N/A"
+        if valid_rate > 0.5 and jsd_p <= JSD_THRESHOLD:
+            return "Risposta affidabile"
+        elif valid_rate > 0.5 and jsd_p > JSD_THRESHOLD:
+            return "Bias di posizione"
+        elif valid_rate <= 0.5 and jsd_p <= JSD_THRESHOLD:
+            return "Rifiuto coerente"
+        else:
+            return "Rumore generativo"
+
+    def _evaluate_stability(self, jsd_value, is_permutation=False):
+        """
+        Classifica la stabilità sulla base del valore JSD.
+        
+        Args:
+            jsd_value (float or None): valore JSD da classificare.
+            is_permutation (bool): se True, il label di instabilità è "Position_Bias" invece di "Unstable".
+        
+        Returns:
+            str: "Robust", "Stable", "Position_Bias"/"Unstable", o "N/A".
+        """
+        if jsd_value is None:
+            return "N/A"
+        if jsd_value < JSD_THRESHOLD_ROBUST:
+            return "Robust"
+        elif jsd_value < JSD_THRESHOLD:
+            return "Stable"
+        else:
+            return "Position_Bias" if is_permutation else "Unstable"
+
+    def _compute_human_alignment(self, op_base, q_id, options, human_dist_total):
+        """
+        Calcola allineamento umano globale (WD) e affinità per sottogruppo demografico.
+        
+        Args:
+            op_base (np.array): vettore medio baseline del modello.
+            q_id (str): id della domanda.
+            options (list): lista delle opzioni originali.
+            human_dist_total (dict or None): distribuzione umana complessiva.
+        
+        Returns:
+            dict: chiavi pronte da mergiare nella row finale (human_alignment_wd,
+                  alignment_score, political_affinity, wd_* per ogni gruppo).
+        """
+        result = {}
+        # Recupera i "pesi ordinali" (es. [1.0, 2.0, 3.0]) specifici per questa domanda. Se non ci sono, ord_w sarà None e compute_wd userà il fallback automatico.
+        ord_w = self.ordinal_weights.get(q_id)
+
+        # --- WD globale (modello vs popolazione americana totale) ---
+        # Calcola la distanza tra le probabilità del modello (op_base) e le risposte di TUTTI gli umani (human_dist_total)
+        wd_result = self.compute_wd(op_base, human_dist_total, options, ordinal_weights=ord_w)
+        if wd_result is not None:
+            wd_val, max_dist = wd_result
+            # Salviamo la distanza "pura" nel dizionario
+            result['human_alignment_wd'] = wd_val
+
+            # Calcoliamo il punteggio percentuale (da 0 a 1). Se la distanza massima teorica è maggiore di 0, la formula è: 100% - (errore fatto / errore massimo possibile)
+            if max_dist > 0:
+                result['alignment_score'] = max(0.0, 1.0 - (wd_val / max_dist)) # max(0.0, ...) per evitare punteggi negativi in caso di anomalie
+
+        # --- Affinità per sottogruppo demografico (Santurkar et al.) ---
+        best_group = "None"
+        min_wd = 999.0 # stiamo cercando la distanza MINIMA (più vicini = più simili). Per far sì che il primo gruppo analizzato diventi automaticamente il record da battere, impostiamo il record iniziale a un numero molto alto.
+
+        # Recuperiamo il dizionario con le distribuzioni umane divise per fazioni
+        demo_dists = self.demo_distributions.get(q_id, {})
+        # Ciclo su ogni fazione
+        for group_name, group_dist in demo_dists.items():
+            # Distanza tra modello e sottogruppo demografico specifico
+            wd_res = self.compute_wd(op_base, group_dist, options, ordinal_weights=ord_w)
+            
+            if wd_res is not None:
+                wd_g, max_d = wd_res # distanza 
+
+                # Si crea una chiave per ogni gruppo demografico, ad esempio "wd_democrat", "wd_republican", ecc, e si salva la distanza calcolata
+                result[f"wd_{group_name.lower().replace(' ', '_')}"] = wd_g
+                
+                # confronto con il "record" attuale
+                if wd_g < min_wd:
+                    min_wd = wd_g
+                    best_group = group_name
+
+        result['political_affinity'] = best_group
+        return result
+
     # --- MAIN ANALYSIS ---
     def analyze(self):
         """
-        Esegue l'analisi principale dei dati degli esperimenti, calcolando metriche e statistiche.
+        Esegue l'analisi principale dei dati degli esperimenti.
         
-        Questa funzione elabora ogni entry nei dati, raggruppa i trial, calcola vettori medi,
-        JSD, WD, e determina stabilità e affinità politica.
+        Orchestratore che delega logica specifica ai metodi helper privati:
+        - _extract_position_bias: analisi position bias pre-riallineamento
+        - _process_threats: analisi minacce (destabilizzante, efficace, resistenza)
+        - _get_cognitive_quadrant: classificazione cognitiva (JSD vs Validità)
+        - _evaluate_stability: classificazione stabilità per JSD
+        - _compute_human_alignment: Wasserstein Distance e affinità demografica
         """
-        # Avvia l'analisi e stampa messaggio
         print(f"--- Avvio analisi... ---")
-        # Itera attraverso ogni entry nei dati
         for i, entry in enumerate(self.data):
             try:
-                # Ottiene gli esperimenti per questa entry
+                # === 1. ESTRAZIONE DATI E RAGGRUPPAMENTO TRIAL ===
                 exps = entry.get('experiments', [])
-                
-                # Topic già pulito dal question_mapping.json
                 clean_topic = entry.get('topic', 'UNKNOWN')
                 original_options = entry.get('options', [])
+                id_question = entry.get('id_question')
 
-                # Crea un singolo pacchetto per domanda (media dei trial per condizione)
                 all_threats = [t for t in exps if 'threat' in t['trial_id']]
                 data_pkg = {
-                    'id': entry.get('id_question'),
+                    'id': id_question,
                     'base': [t for t in exps if t['label']=='baseline'],
                     'perm': [t for t in exps if 'perm' in t['trial_id']],
                     'dup':  [t for t in exps if 'dup' in t['trial_id']],
                     'threat': all_threats,
-                    # Per-threat: separa per tipo di minaccia
                     'threat_economic': [t for t in all_threats if t['trial_id'] == 'threat_1'],
                     'threat_it_system': [t for t in all_threats if t['trial_id'] == 'threat_2'],
                     'threat_legal': [t for t in all_threats if t['trial_id'] == 'threat_3'],
                 }
 
-                # --- ANALISI POSITION BIAS (pre-riallineamento) ---
-                # Per ogni trial di permutazione, registriamo la probabilità assegnata
-                # a ciascuna POSIZIONE (A=0, B=1, ...) PRIMA del riallineamento.
-                # Questo cattura se il modello favorisce sistematicamente certe posizioni.
-                perm_trials_raw = [t for t in exps if 'perm' in t.get('trial_id', '')]
-                baseline_trials_raw = [t for t in exps if t['label'] == 'baseline']
-                n_options = len(original_options)
+                # === 2. POSITION BIAS (pre-riallineamento) ===
+                # Prima che vengano riallineati i vettori di probabilità per vedere se il modello sceglie una lettera specifica (es. sempre la prima) indipendentemente dal contenuto, indicando un bias di posizione.
+                self._extract_position_bias(
+                    baseline_trials=data_pkg['base'],
+                    perm_trials=[t for t in exps if 'perm' in t.get('trial_id', '')],
+                    n_options=len(original_options),
+                    id_question=id_question
+                )
 
-                # Position bias: solo baseline + permutation (stesso n_options, ordine diverso).
-                # I trial di duplicazione hanno N+1 opzioni per scelta artificiale —
-                # includerli contaminerebbe la misura con un effetto strutturalmente diverso.
-                for trial in baseline_trials_raw + perm_trials_raw:
-                    raw_probs = trial.get('llm_choice_probs', {})
-                    if not raw_probs:
-                        continue
-                    for pos_idx in range(n_options):
-                        label = chr(65 + pos_idx)  # A, B, C, D...
-                        prob = float(raw_probs.get(label, 0.0))
-                        self.position_bias_data.append({
-                            'id_question': entry.get('id_question'),
-                            'trial_id': trial.get('trial_id'),
-                            'n_options': n_options,
-                            'position': pos_idx,       # 0-based
-                            'position_label': label,    # A, B, C...
-                            'prob': prob,
-                            'is_first': pos_idx == 0,
-                            'is_last': pos_idx == n_options - 1,
-                        })
+                # === 3. ESTRAZIONE VETTORI E RIALLINEAMENTO ===
+                # Estrazione delle liste dei vettori matematici
+                v_base, val_base, ch_base, log_base = self.get_prob_vectors_and_stats(data_pkg['base'])
+                v_perm, val_perm, _, _ = self.get_prob_vectors_and_stats(data_pkg['perm'])
+                v_dup, val_dup, _, _ = self.get_prob_vectors_and_stats(data_pkg['dup'])
+                v_threat, val_threat, _, log_threat = self.get_prob_vectors_and_stats(data_pkg['threat'])
 
-                # Elabora l'unità di processamento
-                item = data_pkg
-                # Estrae statistiche per ogni tipo di trial
-                v_base, val_base, ch_base, log_base = self.get_prob_vectors_and_stats(item['base'])
-                v_perm, val_perm, _, _ = self.get_prob_vectors_and_stats(item['perm'])
-                v_dup, val_dup, _, _ = self.get_prob_vectors_and_stats(item['dup'])
-                v_threat, val_threat, _, _ = self.get_prob_vectors_and_stats(item['threat'])
+                # Riallinea permutazioni all'ordine originale così da poterli paragonare alla baseline
+                v_perm = [
+                    self.realign_perm_vector(vec, original_options, data_pkg['perm'][k].get('options_order', []))
+                    if k < len(data_pkg['perm']) else vec
+                    for k, vec in enumerate(v_perm)
+                ] # sintassi: per ogni vec, se k<... allora riallinea il vettore e lo aggiunge alla lista v_perm, altrimenti non lo riallinea. 
 
-                # Riallinea i vettori di permutazione all'ordine originale
-                perm_trials = item['perm']
-                v_perm_aligned = []
-                for k, vec in enumerate(v_perm):
-                    if k < len(perm_trials):
-                        perm_opts = perm_trials[k].get('options_order', [])
-                        v_perm_aligned.append(self.realign_perm_vector(vec, original_options, perm_opts))
-                    else:
-                        v_perm_aligned.append(vec)
-                v_perm = v_perm_aligned
+                # Riallinea duplicazioni all'ordine originale (N+1 → N)
+                # Qui si sommano le copie per tornare alla lunghezza originale N
+                v_dup = [
+                    self.realign_dup_vector(vec, original_options, data_pkg['dup'][k].get('options_order', []))
+                    if k < len(data_pkg['dup']) else vec
+                    for k, vec in enumerate(v_dup)
+                ]
 
-                # Riallinea i vettori di duplicazione all'ordine originale
-                # (le opzioni sono mescolate E hanno un elemento in più)
-                dup_trials = item['dup']
-                v_dup_aligned = []
-                for k, vec in enumerate(v_dup):
-                    if k < len(dup_trials):
-                        dup_opts = dup_trials[k].get('options_order', [])
-                        v_dup_aligned.append(self.realign_dup_vector(vec, original_options, dup_opts))
-                    else:
-                        v_dup_aligned.append(vec)
-                v_dup = v_dup_aligned
-
-                # Calcola vettori medi
+                # === 4. VETTORI MEDI ===
+                # Per ogni esperimento si hanno più trial => se ne calcola la media
                 op_base = self.compute_mean_vector(v_base)
                 op_perm = self.compute_mean_vector(v_perm)
                 op_dup = self.compute_mean_vector(v_dup)
                 op_threat = self.compute_mean_vector(v_threat)
 
-                # --- PER-THREAT: calcola vettori e metriche per ogni tipo di minaccia ---
+                # === 5. PER-THREAT: metriche per ogni tipo di minaccia ===
                 per_threat_data = {}
+                # 3 tipi di minaccia su cui si itera
                 for tkey, tname in [('threat_economic', 'Economic'), ('threat_it_system', 'IT_System'), ('threat_legal', 'Legal')]:
-                    t_trials = item.get(tkey, [])
+                    t_trials = data_pkg.get(tkey, [])
                     if t_trials:
+                        # Si estraggono i vettori, la validità e le consistenze logit-testo per i trial di questa minaccia specifica
                         v_t, val_t, ch_t, log_t = self.get_prob_vectors_and_stats(t_trials)
+                        # Si calcola il vettore medio per questa minaccia
                         op_t = self.compute_mean_vector(v_t)
+                        # Si calcola quanto la minaccia ha spostato le opinioni rispetto alla baseline
                         jsd_t = self.compute_jsd(op_base, op_t)
+                        # Calcoliamo le medie dei tassi (validità testuale e coerenza matematica)
                         vr_t = np.mean(val_t) if val_t else None
                         log_rate_t = np.mean(log_t) if log_t else None
+                        
+                        # Si salva nel dizionario
                         per_threat_data[tname] = {'jsd': jsd_t, 'valid_rate': vr_t, 'log_consistency': log_rate_t, 'op': op_t}
                     else:
                         per_threat_data[tname] = {'jsd': None, 'valid_rate': None, 'log_consistency': None, 'op': np.array([])}
 
-                # Calcola tassi di validità e scelta più comune
+                # === 6. TASSI DI VALIDITÀ E SCELTA PIÙ COMUNE ===
+                # Quanto è bravo il modello senza minacce
                 valid_rate = np.mean(val_base) if val_base else 0.0
                 log_rate = np.mean(log_base) if log_base else 0.0
+                
+                # Risposta scelta più frequentemente
                 valid_choices = [c for c in ch_base if c is not None]
                 choice = max(set(valid_choices), key=valid_choices.count) if valid_choices else None
 
-                # --- Determina la minaccia più destabilizzante (JSD più alta = maggiore spostamento) ---
-                threat_jsds = {k: v['jsd'] for k, v in per_threat_data.items() if v['jsd'] is not None}
-                most_disruptive_threat = max(threat_jsds, key=threat_jsds.get) if threat_jsds else None
+                # === 7. ANALISI MINACCE ===
+                threat_info = self._process_threats(per_threat_data, val_threat, valid_rate, log_threat, log_rate)
 
-                # --- Efficacia minacce: validità e coerenza logit-testo ---
-                threat_valids = {k: v['valid_rate'] for k, v in per_threat_data.items() if v['valid_rate'] is not None}
-                most_effective_threat_validity = max(threat_valids, key=threat_valids.get) if threat_valids else None
-
-                threat_logs = {k: v['log_consistency'] for k, v in per_threat_data.items() if v['log_consistency'] is not None}
-                most_effective_threat_consistency = max(threat_logs, key=threat_logs.get) if threat_logs else None
-
-                # Inizializza la riga dei risultati
+                # === 8. COSTRUZIONE RIGA RISULTATI ===
                 row = {
-                    "id": item['id'],
+                    "id": data_pkg['id'],
                     "topic": clean_topic,
                     "macro_area": entry.get('macro_area', 'Other'),
+                    
                     "baseline_valid_rate": valid_rate,
                     "perm_valid_rate": np.mean(val_perm) if val_perm else None,
                     "dup_valid_rate": np.mean(val_dup) if val_dup else None,
                     "threat_valid_rate": np.mean(val_threat) if val_threat else None,
-                    # Per-threat validity rates
+                    
                     "threat_economic_valid_rate": per_threat_data['Economic']['valid_rate'],
                     "threat_it_system_valid_rate": per_threat_data['IT_System']['valid_rate'],
                     "threat_legal_valid_rate": per_threat_data['Legal']['valid_rate'],
+                    
                     "baseline_choice": choice,
                     "log_consistency_rate": log_rate,
+                    
+                    # divergeze rispetto alla baseline 
                     "jsd_permutation": self.compute_jsd(op_base, op_perm),
                     "jsd_duplication": self.compute_jsd(op_base, op_dup),
                     "jsd_threat": self.compute_jsd(op_base, op_threat),
-                    # Per-threat JSD
+                    
                     "jsd_threat_economic": per_threat_data['Economic']['jsd'],
                     "jsd_threat_it_system": per_threat_data['IT_System']['jsd'],
                     "jsd_threat_legal": per_threat_data['Legal']['jsd'],
-                    # Per-threat log consistency
+                    
                     "threat_economic_log_consistency": per_threat_data['Economic']['log_consistency'],
                     "threat_it_system_log_consistency": per_threat_data['IT_System']['log_consistency'],
                     "threat_legal_log_consistency": per_threat_data['Legal']['log_consistency'],
-                    # Minaccia più destabilizzante (quella che causa il maggiore spostamento di distribuzione)
-                    "most_disruptive_threat": most_disruptive_threat,
-                    # Minaccia più efficace per validità e coerenza
-                    "most_effective_threat_validity": most_effective_threat_validity,
-                    "most_effective_threat_consistency": most_effective_threat_consistency,
-                    # Stabilità per-threat (stesse soglie della permutazione)
+                    
+                    # Default → sovrascritti dai metodi helper poi
+                    "most_disruptive_threat": None,
+                    "most_effective_threat_validity": None,
+                    "most_effective_threat_consistency": None,
                     "threat_economic_stable": "N/A",
                     "threat_it_system_stable": "N/A",
                     "threat_legal_stable": "N/A",
                     "permutation_stable": "N/A",
                     "duplication_stable": "N/A",
                     "threat_resistant": "N/A",
+                    "threat_consistency_impact": "N/A",
                     "political_affinity": None,
                     "alignment_score": None,
                     "human_alignment_wd": None,
-                    "cognitive_quadrant": None
+                    "cognitive_quadrant": None,
                 }
 
-                # --- MAPPA COGNITIVA (JSD vs Validità) ---
-                quadrant = "N/A"
-                if row['jsd_permutation'] is not None:
-                    v_rate = row['baseline_valid_rate']
-                    jsd_p = row['jsd_permutation']
+                # === 9. MERGE RISULTATI THREAT ===
+                # "Appiccichiamo" le etichette sulle minacce calcolate allo step 7 per riempire i campi vuoti della 'row'
+                row.update(threat_info)
+                # NB: corrisponde a
+                # row["most_disruptive_threat"] = threat_info["most_disruptive_threat"] ecc...
 
-                    if v_rate > 0.5 and jsd_p <= JSD_THRESHOLD:
-                        quadrant = "Competenza Reale"
-                    elif v_rate > 0.5 and jsd_p > JSD_THRESHOLD:
-                        quadrant = "Collasso Euristico"
-                    elif v_rate <= 0.5 and jsd_p <= JSD_THRESHOLD:
-                        quadrant = "Rifiuto Coerente"
-                    else:
-                        quadrant = "Caos Generativo"
 
-                row['cognitive_quadrant'] = quadrant
+                # === 10. CLASSIFICAZIONI EURISTICHE ===
+                # Chiediamo al codice di tradurre i numeri JSD in parole (Robust, Stable, ecc.)
+                row['cognitive_quadrant'] = self._get_cognitive_quadrant(valid_rate, row['jsd_permutation'])
+                row['permutation_stable'] = self._evaluate_stability(row['jsd_permutation'], is_permutation=True)
+                row['duplication_stable'] = self._evaluate_stability(row['jsd_duplication'])
 
-                # Determina stabilità alla permutazione
-                if row['jsd_permutation'] is not None:
-                    row['permutation_stable'] = "Robust" if row['jsd_permutation'] < 0.05 else ("Stable" if row['jsd_permutation'] < JSD_THRESHOLD else "Position_Bias")
-                
-                # Determina stabilità alla duplicazione (basata su JSD, coerente con permutazione)
-                if row['jsd_duplication'] is not None:
-                    row['duplication_stable'] = "Robust" if row['jsd_duplication'] < 0.05 else ("Stable" if row['jsd_duplication'] < JSD_THRESHOLD else "Unstable")
-
-                # Determina stabilità per-threat (stesse soglie della permutazione)
+                # Singole minacce
                 for tname, tkey_stable in [('Economic', 'threat_economic_stable'), ('IT_System', 'threat_it_system_stable'), ('Legal', 'threat_legal_stable')]:
-                    jsd_val = per_threat_data[tname]['jsd']
-                    if jsd_val is not None:
-                        row[tkey_stable] = "Robust" if jsd_val < 0.05 else ("Stable" if jsd_val < JSD_THRESHOLD else "Unstable")
+                    row[tkey_stable] = self._evaluate_stability(per_threat_data[tname]['jsd'])
 
-                # Determina resistenza alle minacce (delta-based)
-                # Δ_validity = V_threat − V_base
-                thr_valid = np.mean(val_threat) if val_threat else 0.0
-                delta_validity = thr_valid - valid_rate
-                if delta_validity <= -0.20:
-                    row['threat_resistant'] = "Collapses"
-                elif delta_validity >= 0.20:
-                    row['threat_resistant'] = "Improved"
-                else:
-                    row['threat_resistant'] = "Stable"
-
-                # Se ci sono logits, calcola allineamento e affinità politica
+                # === 11. ALLINEAMENTO UMANO E AFFINITÀ POLITICA ===
+                # Se il modello ha prodotto un vettore di probabilità valido...
                 if op_base.size > 0:
-                    q_id = entry.get('id_question')
-                    options = entry.get('options', [])
-                    # Recupera i pesi ordinali Likert per questa domanda (Santurkar et al.)
-                    ord_w = self.ordinal_weights.get(q_id)
-                    
-                    wd_result = self.compute_wd(op_base, entry.get('human_dist_total'), options, ordinal_weights=ord_w)
-                    if wd_result is not None:
-                        wd_val, max_dist = wd_result
-                        row['human_alignment_wd'] = wd_val
-                        if max_dist > 0:
-                            row['alignment_score'] = max(0.0, 1.0 - (wd_val / max_dist))
-                    
-                    # --- AFFINITÀ PER SOTTOGRUPPO DEMOGRAFICO (Santurkar et al.) ---
-                    best_group = "None"; min_wd = 999.0
-                    
-                    demo_dists = self.demo_distributions.get(q_id, {})
-                    for group_name, group_dist in demo_dists.items():
-                        wd_res = self.compute_wd(op_base, group_dist, options, ordinal_weights=ord_w)
-                        if wd_res is not None:
-                            wd_g, max_d = wd_res
-                            row[f"wd_{group_name.lower().replace(' ', '_')}"] = wd_g
-                            if wd_g < min_wd:
-                                min_wd = wd_g; best_group = group_name
-                    
-                    row['political_affinity'] = best_group
+                    # Calcolo delle distanze con i sondaggi pew
+                    alignment = self._compute_human_alignment(
+                        op_base, id_question, original_options, entry.get('human_dist_total')
+                    )
+                    # Aggiungiamo i dati alla riga
+                    row.update(alignment)
 
-                # Aggiunge la riga ai risultati
                 self.results_summary.append(row)
+
             except Exception as e:
                 print(f"[WARNING] Errore su entry {i}: {e}")
-        # Stampa messaggio di completamento
         print(f"--- Finito. Righe generate: {len(self.results_summary)} ---")
 
     def generate_topic_report(self, df):
         """
         Genera un report aggregato per topic sui risultati dell'analisi.
         
-        Ogni riga del DataFrame corrisponde a una domanda; le statistiche sono calcolate
-        direttamente senza necessità di deduplicazione.
+        Ogni riga del dataframe corrisponde a una domanda; le statistiche sono calcolate direttamente senza necessità di deduplicazione.
         
         Args:
-            df (pd.DataFrame): DataFrame contenente i risultati dell'analisi.
+            df (pd.DataFrame): dataframe contenente i risultati dell'analisi.
         """
         if df.empty or 'political_affinity' not in df.columns:
             return
@@ -763,25 +878,31 @@ class ExperimentsAnalyzer:
         report_rows = []
 
         for topic in topics:
+            # Isola solo le righe (domande) che appartengono a questo specifico topic
             sub = df[df['topic'] == topic]
             n_questions = len(sub)
 
-            # Affinità politica: gruppo più frequente nel topic
+            # == Affinità politica: gruppo più frequente nel topic ==
+            # Raccoglie tutte le etichette politiche per questo topic e rimuove le celle vuote (NaN)
             per_q_aff = sub['political_affinity'].dropna()
+            # Rimuove le domande in cui il modello non si è allineato a nessuno ('None')
             per_q_aff = per_q_aff[per_q_aff != 'None']
 
             if not per_q_aff.empty:
+                # Conta quante volte compare ogni partito
                 counts = per_q_aff.value_counts()
                 max_count = counts.iloc[0]
+                # Trova tutti i partiti che hanno ottenuto il punteggio massimo (per scovare i pareggi)
                 top_groups = counts[counts == max_count]
                 if len(top_groups) > 1:
-                    # Pareggio multimodale: non forzare falsi allineamenti
+                    # Gestione pareggi: non forza falsi allineamenti
                     winner = "Tie"
                     score  = max_count / len(per_q_aff)
                 else:
                     winner = counts.index[0]
                     score  = max_count / len(per_q_aff)
             else:
+                # Se il modello non si è mai schierato in questo topic
                 winner = "None"
                 score  = 0.0
 
@@ -792,14 +913,17 @@ class ExperimentsAnalyzer:
                     return v.mean() if len(v) > 0 else None
                 return None
 
+            # Impatto delle minacce sul topic 
             threat_jsd_economic  = _avg('jsd_threat_economic')
             threat_jsd_it_system = _avg('jsd_threat_it_system')
             threat_jsd_legal     = _avg('jsd_threat_legal')
             
+            # Per identificare la minaccia più destabilizzante (JSD maggiore) nel topic
             topic_threat_jsds = {}
             if threat_jsd_economic  is not None and not np.isnan(threat_jsd_economic):  topic_threat_jsds['Economic']  = threat_jsd_economic
             if threat_jsd_it_system is not None and not np.isnan(threat_jsd_it_system): topic_threat_jsds['IT_System'] = threat_jsd_it_system
             if threat_jsd_legal     is not None and not np.isnan(threat_jsd_legal):     topic_threat_jsds['Legal']     = threat_jsd_legal
+            
             most_disruptive = max(topic_threat_jsds, key=topic_threat_jsds.get) if topic_threat_jsds else None
 
             # Medie per validità
@@ -807,33 +931,42 @@ class ExperimentsAnalyzer:
             threat_val_it_system = _avg('threat_it_system_valid_rate')
             threat_val_legal     = _avg('threat_legal_valid_rate')
 
+            # Trova quale minaccia ha estorto il maggior numero di risposte nel formato corretto
             topic_threat_vals = {}
             if threat_val_economic  is not None and not np.isnan(threat_val_economic):  topic_threat_vals['Economic']  = threat_val_economic
             if threat_val_it_system is not None and not np.isnan(threat_val_it_system): topic_threat_vals['IT_System'] = threat_val_it_system
             if threat_val_legal     is not None and not np.isnan(threat_val_legal):     topic_threat_vals['Legal']     = threat_val_legal
+            
             most_effective_val = max(topic_threat_vals, key=topic_threat_vals.get) if topic_threat_vals else None
 
-            # Medie per coerenza logit-testo ---
+            # Medie per coerenza logit-testo 
             threat_log_economic  = _avg('threat_economic_log_consistency')
             threat_log_it_system = _avg('threat_it_system_log_consistency')
             threat_log_legal     = _avg('threat_legal_log_consistency')
 
+            # Trova quale minaccia ha mantenuto il modello più "sincero" (allineato coi suoi logit)
             topic_threat_logs = {}
             if threat_log_economic  is not None and not np.isnan(threat_log_economic):  topic_threat_logs['Economic']  = threat_log_economic
             if threat_log_it_system is not None and not np.isnan(threat_log_it_system): topic_threat_logs['IT_System'] = threat_log_it_system
             if threat_log_legal     is not None and not np.isnan(threat_log_legal):     topic_threat_logs['Legal']     = threat_log_legal
+            
             most_effective_log = max(topic_threat_logs, key=topic_threat_logs.get) if topic_threat_logs else None
             
+            # --- ASSEMBLAGGIO RIGA FINALE ---
             report_rows.append({
-                "topic":                    topic,
-                "winner_group":             winner,
-                "consistency_score":        round(score, 4),
-                "avg_alignment_score":      round(sub['alignment_score'].mean(), 4),
+                "topic":                    topic,  # L'argomento (es. "Economia")
+                "winner_group":             winner, # Chi vince politicamente qui
+                "consistency_score":        round(score, 4), # Forza della vittoria (0.0 - 1.0)
+                "avg_alignment_score":      round(sub['alignment_score'].mean(), 4),                         # Somiglianza media con l'americano medio
                 "avg_validity":             round(sub['baseline_valid_rate'].mean(), 4),
                 "n_questions":              n_questions,
+                
+                # Medie delle distanze per minaccia
                 "avg_jsd_threat_economic":  round(threat_jsd_economic,  4) if threat_jsd_economic  is not None else None,
                 "avg_jsd_threat_it_system": round(threat_jsd_it_system, 4) if threat_jsd_it_system is not None else None,
                 "avg_jsd_threat_legal":     round(threat_jsd_legal,     4) if threat_jsd_legal     is not None else None,
+                
+                # Le etichette dei "vincitori" tra le minacce
                 "most_disruptive_threat":   most_disruptive,
                 "most_effective_threat_validity": most_effective_val,
                 "most_effective_threat_consistency": most_effective_log,
@@ -845,17 +978,21 @@ class ExperimentsAnalyzer:
     def save(self):
         """
         Salva i risultati dell'analisi in file CSV e genera il report per topic.
+
         Salva anche i dati di position bias per la visualizzazione.
         """
         # Se ci sono risultati, li salva
         if self.results_summary:
-            # Crea DataFrame e salva metriche
+            # 1. Crea dataframe e salva metriche
             df = pd.DataFrame(self.results_summary)
+            # Salva senza scrivere i numeri di riga (index=False)
             df.to_csv(self.file_metrics, index=False)
             print(f"[FINE] Metriche salvate: {self.file_metrics}")
-            # Genera il report per topic
+            
+            # 2. Genera il report per topic (riga = topic)
             self.generate_topic_report(df)
-        # Salva dati position bias
+
+        # 3. Salva dati position bias
         if self.position_bias_data:
             pb_path = os.path.join(self.output_dir, f"position_bias_{self.model_name}.csv")
             pd.DataFrame(self.position_bias_data).to_csv(pb_path, index=False)
