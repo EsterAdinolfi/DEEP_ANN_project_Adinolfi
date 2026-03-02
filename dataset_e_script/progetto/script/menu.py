@@ -301,7 +301,7 @@ def run_visualize(model_name, force_update=False):
     key_figures = [
         os.path.join(outdir, "fig0_summary_table.png"),
         os.path.join(outdir, "fig1a_validity_bars.png"),
-        os.path.join(outdir, "fig5a_political_pie.png")
+        os.path.join(outdir, "fig4c_political_pie.png")
     ]
     if all(check_file_exists(f) for f in key_figures) and not force_update:
         print(f"✓ Figure già presenti per {model_name}: {outdir}")
@@ -442,6 +442,7 @@ def display_menu():
     print("  [6] Visualizza grafici (visualize.py)")
     print("  [7] Installa/aggiorna dipendenze (requirements.txt)")
     print("  [8] Esegui SOLO gli esperimenti (modalità server)")
+    print("  [9] Analisi risultati + Visualizzazione grafici")
     print("\n  [0] Esci")
     print("-" * 70)
 
@@ -552,6 +553,18 @@ def interactive_menu():
                 models = select_models()
                 print_header("ESECUZIONE SERVER - SOLO ESPERIMENTI")
                 run_only_experiments_pipeline(models, update_mode)
+
+            elif choice == '9':
+                # Solo Analisi + Visualizzazione
+                models = select_models()
+                print_header("ANALISI RISULTATI + VISUALIZZAZIONE GRAFICI")
+                for model in models:
+                    print(f"\n\u25b8 Modello: {model}")
+                    ok = run_analyze(model, force_update=update_mode)
+                    if ok:
+                        run_visualize(model, force_update=update_mode)
+                    else:
+                        print(f"\u2717 Analisi fallita per {model}, visualizzazione saltata.")
             
             else:
                 print("\n✗ Scelta non valida. Riprova.")
