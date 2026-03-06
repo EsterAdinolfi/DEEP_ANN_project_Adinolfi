@@ -1,0 +1,53 @@
+\documentclass[../relazione.tex]{subfiles}
+\begin{document}
+
+% ======================================================================
+\section{Introduzione}
+% ======================================================================
+
+I Large Language Model (LLM), addestrati su vasti corpora testuali, producono risposte che possono riflettere opinioni e bias presenti nei dati di addestramento. Due articoli di riferimento hanno approfondito questa tematica da angolazioni complementari.
+
+\subsection*{Articoli di Riferimento}
+
+\textbf{Santurkar et al. (2023) --- ``Whose Opinions Do Language Models Reflect?''} \cite{santurkar2023whose}
+
+Questo lavoro, pubblicato all'International Conference on Machine Learning (ICML 2023), indaga \emph{di chi} sono le opinioni riflesse dai LLM quando rispondono a quesiti soggettivi. Gli autori costruiscono il dataset \textbf{OpinionQA}, composto da circa 1500 domande a risposta multipla estratte da 15 wave dell'American Trends Panel del Pew Research Center --- un sondaggio demografico rappresentativo della popolazione statunitense.
+
+La metodologia si articola su quattro assi di valutazione:
+\begin{enumerate}
+    \item \textbf{Rappresentatività}: si confronta la distribuzione di probabilità sulle opzioni prodotta dal modello con la distribuzione delle risposte di 60 gruppi demografici reali (segmentati per età, genere, istruzione, affiliazione politica, religione, ecc.), misurando la distanza tramite 1-Wasserstein Distance;
+    \item \textbf{Steerability}: si verifica se il modello possa essere guidato verso un target demografico tramite prompt del tipo \emph{``Answer as a 65+ conservative''};
+    \item \textbf{Consistenza}: si valuta se le opinioni espresse sono internamente coerenti tra domande semanticamente correlate;
+    \item \textbf{Rifiuti}: si misura quanto spesso il modello si rifiuta di rispondere a domande soggettive.
+\end{enumerate}
+I risultati mostrano un \textbf{disallineamento sostanziale} tra le opinioni dei LLM e quelle della popolazione generale, con una tendenza sistematica verso posizioni \emph{liberal/democratiche}. In particolare, l'alignment tramite RLHF (Reinforcement Learning from Human Feedback) \emph{amplifica} questo bias, poiché i feedback umani provengono prevalentemente da annotatori giovani, istruiti e di orientamento progressista. Inoltre, alcuni sottogruppi demografici --- come gli over-65 e le persone vedove --- risultano particolarmente sotto-rappresentati.
+
+\bigskip
+\textbf{Röttger et al. (2024) --- ``Political Compass or Spinning Arrow?''} \cite{rottger2024political}
+
+Questo studio, premiato come \emph{Outstanding Paper} alla conferenza ACL 2024, pone una domanda metodologica fondamentale: \emph{``È possibile valutare in modo significativo i valori e le opinioni dei LLM?''} Utilizzando il Political Compass Test (PCT) --- un questionario di 62 proposizioni che misura le posizioni su due assi (economico sinistra-destra e sociale libertario-autoritario) --- gli autori dimostrano che le valutazioni basate su formato a risposta forzata (\emph{forced-choice}) producono risultati \textbf{fragili e poco affidabili}. In particolare:
+\begin{itemize}
+    \item \textbf{Il forzamento altera il comportamento}: senza forzatura, la maggior parte dei modelli rifiuta di scegliere un'opzione; con diverse strategie di forzatura (dal semplice ``rispondi solo con la lettera'' fino a ``rispondi o perderai il lavoro''), le risposte cambiano significativamente;
+    \item \textbf{Nessuna robustezza alle parafrasi}: riformulazioni minime della domanda (\emph{``your opinion''} $\to$ \emph{``your view''} $\to$ \emph{``your thoughts''}) spostano le coordinate politiche del modello di una distanza superiore a quella tra le posizioni di Biden e Trump;
+    \item \textbf{Risposte aperte $\neq$ scelta multipla}: in un terzo delle proposizioni, i modelli esprimono opinioni \emph{opposte} quando rispondono in formato libero rispetto alla scelta multipla, tendendo verso posizioni più \emph{right-libertarian} nel formato aperto.
+\end{itemize}
+Gli autori raccomandano di accompagnare ogni valutazione di opinione con \textbf{test di robustezza estensivi} e di formulare solo claims \emph{locali} (specifici per applicazione e dominio) piuttosto che giudizi globali sul posizionamento politico di un LLM.
+
+\subsection*{Contributo del Progetto}
+
+Il presente progetto si colloca all'intersezione dei contributi sopra descritti. Da Santurkar et al. riprendiamo il \textbf{dataset OpinionQA} e l'approccio quantitativo basato sulla Wasserstein Distance per misurare l'allineamento con gruppi demografici reali. Da Röttger et al. accogliamo la lezione metodologica centrale: le opinioni dei LLM sono \textbf{fragili} e dipendono fortemente dalla formulazione dell'input. Questo ci motiva a condurre un'indagine sistematica sulla \textbf{robustezza e stabilità} dei modelli a perturbazioni dell'input.
+
+\medskip
+In particolare, il progetto replica e adatta l'analisi di Santurkar et al. su modelli open-source di diverse dimensioni della famiglia Pythia (EleutherAI): \textbf{Pythia-160M}, \textbf{Pythia-1B}, \textbf{Pythia-1.4B}, \textbf{Pythia-2.8B} e \textbf{Pythia-6.9B}, non sottoposti ad alignment, valutando:
+\begin{enumerate}
+    \item La \textbf{validità} delle risposte generate (il modello sceglie effettivamente un'opzione?);
+    \item La \textbf{robustezza} del modello a perturbazioni dell'input (permutazione dell'ordine delle opzioni, duplicazione di un'opzione, aggiunta di testo minaccioso);
+    \item L'\textbf{allineamento umano}, ovvero quanto la distribuzione del modello si avvicina a quella del campione survey Pew Research;
+    \item La \textbf{coerenza politica}, verificando se il modello si allinea sistematicamente con specifici sottogruppi (Democrats, Republicans, Liberal, Conservative, ecc.);
+    \item Il \textbf{position bias}, analizzando se il modello favorisce sistematicamente determinate posizioni (es.\ prima opzione $\to$ primacy bias, ultima opzione $\to$ recency bias).
+\end{enumerate}
+
+\medskip
+Il dataset impiegato è l'\textbf{OpinionQA}, derivato dall'American Trends Panel del Pew Research Center --- lo stesso utilizzato nell'articolo di riferimento. Si compone di 1506 domande su 15 wave tematiche che spaziano da economia, politica, religione, tecnologia, fino a temi sociali.
+
+\end{document}

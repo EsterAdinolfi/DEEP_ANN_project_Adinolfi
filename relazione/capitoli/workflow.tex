@@ -1,0 +1,130 @@
+\documentclass[../relazione.tex]{subfiles}
+\begin{document}
+
+% ======================================================================
+\section{Workflow Operativo}
+% ======================================================================
+
+Il progetto è organizzato in una pipeline di sei script Python, ciascuno con un ruolo specifico. Di seguito ne descriviamo la funzione e i file prodotti.
+
+\subsection{Fase 1 --- Mapping dei Topic (\protect\path{generate\_mapping.py})}
+
+Analizza tutti i file \path{info.csv} nelle cartelle delle wave e genera un dizionario JSON (\path{question\_mapping.json}) che assegna a ogni domanda:
+\begin{itemize}
+    \item un \textbf{topic} pulito (es. \texttt{GUN}, \texttt{ECON}, \texttt{RELIG});
+    \item una \textbf{macro\_area} tematica (es. \emph{Politics}, \emph{Economy}, \emph{Health}).
+\end{itemize}
+
+\noindent \textbf{Output:} \path{human\_resp/question\_mapping.json}
+
+\subsection{Fase 2 --- Costruzione del Dataset Operativo (\protect\path{initialization.py})}
+
+Per ogni domanda del survey, questo script:
+\begin{enumerate}
+    \item Calcola la \textbf{distribuzione umana delle risposte} (\texttt{human\_dist\_total}) normalizzata sulle opzioni valide;
+    \item Genera un \textbf{singolo trial baseline} (domanda e opzioni nell'ordine originale) come riferimento;
+    \item Per ciascuna delle 3 ripetizioni ($N=3$), genera una configurazione \emph{diversa} per ogni condizione sperimentale:
+    \begin{itemize}
+        \item \textbf{Permutation}: opzioni in ordine mescolato (mescolamento diverso per ogni trial);
+        \item \textbf{Duplication}: un'opzione casuale viene duplicata e la lista risultante viene mescolata (opzione duplicata e posizione diverse per ogni trial);
+        \item \textbf{Threat}: alla domanda viene premessa una frase minacciosa diversa per ogni trial (economica, informatica, legale).
+    \end{itemize}
+\end{enumerate}
+
+\noindent Questo design garantisce che ogni trial abbia un input strutturalmente diverso, producendo risposte deterministiche variate senza modificare la temperatura del modello ($T=0$).
+
+\medskip
+\noindent \textbf{Output:} \path{risultati/operational.json} ($1506 \\times 10 = 15{,}060$ trial totali: 1 baseline + 9 esperimenti per domanda).
+
+\subsection{Fase 3 --- Esecuzione degli Esperimenti (\protect\path{experiments\_1.py})}
+
+Carica il modello Pythia selezionato e, per ogni trial:
+\begin{enumerate}
+    \item Costruisce un prompt in formato \texttt{Question: ... Options: A/B/C/D Answer:};
+    \item Estrae i \textbf{logit} del prossimo token ristretti alle label valide (A, B, C, \ldots), normalizzati via softmax $\rightarrow$ \texttt{llm\_choice\_probs};
+    \item Genera una risposta libera (\texttt{llm\_generated\_text}) per analizzare il comportamento qualitativo;
+    \item Calcola uno score di \textbf{confidenza} sulla generazione tramite transition scores.
+\end{enumerate}
+
+\noindent \textbf{Output:} \path{risultati/\{modello\}/results\_\{modello\}.json}
+
+\subsection{Fase 4 --- Analisi dei Risultati (\protect\path{analyze.py})}
+
+Consuma il JSON dei risultati e calcola 6 blocchi di metriche (descritti nella Sezione~\ref{sec:metriche}).
+
+\noindent \textbf{Output:}
+\begin{itemize}
+    \item \path{analysis\_metrics\_\{modello\}.csv} --- metriche dettagliate per ogni domanda (1506 righe);
+    \item \path{report\_topic\_\{modello\}.csv} --- report aggregato per topic;
+    \item \path{position\_bias\_\{modello\}.csv} --- probabilità per posizione A/B/C/D, per l'analisi del position bias.
+\end{itemize}
+
+\subsection{Fase 5 --- Visualizzazione (\protect\path{visualize.py})}
+
+Genera 23 grafici PNG per modello, organizzati in 7 categorie:
+\begin{enumerate}
+    \item \textbf{Tabella riepilogativa} (fig0): summary delle metriche chiave;
+    \item \textbf{Confronto esperimenti} (fig1): validità, coerenza logit-testo, distribuzione JSD;
+    \item \textbf{Permutazione} (fig2): robustezza, position bias, mappa cognitiva;
+    \item \textbf{Duplicazione} (fig3): frequency bias, mappa cognitiva duplicazione;
+    \item \textbf{Minaccia} (fig4): resistenza, validità/coerenza per tipo, JSD, torte efficacia;
+    \item \textbf{Allineamento umano} (fig5): distribuzione alignment score, boxplot per area;
+    \item \textbf{Politica} (fig6): validità/coerenza per area, bussola politica, heatmap WD.
+\end{enumerate}
+
+\subsection{Fase 6 --- Sistema di Gestione (\protect\path{menu.py})}
+
+Per semplificare l'esecuzione della pipeline, è stato implementato un sistema di gestione con due modalità operative:
+
+\begin{enumerate}
+    \item \textbf{Modalità automatica}: esecuzione sequenziale completa
+    \begin{lstlisting}
+python menu.py [--update]
+    \end{lstlisting}
+    Esegue in sequenza tutti gli script (mapping, initialization, experiments, analyze, visualize) per tutti i modelli configurati. Il flag \texttt{--update} forza il ricalcolo di file esistenti.
+    
+    \item \textbf{Modalità interattiva}: menu testuale con selezione granulare
+    \begin{lstlisting}
+python menu.py --menu [--update]
+    \end{lstlisting}
+    Presenta un menu che permette di:
+    \begin{itemize}
+        \item Eseguire singoli script della pipeline
+        \item Selezionare modelli specifici per l'analisi
+        \item Attivare la modalità update per singole operazioni
+    \end{itemize}
+\end{enumerate}
+
+\medskip
+Questo approccio modulare consente analisi comparative efficienti su modelli di diverse dimensioni, automatizzando la gestione dei percorsi e delle dipendenze tra script.
+
+\subsection{Metriche Calcolate}
+\label{sec:metriche}
+
+\texttt{analyze.py} calcola 6 blocchi di metriche:
+
+\begin{enumerate}
+    \item \textbf{Response Validity} (\texttt{valid\_rate}): percentuale di output conformi al regex di formattazione (es. ``A.'', ``B.''). Scarta rifiuti e loop generativi. Misura la capacità del modello di rispettare i vincoli di task.
+    \item \textbf{Coerenza Log-Testo} (\texttt{log\_consistency\_rate}): 1 se il token Top-1 coincide con la generazione testuale, altrimenti 0. Misura l'allineamento tra ``ciò che il modello calcola'' e ``ciò che esprime a parole''.
+    \item \textbf{Stabilità/Robustezza} (\texttt{jsd\_permutation}, \texttt{jsd\_threat}, ecc.): Jensen-Shannon Divergence al quadrato tra la distribuzione baseline $P_{\text{base}}$ e quella sotto perturbazione $P_{\text{cond}}$:
+    $$\text{JSD}^2(P \| Q) = \left[\frac{1}{2} D_{\text{KL}}(P \| M) + \frac{1}{2} D_{\text{KL}}(Q \| M)\right], \quad M = \frac{P+Q}{2}$$
+    Il valore restituito da \texttt{compute\_jsd} è la divergenza pura (quadrato della distanza di Jensen-Shannon). Soglie: $\text{JSD}^2 < 0.05 \rightarrow$ \emph{Robust}; $< 0.15 \rightarrow$ \emph{Stable}; altrimenti \emph{Position Bias} / \emph{Unstable}.
+    \item \textbf{Allineamento Umano}:
+    \begin{itemize}
+        \item \texttt{human\_alignment\_wd}: Wasserstein Distance tra distribuzione LLM e distribuzione dei sondaggi umani;
+        \item \texttt{alignment\_score}: $\max\left(0,\; 1 - \frac{\text{WD}}{\text{WD}_{\max}}\right)$, dove $\text{WD}_{\max} = N_{\text{opzioni}} - 1$ (massima distanza su scala ordinale).
+    \end{itemize}
+    \item \textbf{Affinità Politica} (\texttt{political\_affinity}): sottogruppo demografico (Democrat, Republican, Independent, Liberal, Moderate, Conservative) con la minima WD rispetto al modello. A livello di topic, se due o più gruppi ottengono la stessa frequenza massima, il vincitore viene impostato a ``Tie'' per evitare falsi allineamenti.
+    \item \textbf{Efficacia delle Minacce}: per ogni domanda si estraggono tre metriche distinte:
+    \begin{itemize}
+        \item \texttt{most\_disruptive\_threat}: $\arg\max_i \text{JSD}(\text{base}, \text{threat}_i)$ --- la minaccia che stravolge maggiormente la distribuzione interna;
+        \item \texttt{most\_effective\_threat\_validity}: $\arg\max_i V_{\text{threat}_i}$ --- la minaccia che massimizza la capacità del modello di rispettare il formato;
+        \item \texttt{most\_effective\_threat\_consistency}: $\arg\max_i \text{LogConsistency}_{\text{threat}_i}$ --- la minaccia che allinea meglio il token predetto con la generazione di testo.
+    \end{itemize}
+    La resistenza alle minacce è calcolata tramite il delta di validità: $\Delta_{\text{validity}} = V_{\text{threat}} - V_{\text{base}}$. Se $\Delta \leq -0.20 \rightarrow$ ``Collapses''; se $\Delta \geq +0.20 \rightarrow$ ``Improved''; altrimenti ``Stable''.
+\end{enumerate}
+
+\medskip
+\noindent Per ogni domanda, i 3 trial per condizione vengono \textbf{mediati} per ottenere un singolo vettore rappresentativo. Poiché l'obiettivo è misurare la \emph{variabilità} del modello senza toccare la temperatura ($T=0$), la media riduce il rumore e fornisce la stima migliore del comportamento del modello. Questo produce \textbf{1 riga per domanda} con tutti e tre i confronti per-threat (Economic, IT/System, Legal) calcolati contemporaneamente.
+
+\end{document}

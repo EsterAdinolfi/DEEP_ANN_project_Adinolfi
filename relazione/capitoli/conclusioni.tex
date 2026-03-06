@@ -1,0 +1,69 @@
+\documentclass[../relazione.tex]{subfiles}
+\begin{document}
+
+% ======================================================================
+\section{Conclusioni e Sviluppi Futuri}
+% ======================================================================
+
+Questo studio ha condotto con successo l'analisi di Santurkar et al. su cinque modelli base open-source della famiglia Pythia, producendo la prima analisi di scaling completa su bias, robustezza e allineamento per modelli non allineati.
+
+\paragraph{Conclusioni:}
+\begin{itemize}
+    \item I modelli base mostrano un bias Democrat/Liberal che si \textbf{attenua con la scala}: da 50.4\% (160M) a $\sim$32\% ($\geq$1.4B), con un crossover verso R+C a partire da 1.4B.
+    \item \textbf{Lo scaling migliora tutte le metriche chiave}: validity, robustezza, allineamento e log-consistency, con rendimenti decrescenti oltre 1.4B.
+    \item \textbf{Le minacce hanno impatto differenziato}: la minaccia IT/System è la più efficace per forzare risposte valide (72.2\% a 2.8B), la Legal è la più destabilizzante per i modelli grandi (72.2\% a 6.9B), la Economic è la meno impattante per modelli $>$1B.
+    \item \textbf{Il primacy bias crolla con la scala}: rapporto prima/ultima posizione da 11.13 (160M) a $\sim$1.2 ($\geq$1.4B).
+    \item L'RLHF \textbf{amplifica drammaticamente} i bias preesistenti: GPT-3 allineato mostra 89\% Democrat vs $\sim$32\% nei nostri modelli base.
+\end{itemize}
+
+\paragraph{Sviluppi futuri:}
+\begin{enumerate}
+    \item \textbf{Modelli alternativi}: LLaMA, Mistral, GPT-2 per verificare la generalizzabilità dei pattern osservati;
+    \item \textbf{Effetto dell'alignment}: confronto Pythia base vs. istruiti per isolare l'impatto dell'RLHF;
+    \item \textbf{Debiasing}: prompt engineering, fine-tuning bilanciato, constitutional AI;
+    \item \textbf{Cross-cultural}: survey non-USA (European Social Survey) per verificare la specificità culturale del bias;
+    \item \textbf{Analisi temporale}: checkpoints intermedi di Pythia per l'emergenza del bias durante il training;
+    \item \textbf{Threat engineering}: categorie aggiuntive (emotiva, morale, sociale) per comprendere i driver dell'influenzabilità.
+\end{enumerate}
+
+\medskip
+\noindent In conclusione, questo lavoro sottolinea l'importanza della \textbf{trasparenza} nella documentazione dei bias dei LLM e della necessità di sviluppare modelli più rappresentativi della diversità di opinioni umane, specialmente in contesti sensibili come informazione politica, sanità e giustizia.
+
+% ======================================================================
+\section*{Ringraziamenti}
+% ======================================================================
+
+Questo progetto è stato sviluppato nell'ambito del corso di \emph{Deep Learning e Architetture di Rete} (A.A. 2024/2025). Si ringrazia il Prof. [Nome Docente] per le preziose indicazioni metodologiche e il supporto durante l'implementazione. Un ringraziamento speciale al Pew Research Center per aver reso pubblicamente disponibili i dataset dell'American Trends Panel, e agli autori di Santurkar et al. per aver condiviso codice e risorse dell'OpinionQA dataset.
+
+\medskip
+\noindent \textbf{Codice e riproducibilità:} Tutti gli script Python sono disponibili in \texttt{dataset\_e\_script/progetto/script/}. Gli esperimenti sono stati eseguiti su Pythia-160M, 1B, 1.4B, 2.8B e 6.9B con PyTorch 2.x e Transformers 4.x. Il sistema di menu (\texttt{menu.py}) supporta la selezione interattiva del modello e l'esecuzione automatica dell'intera pipeline.
+
+\newpage
+% ======================================================================
+% BIBLIOGRAFIA
+% ======================================================================
+\begin{thebibliography}{9}
+
+\bibitem{santurkar2023whose}
+Santurkar, S., Durmus, E., Ladhak, F., Lee, C., Liang, P., \& Hashimoto, T. (2023).
+\emph{Whose Opinions Do Language Models Reflect?}
+Proceedings of the 40th International Conference on Machine Learning (ICML), PMLR 202:29971--30004.
+
+\bibitem{rottger2024political}
+Röttger, P., Hofmann, V., Pyatkin, V., Hinck, M., Kirk, H.\,R., Schütze, H., \& Hovy, D. (2024).
+\emph{Political Compass or Spinning Arrow? Towards More Meaningful Evaluations for Values and Opinions in Large Language Models}.
+Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (ACL), pages 15295--15311. \textbf{Outstanding Paper Award}.
+
+\bibitem{biderman2023pythia}
+Biderman, S., Schoelkopf, H., Anthony, Q., et al. (2023).
+\emph{Pythia: A Suite for Analyzing Large Language Models Across Training and Scaling}.
+Proceedings of the 40th International Conference on Machine Learning (ICML).
+
+\bibitem{pewresearch}
+Pew Research Center.
+\emph{American Trends Panel}.
+\url{https://www.pewresearch.org/american-trends-panel-datasets/}.
+
+\end{thebibliography}
+
+\end{document}
