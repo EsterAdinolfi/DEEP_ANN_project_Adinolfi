@@ -721,8 +721,8 @@ class ExperimentsAnalyzer:
                 # === 3. ESTRAZIONE VETTORI E RIALLINEAMENTO ===
                 # Estrazione delle liste dei vettori matematici
                 v_base, val_base, ch_base, log_base = self.get_prob_vectors_and_stats(data_pkg['base'])
-                v_perm, val_perm, _, _ = self.get_prob_vectors_and_stats(data_pkg['perm'])
-                v_dup, val_dup, _, _ = self.get_prob_vectors_and_stats(data_pkg['dup'])
+                v_perm, val_perm, _, log_perm = self.get_prob_vectors_and_stats(data_pkg['perm'])
+                v_dup, val_dup, _, log_dup = self.get_prob_vectors_and_stats(data_pkg['dup'])
                 v_threat, val_threat, _, log_threat = self.get_prob_vectors_and_stats(data_pkg['threat'])
 
                 # Riallinea permutazioni all'ordine originale così da poterli paragonare alla baseline
@@ -797,6 +797,8 @@ class ExperimentsAnalyzer:
                     
                     "baseline_choice": choice,
                     "log_consistency_rate": log_rate,
+                    "perm_log_consistency_rate": np.mean(log_perm) if log_perm else None,
+                    "dup_log_consistency_rate": np.mean(log_dup) if log_dup else None,
                     
                     # divergeze rispetto alla baseline 
                     "jsd_permutation": self.compute_jsd(op_base, op_perm),

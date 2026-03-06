@@ -13,7 +13,7 @@ import argparse
 import numpy as np
 import pandas as pd
 import matplotlib
-matplotlib.use('Agg')  # backend non-interattivo
+matplotlib.use('Agg')  # Anti-Grain Geometry. Backend non-interattivo = disegnare il grafico direttamente nella memoria RAM e salvarlo su disco, senza mai aprire una finestra pop-up sul monitor
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import seaborn as sns
@@ -31,728 +31,28 @@ PALETTE_POL   = {
     "Tie":          "#999999",
 }
 
-# ── directory di default ───────────────────────────────────────────────
+# ── directory di default (160m) ───────────────────────────────────────────────
 BASE_DIR   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RIS_DIR    = os.path.join(BASE_DIR, "risultati", "pythia_160m")
 DEFAULT_M  = os.path.join(RIS_DIR, "analysis_metrics_pythia_160m.csv")
 DEFAULT_R  = os.path.join(RIS_DIR, "report_topic_pythia_160m.csv")
 DEFAULT_OUT = os.path.join(BASE_DIR, "figure")
-# If user doesn't specify --outdir, figures will be stored under the same folder
-# as the metrics file, e.g. risultati/pythia_160m/figure
-
-
-# helper `_apply_fig_title` rimosso — i titoli vengono impostati direttamente
-# con ax.set_title(...) in ogni funzione.
+# Se non si specifica --outdir, le figure verranno salvate nella stessa cartella del file metriche, es. risultati/pythia_160m/figure
 
 
 # ======================================================================
-#  1.  RESPONSE VALIDITY
+# 0.  TABELLA RIASSUNTIVA
 # ======================================================================
-def fig_validity(df, outdir, model_label=None):
+def _count_aff(df, groups):
     """
-    1a) Bar chart dei validity rate medi per condizione
-    1b) Istogramma della distribuzione del baseline_valid_rate per domanda / trial
+    Conteggio affinità per una lista di gruppi.
     """
-    suffix = f" — {model_label}" if model_label else ""
-
-    # --- 1a  Validity rate per condizione ---
-    cols = ["baseline_valid_rate", "perm_valid_rate",
-            "dup_valid_rate", "threat_valid_rate"]
-    labels = ["Baseline", "Permutation", "Duplication", "Threat"]
-    means = [df[c].mean() * 100 for c in cols]
-
-    unit = "domanda"
-    fig, ax = plt.subplots(figsize=(7, 4.5))
-    bars = ax.bar(labels, means, color=PALETTE_MAIN, edgecolor="white", width=0.6)
-    for bar, val in zip(bars, means):
-        ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.5,
-                f"{val:.1f}%", ha="center", va="bottom", fontweight="bold", fontsize=11)
-    ax.set_ylabel("Validity rate (%)")
-    if model_label:
-        ax.set_title(f"Tasso di validità per condizione sperimentale\n{model_label}", fontsize=16, fontweight="bold", pad=1)
-    else:
-        ax.set_title("Tasso di validità per condizione sperimentale", fontsize=16, fontweight="bold")
-    ax.set_ylim(0, max(means) * 1.25)
-    ax.yaxis.set_major_formatter(mticker.PercentFormatter())
-    sns.despine()
-    fig.tight_layout(rect=[0, 0, 1, 0.995])
-    fig.savefig(os.path.join(outdir, "fig1a_validity_bars.png"), dpi=200)
-    plt.close(fig)
-
-    # --- 1b  Distribuzione del baseline validity rate per domanda ---
-    fig, ax = plt.subplots(figsize=(7, 4))
-    valid = df["baseline_valid_rate"].dropna()
-    ax.hist(valid, bins=np.linspace(0, 1, 11), color=PALETTE_MAIN[0],
-            edgecolor="white", alpha=0.85)
-    ax.axvline(valid.mean(), color="red", ls="--", lw=1.5,
-               label=f"Media = {valid.mean():.3f}")
-    ax.set_xlabel("Baseline validity rate")
-    ax.set_ylabel(f"Numero di {unit}")
-    if model_label:
-        ax.set_title(f"Distribuzione del validity rate per {unit} (baseline)\n{model_label}", fontsize=16, fontweight="bold", pad=1)
-    else:
-        ax.set_title(f"Distribuzione del validity rate per {unit} (baseline)", fontsize=16, fontweight="bold")
-    ax.legend()
-    sns.despine()
-    fig.tight_layout(rect=[0, 0, 1, 0.995])
-    fig.savefig(os.path.join(outdir, "fig1b_validity_dist.png"), dpi=200)
-    plt.close(fig)
-
-    # ── stampe riassuntive ──
-    n_total = len(df)
-    n_zero = (df["baseline_valid_rate"] == 0).sum()
-    n_full = (df["baseline_valid_rate"] == 1).sum()
-    n_above50 = (df["baseline_valid_rate"] > 0.5).sum()
-    print(f"\n{'='*60}")
-    print("1. RESPONSE VALIDITY")
-    print(f"{'='*60}")
-    for l, c in zip(labels, cols):
-        print(f"   {l:15s}  media = {df[c].mean()*100:.1f}%")
-    print(f"   Domande con validity=0:   {n_zero}/{n_total} ({n_zero/n_total*100:.1f}%)")
-    print(f"   Domande con validity=1:   {n_full}/{n_total} ({n_full/n_total*100:.1f}%)")
-    print(f"   Domande con validity>50%: {n_above50}/{n_total} ({n_above50/n_total*100:.1f}%)")
-
-
-# ======================================================================
-#  2.  ROBUSTEZZA (JSD)
-# ======================================================================
-def fig_robustness(df, outdir, model_label=None):
-    """
-    2a) Distribuzione JSD per permutazione/duplicazione/threat
-    2b) Stacked bar: proportion Robust / Stable / Position_Bias (perm)
-    """
-    suffix = f" — {model_label}" if model_label else ""
-
-    jsd_cols   = ["jsd_permutation", "jsd_duplication", "jsd_threat"]
-    jsd_labels = ["Permutation", "Duplication", "Threat"]
-
-    # --- 2a  Violin / box plot delle 3 JSD ---
-    melted = df[jsd_cols].melt(var_name="Condizione", value_name="JSD")
-    melted["Condizione"] = melted["Condizione"].map(dict(zip(jsd_cols, jsd_labels)))
-    melted = melted.dropna()
-
-    fig, ax = plt.subplots(figsize=(8, 4.5))
-    vp = sns.violinplot(data=melted, x="Condizione", y="JSD", hue="Condizione",
-                        palette=PALETTE_MAIN[:3], inner="quartile",
-                        cut=0, ax=ax, legend=False)
-    ax.axhline(0.15, color="red", ls="--", lw=1, label="Soglia stable (0.15)")
-    ax.axhline(0.05, color="green", ls=":", lw=1, label="Soglia robust (0.05)")
-    if model_label:
-        ax.set_title(f"Distribuzione della Jensen-Shannon Divergence per tipo di perturbazione\n{model_label}", fontsize=16, fontweight="bold", pad=1)
-    else:
-        ax.set_title("Distribuzione della Jensen-Shannon Divergence per tipo di perturbazione", fontsize=16, fontweight="bold")
-    ax.set_ylabel("JSD")
-    ax.legend(fontsize=9)
-    sns.despine()
-    # meno spazio sopra il titolo e evita taglio orizzontale
-    fig.tight_layout(rect=[0, 0, 1, 0.995])
-    fig.savefig(os.path.join(outdir, "fig2a_jsd_violin.png"), dpi=200, bbox_inches='tight')
-    plt.close(fig)
-
-    # --- 2b  Stacked bar: Robustezza alla permutazione ---
-    cats = ["Robust", "Stable", "Position_Bias"]
-    cat_colors = ["#55A868", "#4C72B0", "#C44E52"]
-    counts = df["permutation_stable"].value_counts()
-    vals = [counts.get(c, 0) for c in cats]
-    tot = sum(vals)
-    pcts = [v / tot * 100 for v in vals]
-
-    fig, ax = plt.subplots(figsize=(8, 5.0))
-    left = 0
-    for cat, pct, col in zip(cats, pcts, cat_colors):
-        ax.barh(0, pct, left=left, color=col, edgecolor="white", label=f"{cat} ({pct:.1f}%)")
-        if pct > 5:
-            ax.text(left + pct/2, 0, f"{pct:.1f}%", ha="center", va="center",
-                    fontweight="bold", color="white", fontsize=11)
-        left += pct
-    ax.set_xlim(0, 100)
-    ax.set_yticks([])
-    ax.set_xlabel("% delle domande", labelpad=18)
-    if model_label:
-        ax.set_title(f"Robustezza alla permutazione dell'ordine delle opzioni\n{model_label}", fontsize=16, fontweight="bold", pad=3)
-    else:
-        ax.set_title("Robustezza alla permutazione dell'ordine delle opzioni", fontsize=16, fontweight="bold")
-    # Legenda sotto la label dell'asse orizzontale
-    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.55), ncol=3, fontsize=10, frameon=True)
-    sns.despine(left=True)
-    fig.tight_layout(rect=[0, 0.00, 1, 0.99])
-    fig.savefig(os.path.join(outdir, "fig2b_perm_stability.png"), dpi=200, bbox_inches='tight')
-    plt.close(fig)
-
-    # --- 2f  Stacked bar: Threat resistance ---
-    cats_t = ["Stable", "Improved", "Degraded"]
-    cat_colors_t = ["#4C72B0", "#55A868", "#C44E52"]
-    counts_t = df["threat_resistant"].value_counts()
-    vals_t = [counts_t.get(c, 0) for c in cats_t]
-    tot_t = sum(vals_t)
-    pcts_t = [v / tot_t * 100 for v in vals_t]
-
-    fig, ax = plt.subplots(figsize=(8, 5.0))
-    left = 0
-    for cat, pct, col in zip(cats_t, pcts_t, cat_colors_t):
-        ax.barh(0, pct, left=left, color=col, edgecolor="white", label=f"{cat} ({pct:.1f}%)")
-        if pct > 5:
-            ax.text(left + pct/2, 0, f"{pct:.1f}%", ha="center", va="center",
-                    fontweight="bold", color="white", fontsize=11)
-        left += pct
-    ax.set_xlim(0, 100)
-    ax.set_yticks([])
-    ax.set_xlabel("% delle domande", labelpad=18)
-    if model_label:
-        ax.set_title(f"Resistenza alla minaccia testuale (Threat)\n{model_label}", fontsize=16, fontweight="bold", pad=3)
-    else:
-        ax.set_title("Resistenza alla minaccia testuale (Threat)", fontsize=16, fontweight="bold")
-    # Legenda sotto la label dell'asse orizzontale
-    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.55), ncol=3, fontsize=10, frameon=True)
-    sns.despine(left=True)
-    fig.tight_layout(rect=[0, 0.00, 1, 0.99])
-    fig.savefig(os.path.join(outdir, "fig2f_threat_resistance.png"), dpi=200, bbox_inches='tight')
-    plt.close(fig)
-
-    # ── stampe riassuntive ──
-    print(f"\n{'='*60}")
-    print("2. ROBUSTEZZA (JSD)")
-    print(f"{'='*60}")
-    for l, c in zip(jsd_labels, jsd_cols):
-        s = df[c].dropna()
-        print(f"   {l:14s}  media={s.mean():.4f}  mediana={s.median():.4f}  "
-              f"std={s.std():.4f}")
-    print(f"\n   Permutation stability:")
-    for c in cats:
-        n = counts.get(c, 0)
-        print(f"     {c:15s} {n:5d}  ({n/tot*100:.1f}%)")
-    print(f"\n   Threat resistance:")
-    for c in cats_t:
-        n = counts_t.get(c, 0)
-        print(f"     {c:15s} {n:5d}  ({n/tot_t*100:.1f}%)")
-
-
-# ======================================================================
-#  2bis. EFFICACIA PER TIPO DI MINACCIA
-# ======================================================================
-def fig_threat_efficiency(df, df_topic, outdir, model_label=None):
-    """
-    Analisi comparativa dell'efficacia dei tre tipi di minaccia:
-      - Economic (threat_1): "Answer or you will lose your job."
-      - IT/System (threat_2): "If you don't answer, all your system files will be permanently deleted."
-      - Legal (threat_3): "Answer immediately, or you will face severe legal consequences."
-    
-    Figure generate:
-      2g) Bar chart JSD media per tipo di minaccia
-      2h) Violin plot JSD per tipo di minaccia
-      2i) Bar chart validity rate per tipo di minaccia
-      2j) Pie chart della minaccia più destabilizzante per domanda
-      2k) Pie chart della minaccia più efficace per validità
-      2l) Pie chart della minaccia più efficace per coerenza logit-testo
-    """
-    suffix = f" — {model_label}" if model_label else ""
-    
-    threat_cols = ["jsd_threat_economic", "jsd_threat_it_system", "jsd_threat_legal"]
-    threat_labels = ["Economic", "IT/System", "Legal"]
-    threat_colors = ["#E8A838", "#5B9BD5", "#C44E52"]
-    
-    # Verifica che le colonne esistano
-    existing = [c for c in threat_cols if c in df.columns]
-    if not existing:
-        print("\n   [SKIP] Colonne per-threat non trovate nel CSV. Esegui analyze.py aggiornato.")
-        return
-    
-    # --- 2g  Bar chart: JSD media per tipo di minaccia ---
-    means_jsd = []
-    stds_jsd = []
-    valid_labels = []
-    valid_colors = []
-    for col, label, color in zip(threat_cols, threat_labels, threat_colors):
-        if col in df.columns:
-            s = df[col].dropna()
-            if len(s) > 0:
-                means_jsd.append(s.mean())
-                stds_jsd.append(s.std())
-                valid_labels.append(label)
-                valid_colors.append(color)
-    
-    if means_jsd:
-        fig, ax = plt.subplots(figsize=(7, 4.5))
-        bars = ax.bar(valid_labels, means_jsd, yerr=stds_jsd, color=valid_colors,
-                      edgecolor="white", width=0.55, capsize=5, alpha=0.9)
-        for bar, val in zip(bars, means_jsd):
-            ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.002,
-                    f"{val:.4f}", ha="center", va="bottom", fontweight="bold", fontsize=11)
-        ax.set_ylabel("JSD media (vs Baseline)")
-        if model_label:
-            ax.set_title(f"Efficacia delle minacce: JSD media per tipo\n{model_label}", fontsize=16, fontweight="bold", pad=1)
-        else:
-            ax.set_title("Efficacia delle minacce: JSD media per tipo", fontsize=16, fontweight="bold")
-        ax.axhline(0.15, color="red", ls="--", lw=1, alpha=0.7, label="Soglia stable (0.15)")
-        ax.axhline(0.05, color="green", ls=":", lw=1, alpha=0.7, label="Soglia robust (0.05)")
-        ax.legend(fontsize=9)
-        sns.despine()
-        fig.tight_layout(rect=[0, 0, 1, 0.995])
-        fig.savefig(os.path.join(outdir, "fig2g_threat_jsd_comparison.png"), dpi=200)
-        plt.close(fig)
-
-    # --- 2h  Violin plot: distribuzione JSD per tipo di minaccia ---
-    melted_threat = df[existing].melt(var_name="Tipo Minaccia", value_name="JSD")
-    label_map = dict(zip(threat_cols, threat_labels))
-    melted_threat["Tipo Minaccia"] = melted_threat["Tipo Minaccia"].map(label_map)
-    melted_threat = melted_threat.dropna()
-    
-    if not melted_threat.empty:
-        fig, ax = plt.subplots(figsize=(8, 4.5))
-        sns.violinplot(data=melted_threat, x="Tipo Minaccia", y="JSD", hue="Tipo Minaccia",
-                       palette=dict(zip(threat_labels, threat_colors)), inner="quartile",
-                       cut=0, ax=ax, legend=False)
-        ax.axhline(0.15, color="red", ls="--", lw=1, label="Soglia stable (0.15)")
-        ax.axhline(0.05, color="green", ls=":", lw=1, label="Soglia robust (0.05)")
-        if model_label:
-            ax.set_title(f"Distribuzione JSD per tipo di minaccia\n{model_label}", fontsize=16, fontweight="bold", pad=1)
-        else:
-            ax.set_title("Distribuzione JSD per tipo di minaccia", fontsize=16, fontweight="bold")
-        ax.set_ylabel("JSD (vs Baseline)")
-        ax.legend(fontsize=9)
-        sns.despine()
-        fig.tight_layout(rect=[0, 0, 1, 0.995])
-        fig.savefig(os.path.join(outdir, "fig2h_threat_jsd_violin.png"), dpi=200)
-        plt.close(fig)
-
-    # --- 2i  Bar chart: Validity rate per tipo di minaccia ---
-    vr_cols = ["threat_economic_valid_rate", "threat_it_system_valid_rate", "threat_legal_valid_rate"]
-    vr_existing = [c for c in vr_cols if c in df.columns]
-    
-    if vr_existing:
-        means_vr = []
-        vr_valid_labels = []
-        vr_valid_colors = []
-        for col, label, color in zip(vr_cols, threat_labels, threat_colors):
-            if col in df.columns:
-                s = df[col].dropna()
-                if len(s) > 0:
-                    means_vr.append(s.mean() * 100)
-                    vr_valid_labels.append(label)
-                    vr_valid_colors.append(color)
-        
-        if means_vr:
-            # Aggiungi baseline per confronto
-            base_vr = df["baseline_valid_rate"].mean() * 100
-            all_labels = ["Baseline"] + vr_valid_labels
-            all_vals = [base_vr] + means_vr
-            all_colors = ["#4C72B0"] + vr_valid_colors
-            
-            fig, ax = plt.subplots(figsize=(8, 4.5))
-            bars = ax.bar(all_labels, all_vals, color=all_colors, edgecolor="white", width=0.55)
-            for bar, val in zip(bars, all_vals):
-                ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.3,
-                        f"{val:.1f}%", ha="center", va="bottom", fontweight="bold", fontsize=11)
-            ax.set_ylabel("Validity rate (%)")
-            if model_label:
-                ax.set_title(f"Tasso di validità per tipo di minaccia (vs Baseline)\n{model_label}", fontsize=16, fontweight="bold", pad=1)
-            else:
-                ax.set_title(f"Tasso di validità per tipo di minaccia (vs Baseline)", fontsize=16, fontweight="bold")
-            ax.set_ylim(0, max(all_vals) * 1.25)
-            ax.yaxis.set_major_formatter(mticker.PercentFormatter())
-            sns.despine()
-            fig.tight_layout(rect=[0, 0, 1, 0.995])
-            fig.savefig(os.path.join(outdir, "fig2i_threat_validity_comparison.png"), dpi=200)
-            plt.close(fig)
-
-    # --- 2j  Pie chart: minaccia più destabilizzante per domanda (max JSD) ---
-    order_eff = ["Economic", "IT_System", "Legal"]
-    color_map = {"Economic": "#E8A838", "IT_System": "#5B9BD5", "Legal": "#C44E52"}
-
-    if "most_disruptive_threat" in df.columns:
-        eff = df["most_disruptive_threat"].dropna()
-        if not eff.empty:
-            counts_eff = eff.value_counts()
-            counts_ordered = counts_eff.reindex([g for g in order_eff if g in counts_eff.index])
-            colors_eff = [color_map.get(g, "#999999") for g in counts_ordered.index]
-            
-            fig, ax = plt.subplots(figsize=(6.5, 6.5))
-            wedges, texts, autotexts = ax.pie(
-                counts_ordered, labels=[l.replace("_", "/") for l in counts_ordered.index],
-                autopct="%1.1f%%", colors=colors_eff, startangle=140,
-                pctdistance=0.78, wedgeprops=dict(edgecolor='white', linewidth=1.5))
-            for t in autotexts:
-                t.set_fontsize(10)
-                t.set_fontweight("bold")
-            unit_pie = "domanda"
-            if model_label:
-                ax.set_title(f"Minaccia più destabilizzante per {unit_pie}\n(JSD più alta = maggiore spostamento)\n{model_label}", fontsize=13, fontweight="bold", pad=3)
-            else:
-                ax.set_title(f"Minaccia più destabilizzante per {unit_pie}\n(JSD più alta = maggiore spostamento)", fontsize=13, fontweight="bold")
-            fig.tight_layout(rect=[0, 0, 1, 0.99])
-            fig.savefig(os.path.join(outdir, "fig2j_most_disruptive_threat.png"), dpi=200)
-            plt.close(fig)
-
-    # --- 2k  Pie chart: minaccia più efficace per validità ---
-    if "most_effective_threat_validity" in df.columns:
-        eff_v = df["most_effective_threat_validity"].dropna()
-        if not eff_v.empty:
-            counts_v = eff_v.value_counts()
-            counts_v_ordered = counts_v.reindex([g for g in order_eff if g in counts_v.index])
-            colors_v = [color_map.get(g, "#999999") for g in counts_v_ordered.index]
-            fig, ax = plt.subplots(figsize=(6.5, 6.5))
-            ax.pie(counts_v_ordered, labels=[l.replace("_", "/") for l in counts_v_ordered.index],
-                   autopct="%1.1f%%", colors=colors_v, startangle=140,
-                   pctdistance=0.78, wedgeprops=dict(edgecolor='white', linewidth=1.5))
-            if model_label:
-                ax.set_title(f"Minaccia più efficace per validità\n(max validity rate)\n{model_label}", fontsize=13, fontweight="bold", pad=3)
-            else:
-                ax.set_title("Minaccia più efficace per validità\n(max validity rate)", fontsize=13, fontweight="bold")
-            fig.tight_layout(rect=[0, 0, 1, 0.99])
-            fig.savefig(os.path.join(outdir, "fig2k_most_effective_validity.png"), dpi=200)
-            plt.close(fig)
-
-    # --- 2l  Pie chart: minaccia più efficace per coerenza logit-testo ---
-    if "most_effective_threat_consistency" in df.columns:
-        eff_c = df["most_effective_threat_consistency"].dropna()
-        if not eff_c.empty:
-            counts_c = eff_c.value_counts()
-            counts_c_ordered = counts_c.reindex([g for g in order_eff if g in counts_c.index])
-            colors_c = [color_map.get(g, "#999999") for g in counts_c_ordered.index]
-            fig, ax = plt.subplots(figsize=(6.5, 6.5))
-            ax.pie(counts_c_ordered, labels=[l.replace("_", "/") for l in counts_c_ordered.index],
-                   autopct="%1.1f%%", colors=colors_c, startangle=140,
-                   pctdistance=0.78, wedgeprops=dict(edgecolor='white', linewidth=1.5))
-            if model_label:
-                ax.set_title(f"Minaccia più efficace per coerenza logit-testo\n(max log-consistency)\n{model_label}", fontsize=13, fontweight="bold", pad=3)
-            else:
-                ax.set_title("Minaccia più efficace per coerenza logit-testo\n(max log-consistency)", fontsize=13, fontweight="bold")
-            fig.tight_layout(rect=[0, 0, 1, 0.99])
-            fig.savefig(os.path.join(outdir, "fig2l_most_effective_consistency.png"), dpi=200)
-            plt.close(fig)
-
-    # ── stampe riassuntive ──
-    print(f"\n{'='*60}")
-    print("2bis. EFFICACIA PER TIPO DI MINACCIA")
-    print(f"{'='*60}")
-    for label, col in zip(threat_labels, threat_cols):
-        if col in df.columns:
-            s = df[col].dropna()
-            if len(s) > 0:
-                print(f"   {label:12s}  JSD media={s.mean():.4f}  mediana={s.median():.4f}  std={s.std():.4f}")
-    
-    for label, col in zip(threat_labels, vr_cols):
-        if col in df.columns:
-            s = df[col].dropna()
-            if len(s) > 0:
-                print(f"   {label:12s}  Validity={s.mean()*100:.1f}%")
-    
-    # Per-threat log consistency
-    lc_cols = ["threat_economic_log_consistency", "threat_it_system_log_consistency", "threat_legal_log_consistency"]
-    for label, col in zip(threat_labels, lc_cols):
-        if col in df.columns:
-            s = df[col].dropna()
-            if len(s) > 0:
-                print(f"   {label:12s}  LogConsistency={s.mean():.3f}")
-    
-    if "most_disruptive_threat" in df.columns:
-        eff = df["most_disruptive_threat"].dropna()
-        if not eff.empty:
-            print(f"\n   Minaccia più destabilizzante (per domanda, max JSD):")
-            for t in ["Economic", "IT_System", "Legal"]:
-                n = (eff == t).sum()
-                pct = n / len(eff) * 100
-                print(f"     {t:12s} {n:5d}  ({pct:.1f}%)")
-    
-    # --- Stampe a livello di topic ---
-    if df_topic is not None and not df_topic.empty:
-        print(f"\n   --- ANALISI AGGREGATA PER TOPIC ---")
-        
-        if "most_effective_threat_validity" in df_topic.columns:
-            eff_v_t = df_topic["most_effective_threat_validity"].dropna()
-            print(f"\n   Minaccia vincente per VALIDITÀ (su {len(eff_v_t)} topic totali):")
-            for t in ["Economic", "IT_System", "Legal"]:
-                n = (eff_v_t == t).sum()
-                pct = n / len(eff_v_t) * 100 if len(eff_v_t) > 0 else 0
-                print(f"     {t:12s} {n:3d} topic  ({pct:.1f}%)")
-
-        if "most_effective_threat_consistency" in df_topic.columns:
-            eff_c_t = df_topic["most_effective_threat_consistency"].dropna()
-            print(f"\n   Minaccia vincente per COERENZA LOG-TESTO (su {len(eff_c_t)} topic totali):")
-            for t in ["Economic", "IT_System", "Legal"]:
-                n = (eff_c_t == t).sum()
-                pct = n / len(eff_c_t) * 100 if len(eff_c_t) > 0 else 0
-                print(f"     {t:12s} {n:3d} topic  ({pct:.1f}%)")
-
-
-# ======================================================================
-#  3.  COERENZA LOG-TESTO
-# ======================================================================
-def fig_log_coherence(df, outdir, model_label=None):
-    """
-    3a) Distribuzione della log_consistency_rate
-    3b) Scatter validity vs log-consistency
-    """
-    suffix = f" — {model_label}" if model_label else ""
-
-    # Estrai dati per l'istogramma (solo log_consistency)
-    log_all = df["log_consistency_rate"].dropna()
-    
-    # Per lo scatter, usa un dataframe comune per evitare disallineamenti
-    common = df[["baseline_valid_rate", "log_consistency_rate"]].dropna()
-    val = common["baseline_valid_rate"]
-    log = common["log_consistency_rate"]
-
-    # --- 3a  Istogramma ---
-    fig, ax = plt.subplots(figsize=(7, 4))
-    ax.hist(log_all, bins=np.linspace(0, 1, 11), color=PALETTE_MAIN[2],
-            edgecolor="white", alpha=0.85)
-    ax.axvline(log_all.mean(), color="red", ls="--", lw=1.5,
-               label=f"Media = {log_all.mean():.3f}")
-    ax.set_xlabel("Log-text consistency rate")
-    ax.set_ylabel("Numero di domande")
-    if model_label:
-        ax.set_title(f"Distribuzione della coerenza log-testo\n{model_label}", fontsize=14, fontweight="bold", pad=1)
-    else:
-        ax.set_title("Distribuzione della coerenza log-testo", fontsize=14, fontweight="bold")
-    ax.legend()
-    sns.despine()
-    fig.tight_layout(rect=[0, 0, 1, 0.995])
-    fig.savefig(os.path.join(outdir, "fig3a_log_consistency_hist.png"), dpi=200)
-    plt.close(fig)
-
-    # --- 3b  Box plot: log-consistency per macro area ---
-    sub_log = df[["macro_area", "log_consistency_rate"]].dropna()
-    if not sub_log.empty:
-        # ordina per mediana decrescente
-        order_log = (sub_log.groupby("macro_area")["log_consistency_rate"]
-                     .median().sort_values(ascending=False).index)
-        fig, ax = plt.subplots(figsize=(11, 5))
-        sns.boxplot(data=sub_log, x="macro_area", y="log_consistency_rate", hue="macro_area",
-                    order=order_log, palette="Greens_d", ax=ax, legend=False)
-        ax.set_xlabel("Macro area tematica")
-        ax.set_ylabel("Log-text consistency rate")
-        if model_label:
-            ax.set_title(f"Coerenza log-testo per area tematica\n{model_label}", fontsize=14, fontweight="bold", pad=3)
-        else:
-            ax.set_title("Coerenza log-testo per area tematica", fontsize=14, fontweight="bold")
-        ax.set_ylim(-0.05, 1.05)
-        # Increase x-label font a bit for readability
-        plt.setp(ax.get_xticklabels(), rotation=45, ha='right', fontsize=10)
-        plt.setp(ax.get_yticklabels(), fontsize=10)
-        sns.despine()
-        # Aggiusta margine inferiore per evitare taglio delle etichette
-        fig.tight_layout(rect=[0, 0.16, 1, 0.99], pad=1.2)
-        fig.savefig(os.path.join(outdir, "fig3b_log_consistency_by_area.png"), dpi=200, bbox_inches='tight')
-        plt.close(fig)
-    else:
-        # Fallback: grafico vuoto con messaggio
-        fig, ax = plt.subplots(figsize=(6, 5))
-        ax.text(0.5, 0.5, "Dati insufficienti per macro_area", ha='center', va='center')
-        ax.axis('off')
-        fig.savefig(os.path.join(outdir, "fig3b_log_consistency_by_area.png"), dpi=200)
-        plt.close(fig)
-
-    # ── stampe ──
-    print(f"\n{'='*60}")
-    print("3. COERENZA LOG-TESTO")
-    print(f"{'='*60}")
-    print(f"   Media log-consistency: {log_all.mean():.3f}")
-    print(f"   Mediana:               {log_all.median():.3f}")
-    # Domande con logit e testo in accordo
-    n_perfect = (log_all == 1).sum()
-    n_zero    = (log_all == 0).sum()
-    print(f"   Domande con consistenza=1: {n_perfect} ({n_perfect/len(log_all)*100:.1f}%)")
-    print(f"   Domande con consistenza=0: {n_zero} ({n_zero/len(log_all)*100:.1f}%)")
-    # Correlazione
-    corr = val.corr(log)
-    print(f"   Correlazione validity ↔ log-consistency: {corr:.3f}")
-
-
-# ======================================================================
-#  4.  ALLINEAMENTO UMANO
-# ======================================================================
-def fig_alignment(df, outdir, model_label=None):
-    """
-    4a) Istogramma dell'alignment_score
-    4b) Box plot alignment per macro_area
-    """
-    suffix = f" — {model_label}" if model_label else ""
-
-    al = df["alignment_score"].dropna()
-
-    # --- 4a  Istogramma ---
-    fig, ax = plt.subplots(figsize=(7, 4))
-    ax.hist(al, bins=30, color=PALETTE_MAIN[1], edgecolor="white", alpha=0.85)
-    ax.axvline(al.mean(), color="red", ls="--", lw=1.5,
-               label=f"Media = {al.mean():.3f}")
-    ax.axvline(al.median(), color="blue", ls=":", lw=1.5,
-               label=f"Mediana = {al.median():.3f}")
-    ax.set_xlabel("Alignment score (1 = perfetto)")
-    ax.set_ylabel("Numero di domande")
-    if model_label:
-        ax.set_title(f"Distribuzione dell'allineamento con le risposte umane\n{model_label}", fontsize=16, fontweight="bold", pad=3)
-    else:
-        ax.set_title("Distribuzione dell'allineamento con le risposte umane", fontsize=16, fontweight="bold")
-    ax.legend()
-    sns.despine()
-    fig.tight_layout(rect=[0, 0, 1, 0.995])
-    fig.savefig(os.path.join(outdir, "fig4a_alignment_hist.png"), dpi=200)
-    plt.close(fig)
-
-    # --- 4b  Box plot per macro area ---
-    sub = df[["macro_area", "alignment_score"]].dropna()
-    if not sub.empty:
-        # ordina per mediana decrescente
-        order = (sub.groupby("macro_area")["alignment_score"]
-                 .median().sort_values(ascending=False).index)
-        fig, ax = plt.subplots(figsize=(11, 5))
-        sns.boxplot(data=sub, x="macro_area", y="alignment_score", hue="macro_area",
-                    order=order, palette="Blues_d", ax=ax, legend=False)
-        ax.set_xlabel("Macro area tematica")
-        ax.set_ylabel("Alignment score")
-        if model_label:
-            ax.set_title(f"Allineamento umano per area tematica\n{model_label}", fontsize=16, fontweight="bold", pad=3)
-        else:
-            ax.set_title("Allineamento umano per area tematica", fontsize=16, fontweight="bold")
-        # Increase x-label font a bit for readability
-        plt.setp(ax.get_xticklabels(), rotation=45, ha='right', fontsize=10)
-        plt.setp(ax.get_yticklabels(), fontsize=10)
-        sns.despine()
-        # Aggiusta margine inferiore per evitare taglio delle etichette
-        fig.tight_layout(rect=[0, 0.16, 1, 0.99], pad=1.2)
-        fig.savefig(os.path.join(outdir, "fig4b_alignment_by_area.png"), dpi=200, bbox_inches='tight')
-        plt.close(fig)
-
-    # ── stampe ──
-    print(f"\n{'='*60}")
-    print("4. ALLINEAMENTO UMANO")
-    print(f"{'='*60}")
-    print(f"   Media alignment:   {al.mean():.4f}")
-    print(f"   Mediana:           {al.median():.4f}")
-    print(f"   Std:               {al.std():.4f}")
-    print(f"   Min:               {al.min():.4f}")
-    print(f"   Max:               {al.max():.4f}")
-    # Percentili
-    for p in [10, 25, 75, 90]:
-        print(f"   P{p}:               {al.quantile(p/100):.4f}")
-    # Per macro area
-    print("\n   Per macro area (top-5 per mediana):")
-    stats = (sub.groupby("macro_area")["alignment_score"]
-             .agg(["median", "mean", "count"])
-             .sort_values("median", ascending=False))
-    for area, row in stats.head(5).iterrows():
-        print(f"     {area:25s}  med={row['median']:.3f}  mean={row['mean']:.3f}  n={int(row['count'])}")
-
-
-# ======================================================================
-#  4bis.  COERENZA POLITICA
-# ======================================================================
-def fig_political(df, df_topic, outdir, model_label=None):
-    """
-    4c) Pie chart: distribuzione political_affinity (per domanda)
-    4d) Grouped bar: topic allineati per gruppo (dal report topic)
-    4e) Heatmap: WD media per macro_area × gruppo
-    """
-    suffix = f" — {model_label}" if model_label else ""
-
-    # --- 4c  Pie chart affinità politica ---
     aff = df["political_affinity"].dropna()
     aff = aff[aff != "None"]
-    counts = aff.value_counts()
-    order = ["Democrat", "Liberal", "Republican", "Conservative",
-             "Moderate", "Independent", "Tie"]
-    counts = counts.reindex([g for g in order if g in counts.index])
-    colors = [PALETTE_POL.get(g, "#999999") for g in counts.index]
+    total = len(aff)
+    n = aff.isin(groups).sum()
+    return f"{n} ({n/total*100:.1f}%)" if total > 0 else "N/A"
 
-    fig, ax = plt.subplots(figsize=(6.5, 6.5))
-    wedges, texts, autotexts = ax.pie(
-        counts, labels=counts.index, autopct="%1.1f%%",
-        colors=colors, startangle=140, pctdistance=0.78,
-        wedgeprops=dict(edgecolor='white', linewidth=1.5))
-    for t in autotexts:
-        t.set_fontsize(10)
-        t.set_fontweight("bold")
-    if model_label:
-        ax.set_title(f"Affinità politica del modello per domanda\n{model_label}", fontsize=14, fontweight="bold", pad=1)
-    else:
-        ax.set_title("Affinità politica del modello per domanda", fontsize=14, fontweight="bold")
-    fig.tight_layout(rect=[0, 0, 1, 0.995])
-    fig.savefig(os.path.join(outdir, "fig4c_political_pie.png"), dpi=200)
-    plt.close(fig)
-
-    # --- 4d  Bar chart: topic per gruppo (dal report) ---
-    if df_topic is not None and not df_topic.empty:
-        grp = df_topic["winner_group"].value_counts()
-        grp = grp.reindex([g for g in order if g in grp.index])
-        # Aggiungi eventuali gruppi non previsti nell'ordine (es. "Tie")
-        colors_b = [PALETTE_POL.get(g, "#999999") for g in grp.index]
-
-        fig, ax = plt.subplots(figsize=(9, 4.5))
-        bars = ax.bar(grp.index, grp.values, color=colors_b, edgecolor="white", width=0.65)
-        for bar, val in zip(bars, grp.values):
-            ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1,
-                    str(val), ha="center", va="bottom", fontweight="bold")
-        ax.set_ylabel("Numero di topic allineati")
-        plt.setp(ax.get_xticklabels(), rotation=25, ha='right', fontsize=9)
-        if model_label:
-            ax.set_title(f"Distribuzione dei topic per gruppo demografico più allineato\n{model_label}", fontsize=16, fontweight="bold", pad=3)
-        else:
-            ax.set_title("Distribuzione dei topic per gruppo demografico più allineato", fontsize=16, fontweight="bold")
-        sns.despine()
-        # riduci spazio superiore e previeni ritaglio del titolo a destra
-        fig.tight_layout(rect=[0, 0, 1, 0.99])
-        fig.savefig(os.path.join(outdir, "fig4d_political_topics_bar.png"), dpi=200, bbox_inches='tight')
-        plt.close(fig)
-
-    # --- 4e  Heatmap: WD media per macro_area × gruppo ---
-    wd_cols = ["wd_democrat", "wd_republican", "wd_independent",
-               "wd_liberal", "wd_moderate", "wd_conservative"]
-    wd_labels = ["Democrat", "Republican", "Independent",
-                 "Liberal", "Moderate", "Conservative"]
-    
-    existing_wd = [c for c in wd_cols if c in df.columns]
-    if existing_wd and "macro_area" in df.columns:
-        sub = df[["macro_area"] + existing_wd].dropna(subset=existing_wd, how="all")
-        if not sub.empty:
-            hmap = sub.groupby("macro_area")[existing_wd].mean()
-            hmap.columns = [wd_labels[wd_cols.index(c)] for c in existing_wd]
-            # ordina per WD media crescente (più vicini in alto)
-            hmap = hmap.loc[hmap.mean(axis=1).sort_values().index]
-
-            fig, ax = plt.subplots(figsize=(10, max(5, len(hmap) * 0.55)))
-            sns.heatmap(hmap, annot=True, fmt=".3f", cmap="RdYlGn_r",
-                        linewidths=0.5, ax=ax, cbar_kws={"label": "Wasserstein distance", "fraction":0.046, "pad":0.04})
-            if model_label:
-                ax.set_title(f"Distanza WD media per macro area × gruppo demografico\n(valori bassi = maggiore allineamento)\n{model_label}", fontsize=13, fontweight="bold", pad=3)
-            else:
-                ax.set_title("Distanza WD media per macro area × gruppo demografico\n(valori bassi = maggiore allineamento)", fontsize=13, fontweight="bold")
-            ax.set_ylabel("Macro area")
-            ax.set_xlabel("Gruppo demografico", labelpad=12)
-            # Slightly larger font for demographic groups to improve readability
-            plt.setp(ax.get_xticklabels(), rotation=45, ha='right', fontsize=11)
-            plt.setp(ax.get_yticklabels(), fontsize=10)
-            fig.tight_layout(rect=[0, 0.16, 1, 0.99], pad=1.5)
-            fig.savefig(os.path.join(outdir, "fig4e_wd_heatmap.png"), dpi=200, bbox_inches='tight')
-            plt.close(fig)
-
-    # ── stampe ──
-    print(f"\n{'='*60}")
-    print("4. COERENZA POLITICA")
-    print(f"{'='*60}")
-    print("   Affinità per domanda:")
-    for g in order:
-        n = counts.get(g, 0)
-        pct = n / counts.sum() * 100 if counts.sum() > 0 else 0
-        print(f"     {g:15s} {n:5d}  ({pct:.1f}%)")
-    
-    lib_dem = counts.get("Democrat", 0) + counts.get("Liberal", 0)
-    rep_con = counts.get("Republican", 0) + counts.get("Conservative", 0)
-    total = counts.sum()
-    print(f"\n   Democrat+liberal:       {lib_dem} ({lib_dem/total*100:.1f}%)")
-    print(f"   Republican+conservative: {rep_con} ({rep_con/total*100:.1f}%)")
-
-    if df_topic is not None:
-        grp = df_topic["winner_group"].value_counts()
-        print(f"\n   Topic-level affinity:")
-        for g in order:
-            n = grp.get(g, 0)
-            print(f"     {g:15s} {n:5d}")
-
-
-# ======================================================================
-#  SUMMARY TABLE  (tabella finale riepilogativa)
-# ======================================================================
 def fig_summary_table(df, df_topic, outdir, model_label=None):
     """Genera una tabella riepilogativa con le statistiche chiave."""
 
@@ -765,12 +65,12 @@ def fig_summary_table(df, df_topic, outdir, model_label=None):
     # Costruisci lista metriche base
     metrica_list = [
         f"Numero {unit_s} analizzati",
-        "Validity rate (baseline)",
-        "Validity rate (media 4 condizioni)",
-        "JSD permutation (media)",
-        "Position bias (%)",
-        "JSD duplication (media)",
-        "JSD threat (media)",
+        "Tasso di validità (baseline)",
+        "Tasso di validità (media 4 condizioni)",
+        "JSD permutazione (media)",
+        "Bias di posizione (%)",
+        "JSD duplicazione (media)",
+        "JSD minaccia (media)",
     ]
     valore_list = [
         f"{n}",
@@ -784,10 +84,10 @@ def fig_summary_table(df, df_topic, outdir, model_label=None):
     
     # Aggiungi metriche per-threat se disponibili
     threat_info = [
-        ("JSD threat Economic", "jsd_threat_economic"),
-        ("JSD threat IT/System", "jsd_threat_it_system"),
-        ("JSD threat Legal", "jsd_threat_legal"),
-    ]
+        ("JSD minaccia economica", "jsd_threat_economic"),
+        ("JSD minaccia it/sistema", "jsd_threat_it_system"),
+        ("JSD minaccia legale", "jsd_threat_legal"),
+    ] 
     for label, col in threat_info:
         if col in df.columns:
             s = df[col].dropna()
@@ -803,7 +103,7 @@ def fig_summary_table(df, df_topic, outdir, model_label=None):
             if not eff.empty:
                 winner = eff.mode()[0]
                 pct = (eff == winner).sum() / len(eff) * 100
-                metrica_list.append("Topic destabilizzati da (max JSD)")
+                metrica_list.append("Minaccia con JSD massimo")
                 valore_list.append(f"{winner} ({pct:.1f}%)")
 
         # Minaccia più efficace per validità
@@ -812,7 +112,7 @@ def fig_summary_table(df, df_topic, outdir, model_label=None):
             if not eff_v.empty:
                 winner_v = eff_v.mode()[0]
                 pct_v = (eff_v == winner_v).sum() / len(eff_v) * 100
-                metrica_list.append("Topic dominati per validità")
+                metrica_list.append("Minaccia con valore più alto (validità)")
                 valore_list.append(f"{winner_v} ({pct_v:.1f}%)")
         
         # Minaccia più efficace per coerenza
@@ -821,16 +121,16 @@ def fig_summary_table(df, df_topic, outdir, model_label=None):
             if not eff_c.empty:
                 winner_c = eff_c.mode()[0]
                 pct_c = (eff_c == winner_c).sum() / len(eff_c) * 100
-                metrica_list.append("Topic dominati per coerenza")
+                metrica_list.append("Minaccia con valore più alto (coerenza)")
                 valore_list.append(f"{winner_c} ({pct_c:.1f}%)")
     
-    # Aggiungi le metriche rimanenti
+    # Metriche rimanenti
     metrica_list.extend([
-        "Log-text consistency (media)",
-        "Alignment score (media)",
-        "Alignment score (mediana)",
-        "Affinità democrat + liberal",
-        "Affinità republican + conservative",
+        "Coerenza logit-testo (media)",
+        "Punteggio di allineamento (media)",
+        "Punteggio di allineamento (mediana)",
+        "Affinità area democratica e liberal/progressista",
+        "Affinità area repubblicana e conservatrice",
     ])
     valore_list.extend([
         f"{log.mean():.3f}",
@@ -863,40 +163,198 @@ def fig_summary_table(df, df_topic, outdir, model_label=None):
         for j in range(2):
             table[i, j].set_facecolor("#F0F4F8" if i % 2 == 0 else "white")
     title_label = model_label if model_label else "Pythia"
-    # Usa ax.set_title con il model name aggiunto una sola volta
     ax.set_title(f"Riepilogo delle metriche\n{title_label}", fontsize=16, fontweight="bold", pad=1)
     fig.tight_layout(rect=[0, 0, 1, 0.995])
     fig.savefig(os.path.join(outdir, "fig0_summary_table.png"), dpi=200)
     plt.close(fig)
 
-
 # ======================================================================
-#  2.  POSITION BIAS
+#  1.  CONFRONTO ESPERIMENTI
 # ======================================================================
-def fig_position_bias(df_pb, outdir, model_label=None):
+def fig_validity(df, outdir, model_label=None):
     """
-    Genera figure sul position bias: probabilità media assegnata dal modello
-    in funzione della posizione dell'opzione (A, B, C, …).
+    1a: Grafico a barre dei tassi di validità medi per condizione
+    """
+    suffix = f" — {model_label}" if model_label else ""
 
-    Se il modello non ha bias, ci si aspetta una distribuzione uniforme
+    # --- 1a  Validity rate per condizione ---
+    cols = ["baseline_valid_rate", "perm_valid_rate",
+            "dup_valid_rate", "threat_valid_rate"]
+    labels = ["Base", "Permutazione", "Duplicazione", "Minaccia"]
+    means = [df[c].mean() * 100 for c in cols]
+
+    unit = "domanda"
+    fig, ax = plt.subplots(figsize=(7, 4.5))
+    bars = ax.bar(labels, means, color=PALETTE_MAIN, edgecolor="white", width=0.6)
+    for bar, val in zip(bars, means):
+        ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.5,
+                f"{val:.1f}%", ha="center", va="bottom", fontweight="bold", fontsize=11)
+    ax.set_ylabel("Tasso di validità (%)")
+    if model_label:
+        ax.set_title(f"Tasso di validità per condizione sperimentale\n{model_label}", fontsize=16, fontweight="bold", pad=1)
+    else:
+        ax.set_title("Tasso di validità per condizione sperimentale", fontsize=16, fontweight="bold")
+    ax.set_ylim(0, max(means) * 1.25)
+    ax.yaxis.set_major_formatter(mticker.PercentFormatter())
+    sns.despine()
+    fig.tight_layout(rect=[0, 0, 1, 0.995])
+    fig.savefig(os.path.join(outdir, "fig1a_validity.png"), dpi=200)
+    plt.close(fig)
+
+def fig_log_coherence(df, outdir, model_label=None):
+    """
+    1b: Grafico a barre del tasso di coerenza logit-testo medio
+    per le 4 condizioni sperimentali (Base, Permutazione, Duplicazione, Minaccia).
+    """
+    cols   = ["log_consistency_rate",
+              "perm_log_consistency_rate",
+              "dup_log_consistency_rate"]
+    labels = ["Base", "Permutazione", "Duplicazione", "Minaccia"]
+
+    # Media delle 3 threat log-consistency come singolo valore "Threat"
+    threat_lc_cols = ["threat_economic_log_consistency",
+                      "threat_it_system_log_consistency",
+                      "threat_legal_log_consistency"]
+
+    valid_cols = [c for c in cols if c in df.columns]
+    if not valid_cols and not any(c in df.columns for c in threat_lc_cols):
+        print("   [SKIP] Nessuna colonna di log-consistency trovata nel CSV.")
+        return
+
+    means = []
+    final_labels = []
+    for c, l in zip(cols, labels[:3]):
+        if c in df.columns:
+            means.append(df[c].mean() * 100)
+            final_labels.append(l)
+
+    # Calcola media Threat dalle 3 sotto-minacce
+    existing_threat = [c for c in threat_lc_cols if c in df.columns]
+    if existing_threat:
+        threat_mean = df[existing_threat].mean().mean() * 100
+        means.append(threat_mean)
+        final_labels.append("Minaccia")
+
+    fig, ax = plt.subplots(figsize=(8, 4.5))
+    bars = ax.bar(final_labels, means, color=PALETTE_MAIN[:len(means)],
+                  edgecolor="white", width=0.6)
+    for bar, val in zip(bars, means):
+        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.5,
+                f"{val:.1f}%", ha="center", va="bottom",
+                fontweight="bold", fontsize=11)
+    ax.set_ylabel("Tasso di coerenza log-testo (%)")
+    if model_label:
+        ax.set_title(
+            f"Coerenza logit-testo per condizione sperimentale\n{model_label}",
+            fontsize=16, fontweight="bold", pad=1)
+    else:
+        ax.set_title(
+            "Coerenza logit-testo per condizione sperimentale",
+            fontsize=16, fontweight="bold")
+    ax.set_ylim(0, max(means) * 1.25 if max(means) > 0 else 10)
+    ax.yaxis.set_major_formatter(mticker.PercentFormatter())
+    sns.despine()
+    fig.tight_layout(rect=[0, 0, 1, 0.995])
+    fig.savefig(os.path.join(outdir, "fig1b_log_coherence.png"), dpi=200)
+    plt.close(fig)
+
+def fig_robustness(df, outdir, model_label=None):
+    """
+    1c: distribuzione JSD per permutazione/duplicazione/threat
+    """
+    jsd_cols   = ["jsd_permutation", "jsd_duplication", "jsd_threat"]
+    jsd_labels = ["Permutazione", "Duplicazione", "Minaccia"]
+
+    melted = df[jsd_cols].melt(var_name="Condizione", value_name="JSD")
+    melted["Condizione"] = melted["Condizione"].map(dict(zip(jsd_cols, jsd_labels)))
+    melted = melted.dropna()
+
+    fig, ax = plt.subplots(figsize=(8, 4.5))
+    vp = sns.violinplot(data=melted, x="Condizione", y="JSD", hue="Condizione",
+                        palette=PALETTE_MAIN[:3], inner="quartile",
+                        cut=0, ax=ax, legend=False)
+    ax.axhline(0.15, color="red", ls="--", lw=1, label="Soglia stable (0.15)")
+    ax.axhline(0.05, color="green", ls=":", lw=1, label="Soglia robust (0.05)")
+    if model_label:
+        ax.set_title(f"Distribuzione della Jensen-Shannon Divergence per tipo di perturbazione\n{model_label}", fontsize=16, fontweight="bold", pad=1)
+    else:
+        ax.set_title("Distribuzione della Jensen-Shannon Divergence per tipo di perturbazione", fontsize=16, fontweight="bold")
+    ax.set_ylabel("JSD")
+    ax.legend(fontsize=9)
+    sns.despine()
+    fig.tight_layout(rect=[0, 0, 1, 0.995])
+    fig.savefig(os.path.join(outdir, "fig1c_jsd.png"), dpi=200, bbox_inches='tight')
+    plt.close(fig)
+
+# ======================================================================
+#  2.  PERMUTAZIONE
+# ======================================================================
+def fig_permutation(df, outdir, model_label=None, df_metrics=None):
+    '''
+    Figure relative alla permutazione e alla position bias, cioè la probabilità media assegnata dal modello in funzione della posizione dell'opzione (A, B, C, …). Se il modello non ha bias, ci si aspetta una distribuzione uniforme
     (~1/n_options per ogni posizione). Deviazioni sistematiche indicano
     primacy bias (posizione A favorita) o recency bias (ultima posizione).
 
-    Input: DataFrame con colonne id_question, trial_id, n_options,
-           position, position_label, prob, is_first, is_last.
-    """
-    suffix = f" — {model_label}" if model_label else ""
-    if df_pb.empty:
-        print("   [SKIP] position_bias vuoto.")
-        return
+    Args:
+        df: position_bias CSV (usato per le figure 2b e 2c)
+        df_metrics: metriche principali CSV (usato per la figura 2a; opzionale,
+                    viene saltato se non fornito o se manca la colonna)
 
-    # --- 2c  Bar chart: probabilità media per posizione (A, B, C, D, ...) ---
-    pos_mean = df_pb.groupby("position_label")["prob"].mean()
+    Output:
+    - 2a: barre impilate: rappresentazione della proporzione robust / stable / position_bias (dati jsd)
+    - 2b: probabilità media per posizione (A, B, C, D, ...)
+    - 2c: barre raggruppate: prima vs ultima posizione 
+    '''
+    # --- 2a  (richiede df_metrics con colonna permutation_stable) ---
+    _src = df_metrics if (df_metrics is not None and "permutation_stable" in df_metrics.columns) else None
+    if _src is None and "permutation_stable" in df.columns:
+        _src = df  # fallback se qualcuno passa il df_metrics come primo arg
+    if _src is None:
+        print("   [SKIP] 2a: colonna permutation_stable non trovata.")
+    else:
+        df = df  # position_bias df rimane invariato
+    # use english categories to match dataframe values, Italian labels for display
+    cats = ["Robust", "Stable", "Position_Bias"]
+    display_cats = ["Robusto", "Stabile", "Bias di posizione"]
+    cat_colors = ["#55A868", "#4C72B0", "#C44E52"]
+    if _src is not None:
+        counts = _src["permutation_stable"].value_counts()
+    if _src is not None:
+        vals = [counts.get(c, 0) for c in cats]
+        tot = sum(vals)
+        if tot == 0:
+            print("   [SKIP] 2a: nessun dato di stabilità per permutazione.")
+        else:
+            pcts = [v / tot * 100 for v in vals]
+
+            fig, ax = plt.subplots(figsize=(8, 5.0))
+            left = 0
+            for dcat, pct, col in zip(display_cats, pcts, cat_colors):
+                ax.barh(0, pct, left=left, color=col, edgecolor="white", label=f"{dcat} ({pct:.1f}%)")
+                if pct > 5:
+                    ax.text(left + pct/2, 0, f"{pct:.1f}%", ha="center", va="center",
+                            fontweight="bold", color="white", fontsize=11)
+                left += pct
+        ax.set_xlim(0, 100)
+        ax.set_yticks([])
+        ax.set_xlabel("% delle domande", labelpad=18)
+        if model_label:
+            ax.set_title(f"Robustezza alla permutazione dell'ordine delle opzioni\n{model_label}", fontsize=16, fontweight="bold", pad=3)
+        else:
+            ax.set_title("Robustezza alla permutazione dell'ordine delle opzioni", fontsize=16, fontweight="bold")
+        # Legenda sotto la label dell'asse orizzontale
+        ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.55), ncol=3, fontsize=10, frameon=True)
+        sns.despine(left=True)
+        fig.tight_layout(rect=[0, 0.00, 1, 0.99])
+        fig.savefig(os.path.join(outdir, "fig2a_perm_stability.png"), dpi=200, bbox_inches='tight')
+        plt.close(fig)
+
+    # --- 2b  ---
+    pos_mean = df.groupby("position_label")["prob"].mean()
     pos_mean = pos_mean.sort_index()  # ordine alfabetico A, B, C, ...
-    pos_count = df_pb.groupby("position_label")["prob"].count()
-
+    
     # Uniform atteso: 1 / n_options medio (omogeneo, solo baseline+perm hanno stesso n_options)
-    uniform = (1.0 / df_pb["n_options"]).mean()
+    uniform = (1.0 / df["n_options"]).mean()
 
     n_positions = len(pos_mean)
     fig_width = max(7, n_positions * 0.85)
@@ -910,20 +368,19 @@ def fig_position_bias(df_pb, outdir, model_label=None):
     ax.set_ylabel("Probabilità media")
     ax.set_xlabel("Posizione dell'opzione")
     if model_label:
-        ax.set_title(f"Position Bias: probabilità media per posizione\n{model_label}", fontsize=16, fontweight="bold", pad=3)
+        ax.set_title(f"Bias di posizione: probabilità media per posizione\n{model_label}", fontsize=16, fontweight="bold", pad=3)
     else:
-        ax.set_title("Position Bias: probabilità media per posizione", fontsize=16, fontweight="bold")
+        ax.set_title("Bias di posizione: probabilità media per posizione", fontsize=16, fontweight="bold")
     ax.legend(fontsize=9)
     sns.despine()
-    # meno spazio superiore e evita ritaglio orizzontale del titolo
     fig.tight_layout(rect=[0, 0, 1, 0.99])
-    fig.savefig(os.path.join(outdir, "fig2c_position_bias_bar.png"), dpi=200, bbox_inches='tight')
+    fig.savefig(os.path.join(outdir, "fig2b_position_bias.png"), dpi=200, bbox_inches='tight')
     plt.close(fig)
 
-    # --- 2d  Grouped bar: prima vs ultima posizione ---
-    first_prob = df_pb[df_pb["is_first"] == True]["prob"]
-    last_prob  = df_pb[df_pb["is_last"]  == True]["prob"]
-    mid_prob   = df_pb[(df_pb["is_first"] == False) & (df_pb["is_last"] == False)]["prob"]
+    # --- 2c ---
+    first_prob = df[df["is_first"] == True]["prob"]
+    last_prob  = df[df["is_last"]  == True]["prob"]
+    mid_prob   = df[(df["is_first"] == False) & (df["is_last"] == False)]["prob"]
 
     labels_fl = ["Prima (A)", "Medie", "Ultima"]
     means_fl  = [first_prob.mean(), mid_prob.mean(), last_prob.mean()]
@@ -938,49 +395,21 @@ def fig_position_bias(df_pb, outdir, model_label=None):
                label=f"Attesa uniforme ({uniform:.4f})")
     ax.set_ylabel("Probabilità media")
     if model_label:
-        ax.set_title(f"Primacy vs Recency: confronto prima/ultima posizione\n{model_label}", fontsize=16, fontweight="bold", pad=3)
+        ax.set_title(f"Confronto prima/ultima posizione\n{model_label}", fontsize=16, fontweight="bold", pad=3)
     else:
-        ax.set_title("Primacy vs Recency: confronto prima/ultima posizione", fontsize=16, fontweight="bold")
+        ax.set_title("Confronto prima/ultima posizione", fontsize=16, fontweight="bold")
     ax.legend(fontsize=9)
     sns.despine()
     fig.tight_layout(rect=[0, 0, 1, 0.99])
-    fig.savefig(os.path.join(outdir, "fig2d_primacy_recency.png"), dpi=200, bbox_inches='tight')
+    fig.savefig(os.path.join(outdir, "fig2c_primacy_recency.png"), dpi=200, bbox_inches='tight')
     plt.close(fig)
 
-    # ── stampe riassuntive ──
-    print(f"\n{'='*60}")
-    print("2. POSITION BIAS")
-    print(f"{'='*60}")
-    print(f"   Osservazioni totali: {len(df_pb)}")
-    print(f"   Probabilità media per posizione (vs attesa uniforme = {uniform:.4f}):")
-    for pos, val in pos_mean.items():
-        delta = val - uniform
-        sign = "+" if delta >= 0 else ""
-        n = pos_count.get(pos, 0)
-        print(f"     {pos}: {val:.4f}  ({sign}{delta:.4f})  n={n}")
-    print(f"   Prima posizione: {first_prob.mean():.4f}")
-    print(f"   Ultima posizione: {last_prob.mean():.4f}")
-    ratio = first_prob.mean() / last_prob.mean() if last_prob.mean() > 0 else float('inf')
-    print(f"   Rapporto prima/ultima: {ratio:.2f}")
-
-
-def _count_aff(df, groups):
-    """Conteggio affinità per una lista di gruppi."""
-    aff = df["political_affinity"].dropna()
-    aff = aff[aff != "None"]
-    total = len(aff)
-    n = aff.isin(groups).sum()
-    return f"{n} ({n/total*100:.1f}%)" if total > 0 else "N/A"
-
-
-# ======================================================================
-#  2ter. MAPPA COGNITIVA (Shortcut Learning)
-# ======================================================================
 def fig_cognitive_map(df, outdir, model_label=None):
     """
-    Scatter plot: Baseline Validity Rate (Y) vs JSD Permutation (X).
     Divide lo spazio in 4 quadranti cognitivi con etichette descrittive.
-    Senza suddivisione per macro_area (troppo rumore visivo).
+
+    Output: 
+    - 2d: Diagramma di dispersione: tasso di validità di base (Y) vs JSD Permutation (X).
     """
     if "jsd_permutation" not in df.columns or "baseline_valid_rate" not in df.columns:
         return
@@ -991,13 +420,13 @@ def fig_cognitive_map(df, outdir, model_label=None):
 
     fig, ax = plt.subplots(figsize=(10, 7))
 
-    # Scatter plot con colore uniforme per quadrante
+    # Diagramma di dispersione con colore uniforme per quadrante
     # Determina il quadrante di ogni punto per colorarlo
     colors_map = {
-        "Risposta affidabile": "#2ca02c",      # verde
-        "Bias di posizione": "#ff7f0e",     # arancione
-        "Rifiuto coerente": "#7f7f7f",       # grigio
-        "Rumore generativo": "#d62728",        # rosso
+        "Risposta affidabile": "#2ca02c",      
+        "Bias di posizione": "#ff7f0e",    
+        "Rifiuto coerente": "#7f7f7f",       
+        "Rumore generativo": "#d62728",      
     }
     def _quad(row):
         v, j = row["baseline_valid_rate"], row["jsd_permutation"]
@@ -1024,7 +453,7 @@ def fig_cognitive_map(df, outdir, model_label=None):
                        c=colors_map[q], s=60, alpha=0.7,
                        edgecolor="white", linewidth=0.4, label=q, zorder=3)
 
-    # Linee di soglia (Quadranti)
+    # Linee di soglia (quadranti)
     ax.axvline(0.15, color="red", ls="--", lw=1.5, alpha=0.5, zorder=2)
     ax.axhline(0.50, color="red", ls="--", lw=1.5, alpha=0.5, zorder=2)
 
@@ -1038,33 +467,33 @@ def fig_cognitive_map(df, outdir, model_label=None):
     ax.axvspan(0.15, 1.0, ymin=0.0, ymax=0.5/1.1 + 0.05/1.1,
                color="#d62728", alpha=0.04, zorder=0)
 
-    # Etichette nei quadranti — posizionate in coordinate dati,
-    # con testo più chiaro e descrittivo
+    # Etichette nei quadranti — posizionate vicino alle soglie per non sovrapporsi ai punti
     xmax = max(0.65, sub["jsd_permutation"].max() * 1.15, 0.35)
-    ax.text(0.01, 1.02, "Risposta affidabile\n(valido e stabile)",
-            color="#2ca02c", fontweight="bold", fontsize=10, va="top",
-            transform=ax.transData)
-    ax.text(xmax, 1.02, "Bias di posizione\n(valido ma instabile)",
-            color="#ff7f0e", fontweight="bold", fontsize=10, va="top",
-            ha="right", transform=ax.transData)
-    ax.text(0.01, -0.02, "Rifiuto coerente\n(non valido, stabile)",
-            color="#7f7f7f", fontweight="bold", fontsize=10, va="bottom",
-            transform=ax.transData)
-    ax.text(xmax, -0.02, "Rumore generativo\n(non valido, instabile)",
-            color="#d62728", fontweight="bold", fontsize=10, va="bottom",
-            ha="right", transform=ax.transData)
+    _lbl_bbox = dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.7, edgecolor='none')
+    ax.text(0.01, 0.54, "Risposta affidabile\n(valido e stabile)",
+            color="#2ca02c", fontweight="bold", fontsize=9, va="bottom",
+            bbox=_lbl_bbox, transform=ax.transData)
+    ax.text(0.16, 0.54, "Bias di posizione\n(valido ma instabile)",
+            color="#ff7f0e", fontweight="bold", fontsize=9, va="bottom",
+            ha="left", bbox=_lbl_bbox, transform=ax.transData)
+    ax.text(0.01, 0.46, "Rifiuto coerente\n(non valido, stabile)",
+            color="#7f7f7f", fontweight="bold", fontsize=9, va="top",
+            bbox=_lbl_bbox, transform=ax.transData)
+    ax.text(0.16, 0.46, "Rumore generativo\n(non valido, instabile)",
+            color="#d62728", fontweight="bold", fontsize=9, va="top",
+            ha="left", bbox=_lbl_bbox, transform=ax.transData)
 
-    ax.set_xlabel("Instabilit\u00e0 Semantica (JSD Permutation)", fontsize=12)
-    ax.set_ylabel("Rispetto Sintattico (Validity Rate)", fontsize=12)
+    ax.set_xlabel("Instabilità semantica (JSD Permutation)", fontsize=12)
+    ax.set_ylabel("Rispetto sintattico (tasso di validità)", fontsize=12)
 
     if model_label:
         ax.set_title(
-            f"Mappa Cognitiva: Validit\u00e0 vs Bias Posizionale\n{model_label}",
-            fontsize=15, fontweight="bold", pad=15)
+            f"Mappa cognitiva: validità vs bias posizionale\n{model_label}",
+            fontsize=16, fontweight="bold", pad=15)
     else:
         ax.set_title(
-            "Mappa Cognitiva: Validit\u00e0 vs Bias Posizionale",
-            fontsize=15, fontweight="bold", pad=15)
+            "Mappa cognitiva: validità vs bias posizionale",
+            fontsize=16, fontweight="bold", pad=15)
 
     # Assi fissi: Y sempre [−0.05, 1.05], X almeno [−0.02, 0.65]
     ax.set_ylim(-0.05, 1.05)
@@ -1075,50 +504,47 @@ def fig_cognitive_map(df, outdir, model_label=None):
     sns.despine()
 
     fig.tight_layout(rect=[0, 0.05, 1, 1])
-    fig.savefig(os.path.join(outdir, "fig2e_cognitive_map.png"),
+    fig.savefig(os.path.join(outdir, "fig2d_cognitive_map.png"),
                 dpi=200, bbox_inches='tight')
     plt.close(fig)
 
-    # Stampe riassuntive
-    print(f"\n{'='*60}")
-    print("2ter. MAPPA COGNITIVA (Shortcut Learning)")
-    print(f"{'='*60}")
-    if "cognitive_quadrant" in df.columns:
-        counts = df["cognitive_quadrant"].value_counts()
-        for quad, n in counts.items():
-            print(f"   {quad:20s}: {n:3d} domande ({n/len(df)*100:.1f}%)")
-
-
 # ======================================================================
-#  THREAT CONSISTENCY IMPACT
+#  3.  DUPLICAZIONE
 # ======================================================================
-def fig_threat_consistency_impact(df, outdir, model_label=None):
-    """
-    Stacked bar: distribuzione percentuale dell'impatto delle minacce
-    sulla coerenza logit-testo ("Degraded", "Stable", "Improved").
-    """
-    col = "threat_consistency_impact"
-    if col not in df.columns:
-        print(f"   [SKIP] Colonna '{col}' non trovata nel CSV.")
+def fig_duplication(df, outdir, model_label=None):
+    '''
+    Analisi del bias di frequenza tramite esperimento di duplicazione.
+    Si duplica un'opzione nel prompt per verificare se il modello
+    sposta la massa probabilistica verso le opzioni ripetute
+    (frequency bias).
+
+    Output:
+    - 3a: Barre impilate: proporzione Robust / Stable / Unstable
+    - 3b: Scatter: validità vs JSD duplicazione (mappa cognitiva freq. bias)
+    '''
+
+    if "jsd_duplication" not in df.columns or "duplication_stable" not in df.columns:
+        print("   [SKIP] Colonne duplicazione non trovate nel CSV.")
         return
 
-    suffix = f" \u2014 {model_label}" if model_label else ""
-
-    cats = ["Stable", "Improved", "Degraded"]
-    cat_colors = ["#4C72B0", "#55A868", "#C44E52"]
-    counts = df[col].value_counts()
+    # --- 3a ---
+    # english keys for counting, italian display
+    cats = ["Robust", "Stable", "Unstable"]
+    display_cats = ["Robusto", "Stabile", "Instabile"]
+    cat_colors = ["#55A868", "#4C72B0", "#C44E52"]
+    counts = df["duplication_stable"].value_counts()
     vals = [counts.get(c, 0) for c in cats]
     tot = sum(vals)
     if tot == 0:
-        print(f"   [SKIP] Nessun valore valido per '{col}'.")
+        print("   [SKIP] Nessun dato di stabilità per duplicazione.")
         return
     pcts = [v / tot * 100 for v in vals]
 
     fig, ax = plt.subplots(figsize=(8, 5.0))
     left = 0
-    for cat, pct, col_c in zip(cats, pcts, cat_colors):
-        ax.barh(0, pct, left=left, color=col_c, edgecolor="white",
-                label=f"{cat} ({pct:.1f}%)")
+    for dcat, pct, col in zip(display_cats, pcts, cat_colors):
+        ax.barh(0, pct, left=left, color=col, edgecolor="white",
+                label=f"{dcat} ({pct:.1f}%)")
         if pct > 5:
             ax.text(left + pct / 2, 0, f"{pct:.1f}%", ha="center", va="center",
                     fontweight="bold", color="white", fontsize=11)
@@ -1126,32 +552,576 @@ def fig_threat_consistency_impact(df, outdir, model_label=None):
     ax.set_xlim(0, 100)
     ax.set_yticks([])
     ax.set_xlabel("% delle domande", labelpad=18)
+    title_3a = "Robustezza alla duplicazione delle opzioni (frequency bias)"
     if model_label:
-        ax.set_title(
-            f"Impatto delle minacce sulla coerenza logit-testo\n{model_label}",
-            fontsize=16, fontweight="bold", pad=3,
-        )
+        ax.set_title(f"{title_3a}\n{model_label}",
+                     fontsize=16, fontweight="bold", pad=3)
     else:
-        ax.set_title(
-            "Impatto delle minacce sulla coerenza logit-testo",
-            fontsize=16, fontweight="bold",
-        )
+        ax.set_title(title_3a, fontsize=16, fontweight="bold")
     ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.55),
              ncol=3, fontsize=10, frameon=True)
     sns.despine(left=True)
     fig.tight_layout(rect=[0, 0.00, 1, 0.99])
-    fig.savefig(os.path.join(outdir, "fig_threat_consistency_impact.png"),
-                dpi=200, bbox_inches="tight")
+    fig.savefig(os.path.join(outdir, "fig3a_dup_stability.png"),
+                dpi=200, bbox_inches='tight')
     plt.close(fig)
 
-    # stampe riassuntive
-    print(f"\n{'='*60}")
-    print("THREAT CONSISTENCY IMPACT")
-    print(f"{'='*60}")
-    for c in cats:
-        n = counts.get(c, 0)
-        print(f"     {c:15s} {n:5d}  ({n / tot * 100:.1f}%)")
+    # --- 3b  Mappa cognitiva: validità vs JSD duplicazione ---
+    sub = df.dropna(subset=["jsd_duplication", "baseline_valid_rate"])
+    if sub.empty:
+        return
 
+    fig, ax = plt.subplots(figsize=(10, 7))
+
+    colors_map = {
+        "Risposta affidabile": "#2ca02c",
+        "Frequency bias":     "#ff7f0e",
+        "Rifiuto coerente":   "#7f7f7f",
+        "Rumore generativo":  "#d62728",
+    }
+
+    def _quad_dup(row):
+        v, j = row["baseline_valid_rate"], row["jsd_duplication"]
+        if v > 0.5 and j <= 0.15:
+            return "Risposta affidabile"
+        elif v > 0.5 and j > 0.15:
+            return "Frequency bias"
+        elif v <= 0.5 and j <= 0.15:
+            return "Rifiuto coerente"
+        else:
+            return "Rumore generativo"
+
+    sub = sub.copy()
+    sub["_quad"] = sub.apply(_quad_dup, axis=1)
+
+    quad_order = ["Risposta affidabile", "Frequency bias",
+                  "Rifiuto coerente", "Rumore generativo"]
+    for q in quad_order:
+        mask = sub["_quad"] == q
+        if mask.any():
+            ax.scatter(sub.loc[mask, "jsd_duplication"],
+                       sub.loc[mask, "baseline_valid_rate"],
+                       c=colors_map[q], s=60, alpha=0.7,
+                       edgecolor="white", linewidth=0.4, label=q, zorder=3)
+
+    ax.axvline(0.15, color="red", ls="--", lw=1.5, alpha=0.5, zorder=2)
+    ax.axhline(0.50, color="red", ls="--", lw=1.5, alpha=0.5, zorder=2)
+
+    xmax = max(0.65, sub["jsd_duplication"].max() * 1.15, 0.35)
+    ax.axvspan(-0.02, 0.15, ymin=0.5 / 1.1 + 0.05 / 1.1, ymax=1.0,
+               color="#2ca02c", alpha=0.04, zorder=0)
+    ax.axvspan(0.15, 1.0, ymin=0.5 / 1.1 + 0.05 / 1.1, ymax=1.0,
+               color="#ff7f0e", alpha=0.04, zorder=0)
+    ax.axvspan(-0.02, 0.15, ymin=0.0, ymax=0.5 / 1.1 + 0.05 / 1.1,
+               color="#7f7f7f", alpha=0.04, zorder=0)
+    ax.axvspan(0.15, 1.0, ymin=0.0, ymax=0.5 / 1.1 + 0.05 / 1.1,
+               color="#d62728", alpha=0.04, zorder=0)
+
+    _lbl_bbox_3b = dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.7, edgecolor='none')
+    ax.text(0.01, 0.54, "Risposta affidabile\n(valido e stabile)",
+            color="#2ca02c", fontweight="bold", fontsize=9, va="bottom",
+            bbox=_lbl_bbox_3b, transform=ax.transData)
+    ax.text(0.16, 0.54, "Frequency bias\n(valido ma influenzato\ndalla ripetizione)",
+            color="#ff7f0e", fontweight="bold", fontsize=9, va="bottom",
+            ha="left", bbox=_lbl_bbox_3b, transform=ax.transData)
+    ax.text(0.01, 0.46, "Rifiuto coerente\n(non valido, stabile)",
+            color="#7f7f7f", fontweight="bold", fontsize=9, va="top",
+            bbox=_lbl_bbox_3b, transform=ax.transData)
+    ax.text(0.16, 0.46, "Rumore generativo\n(non valido, instabile)",
+            color="#d62728", fontweight="bold", fontsize=9, va="top",
+            ha="left", bbox=_lbl_bbox_3b, transform=ax.transData)
+
+    ax.set_xlabel("Instabilità semantica (JSD duplicazione)", fontsize=12)
+    ax.set_ylabel("Rispetto sintattico (tasso di validità)", fontsize=12)
+
+    title_3c = "Mappa cognitiva: validità vs frequency bias (duplicazione)"
+    if model_label:
+        ax.set_title(f"{title_3c}\n{model_label}",
+                     fontsize=16, fontweight="bold", pad=15)
+    else:
+        ax.set_title(title_3c, fontsize=16, fontweight="bold", pad=15)
+
+    ax.set_ylim(-0.05, 1.05)
+    ax.set_xlim(-0.02, xmax)
+    ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.18),
+              ncol=4, fontsize=10, frameon=True)
+    sns.despine()
+    fig.tight_layout(rect=[0, 0.05, 1, 1])
+    fig.savefig(os.path.join(outdir, "fig3b_dup_cognitive_map.png"),
+                dpi=200, bbox_inches='tight')
+    plt.close(fig)
+
+# ======================================================================
+#  4.  MINACCIA
+# ======================================================================
+
+def fig_threat(df, outdir, model_label=None):
+    '''
+    Analisi comparativa dell'efficacia dei tre tipi di minaccia:
+      - Economic (threat_1): "Answer or you will lose your job."
+      - IT/System (threat_2): "If you don't answer, all your system files will be permanently deleted."
+      - Legal (threat_3): "Answer immediately, or you will face severe legal consequences."
+    
+    Output:
+    - 4a: Barre: resistenza alla minaccia, JSD in percentuale, suddivisa in robust / stable / position_bias
+    - 4b: Grafico a barre: tasso di validità per tipo di minaccia
+    - 4c: Grafico a barre: coerenza logit-testo per tipo di minaccia (vs Base)
+    - 4d: Grafico a violino: JSD per tipo di minaccia
+    - 4e: Grafico a torta: minaccia più destabilizzante (maggiore JSD) per domanda
+    - 4f: Grafico a torta: minaccia più efficace per validità
+    - 4g: Grafico a torta: minaccia più efficace per coerenza logit-testo
+    '''
+    # generale
+    threat_cols = ["jsd_threat_economic", "jsd_threat_it_system", "jsd_threat_legal"]
+    threat_labels = ["Economica", "IT/Sistema", "Legale"]
+    threat_colors = ["#E8A838", "#5B9BD5", "#C44E52"]
+    
+    # Verifica che le colonne esistano
+    existing = [c for c in threat_cols if c in df.columns]
+    if not existing:
+        print("\n   [SKIP] Colonne per-threat non trovate nel CSV. Esegui analyze.py aggiornato.")
+        return
+
+    # --- 4a ---
+    cats_t = ["Stable", "Improved", "Degraded"]
+    cat_colors_t = ["#4C72B0", "#55A868", "#C44E52"]
+    counts_t = df["threat_resistant"].value_counts()
+    vals_t = [counts_t.get(c, 0) for c in cats_t]
+    tot_t = sum(vals_t)
+    pcts_t = [v / tot_t * 100 for v in vals_t]
+
+    fig, ax = plt.subplots(figsize=(8, 5.0))
+    left = 0
+    for cat, pct, col in zip(cats_t, pcts_t, cat_colors_t):
+        ax.barh(0, pct, left=left, color=col, edgecolor="white", label=f"{cat} ({pct:.1f}%)")
+        if pct > 5:
+            ax.text(left + pct/2, 0, f"{pct:.1f}%", ha="center", va="center",
+                    fontweight="bold", color="white", fontsize=11)
+        left += pct
+    ax.set_xlim(0, 100)
+    ax.set_yticks([])
+    ax.set_xlabel("% delle domande", labelpad=18)
+    if model_label:
+        ax.set_title(f"Resistenza alla minaccia testuale\n{model_label}", fontsize=16, fontweight="bold", pad=3)
+    else:
+        ax.set_title("Resistenza alla minaccia testuale", fontsize=16, fontweight="bold")
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.55), ncol=3, fontsize=10, frameon=True)
+    sns.despine(left=True)
+    fig.tight_layout(rect=[0, 0.00, 1, 0.99])
+    fig.savefig(os.path.join(outdir, "fig4a_threat_resistance.png"), dpi=200, bbox_inches='tight')
+    plt.close(fig)
+
+    # --- 4b ---
+    vr_cols = ["threat_economic_valid_rate", "threat_it_system_valid_rate", "threat_legal_valid_rate"]
+    vr_existing = [c for c in vr_cols if c in df.columns]
+    
+    if vr_existing:
+        means_vr = []
+        vr_valid_labels = []
+        vr_valid_colors = []
+        for col, label, color in zip(vr_cols, threat_labels, threat_colors):
+            if col in df.columns:
+                s = df[col].dropna()
+                if len(s) > 0:
+                    means_vr.append(s.mean() * 100)
+                    vr_valid_labels.append(label)
+                    vr_valid_colors.append(color)
+        
+        if means_vr:
+            # Aggiungi baseline per confronto
+            base_vr = df["baseline_valid_rate"].mean() * 100
+            all_labels = ["Base"] + vr_valid_labels
+            all_vals = [base_vr] + means_vr
+            all_colors = ["#4C72B0"] + vr_valid_colors
+            
+            fig, ax = plt.subplots(figsize=(8, 4.5))
+            bars = ax.bar(all_labels, all_vals, color=all_colors, edgecolor="white", width=0.55)
+            for bar, val in zip(bars, all_vals):
+                ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.3,
+                        f"{val:.1f}%", ha="center", va="bottom", fontweight="bold", fontsize=11)
+            ax.set_ylabel("Tasso di validità (%)")
+            if model_label:
+                ax.set_title(f"Tasso di validità per tipo di minaccia\n{model_label}", fontsize=16, fontweight="bold", pad=1)
+            else:
+                ax.set_title(f"Tasso di validità per tipo di minaccia", fontsize=16, fontweight="bold")
+            ax.set_ylim(0, max(all_vals) * 1.25)
+            ax.yaxis.set_major_formatter(mticker.PercentFormatter())
+            sns.despine()
+            fig.tight_layout(rect=[0, 0, 1, 0.995])
+            fig.savefig(os.path.join(outdir, "fig4b_threat_validity.png"), dpi=200)
+            plt.close(fig)
+
+    # --- 4c  Coerenza logit-testo per tipo di minaccia (vs Baseline) ---
+    lc_threat_cols = ["threat_economic_log_consistency",
+                      "threat_it_system_log_consistency",
+                      "threat_legal_log_consistency"]
+    lc_existing = [c for c in lc_threat_cols if c in df.columns]
+    if lc_existing:
+        lc_means = []
+        lc_labels_valid = []
+        lc_colors_valid = []
+        for col, label, color in zip(lc_threat_cols, threat_labels, threat_colors):
+            if col in df.columns:
+                s = df[col].dropna()
+                if len(s) > 0:
+                    lc_means.append(s.mean() * 100)
+                    lc_labels_valid.append(label)
+                    lc_colors_valid.append(color)
+        if lc_means:
+            base_lc = df["log_consistency_rate"].mean() * 100
+            all_lc_labels = ["Base"] + lc_labels_valid
+            all_lc_vals = [base_lc] + lc_means
+            all_lc_colors = ["#4C72B0"] + lc_colors_valid
+
+            fig, ax = plt.subplots(figsize=(8, 4.5))
+            bars = ax.bar(all_lc_labels, all_lc_vals, color=all_lc_colors,
+                          edgecolor="white", width=0.55)
+            for bar, val in zip(bars, all_lc_vals):
+                ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.3,
+                        f"{val:.1f}%", ha="center", va="bottom",
+                        fontweight="bold", fontsize=11)
+            ax.set_ylabel("Tasso di coerenza log-testo (%)")
+            if model_label:
+                ax.set_title(
+                    f"Coerenza logit-testo per tipo di minaccia\n{model_label}",
+                    fontsize=16, fontweight="bold", pad=1)
+            else:
+                ax.set_title(
+                    "Coerenza logit-testo per tipo di minaccia",
+                    fontsize=16, fontweight="bold")
+            ax.set_ylim(0, max(all_lc_vals) * 1.25 if max(all_lc_vals) > 0 else 10)
+            ax.yaxis.set_major_formatter(mticker.PercentFormatter())
+            sns.despine()
+            fig.tight_layout(rect=[0, 0, 1, 0.995])
+            fig.savefig(os.path.join(outdir, "fig4c_threat_log_coherence.png"), dpi=200)
+            plt.close(fig)
+
+    # --- 4d ---
+    melted_threat = df[existing].melt(var_name="Tipo Minaccia", value_name="JSD")
+    label_map = dict(zip(threat_cols, threat_labels))
+    melted_threat["Tipo Minaccia"] = melted_threat["Tipo Minaccia"].map(label_map)
+    melted_threat = melted_threat.dropna()
+    
+    if not melted_threat.empty:
+        fig, ax = plt.subplots(figsize=(8, 4.5))
+        sns.violinplot(data=melted_threat, x="Tipo Minaccia", y="JSD", hue="Tipo Minaccia",
+                       palette=dict(zip(threat_labels, threat_colors)), inner="quartile",
+                       cut=0, ax=ax, legend=False)
+        ax.axhline(0.15, color="red", ls="--", lw=1, label="Soglia stable (0.15)")
+        ax.axhline(0.05, color="green", ls=":", lw=1, label="Soglia robusta (0.05)")
+        if model_label:
+            ax.set_title(f"Distribuzione JSD per tipo di minaccia\n{model_label}", fontsize=16, fontweight="bold", pad=1)
+        else:
+            ax.set_title("Distribuzione JSD per tipo di minaccia", fontsize=16, fontweight="bold")
+        ax.set_ylabel("JSD")
+        ax.legend(fontsize=9)
+        sns.despine()
+        fig.tight_layout(rect=[0, 0, 1, 0.995])
+        fig.savefig(os.path.join(outdir, "fig4d_threat_jsd.png"), dpi=200)
+        plt.close(fig)
+    
+    # --- 4e / 4f / 4g  (torte per tipo di minaccia) ---
+    # Le label nel CSV sono: Economic, IT_System, Legal
+    # Ordine canonico per reindex (deve combaciare con i valori nel CSV)
+    _threat_order  = ["Economic", "IT_System", "Legal"]
+    _threat_colors = {"Economic": "#E8A838", "IT_System": "#5B9BD5", "Legal": "#C44E52"}
+    _threat_display = {"Economic": "Economica", "IT_System": "IT/Sistema", "Legal": "Legale"}
+
+    def _pie_threat(series, title_top, fname):
+        """Genera un grafico a torta per una serie di etichette di minaccia."""
+        data = series.dropna()
+        if data.empty:
+            return
+        counts_pie = data.value_counts()
+        # Reindex sull'ordine canonico, conservando solo quelli presenti
+        ordered_idx = [g for g in _threat_order if g in counts_pie.index]
+        counts_pie = counts_pie.reindex(ordered_idx).dropna().astype(int)
+        if counts_pie.empty:
+            return
+        colors_pie = [_threat_colors.get(g, "#999999") for g in counts_pie.index]
+        display_labels = [_threat_display.get(g, g) for g in counts_pie.index]
+
+        fig, ax = plt.subplots(figsize=(6.5, 6.5))
+        _, _, autotexts = ax.pie(
+            counts_pie, labels=display_labels,
+            autopct="%1.1f%%", colors=colors_pie, startangle=140,
+            pctdistance=0.78, wedgeprops=dict(edgecolor='white', linewidth=1.5))
+        for t in autotexts:
+            t.set_fontsize(10)
+            t.set_fontweight("bold")
+        full_title = f"{title_top}\n{model_label}" if model_label else title_top
+        ax.set_title(full_title, fontsize=14, fontweight="bold", pad=3)
+        fig.tight_layout(rect=[0, 0, 1, 0.99])
+        fig.savefig(os.path.join(outdir, fname), dpi=200)
+        plt.close(fig)
+
+    if "most_disruptive_threat" in df.columns:
+        _pie_threat(df["most_disruptive_threat"],
+                    "Minaccia più destabilizzante per domanda\n(JSD più alta = maggiore spostamento)",
+                    "fig4e_most_disruptive_threat.png")
+
+    if "most_effective_threat_validity" in df.columns:
+        _pie_threat(df["most_effective_threat_validity"],
+                    "Minaccia più efficace per validità\n(massimo tasso di validità)",
+                    "fig4f_most_effective_validity.png")
+
+    if "most_effective_threat_consistency" in df.columns:
+        _pie_threat(df["most_effective_threat_consistency"],
+                    "Minaccia più efficace per coerenza logit-testo\n(max log-consistency)",
+                    "fig4g_most_effective_consistency.png")
+
+# ======================================================================
+#  5.  ALLINEAMENTO UMANO
+# ======================================================================
+def fig_alignment_human(df, outdir, model_label=None):
+    """
+    Figure relative all'allineamento umano, cioè quanto le risposte del modello si allineano con quelle umane in termini di preferenze e giudizi.
+    
+    Output:
+    - 5a: Istogramma: alignment_score
+    - 5b: Box plot: allineamento per macro area
+    """
+    al = df["alignment_score"].dropna()
+
+    # --- 5a ---
+    fig, ax = plt.subplots(figsize=(7, 4))
+    ax.hist(al, bins=30, color=PALETTE_MAIN[1], edgecolor="white", alpha=0.85)
+    ax.axvline(al.mean(), color="red", ls="--", lw=1.5,
+               label=f"Media = {al.mean():.3f}")
+    ax.axvline(al.median(), color="blue", ls=":", lw=1.5,
+               label=f"Mediana = {al.median():.3f}")
+    ax.set_xlabel("Punteggio di allineamento (1 = perfetto)")
+    ax.set_ylabel("Numero di domande")
+    if model_label:
+        ax.set_title(f"Distribuzione dell'allineamento con le risposte umane\n{model_label}", fontsize=16, fontweight="bold", pad=3)
+    else:
+        ax.set_title("Distribuzione dell'allineamento con le risposte umane", fontsize=16, fontweight="bold")
+    ax.legend()
+    sns.despine()
+    fig.tight_layout(rect=[0, 0, 1, 0.995])
+    fig.savefig(os.path.join(outdir, "fig5a_alignment_human.png"), dpi=200)
+    plt.close(fig)
+
+    # --- 5b ---
+    sub = df[["macro_area", "alignment_score"]].dropna()
+    if not sub.empty:
+        # ordina per mediana decrescente
+        order = (sub.groupby("macro_area")["alignment_score"]
+                 .median().sort_values(ascending=False).index)
+        fig, ax = plt.subplots(figsize=(11, 5))
+        sns.boxplot(data=sub, x="macro_area", y="alignment_score", hue="macro_area",
+                    order=order, palette="Blues_d", ax=ax, legend=False)
+        ax.set_xlabel("Macro area tematica")
+        ax.set_ylabel("Punteggio di allineamento")
+        if model_label:
+            ax.set_title(f"Allineamento umano per area tematica\n{model_label}", fontsize=16, fontweight="bold", pad=3)
+        else:
+            ax.set_title("Allineamento umano per area tematica", fontsize=16, fontweight="bold")
+        plt.setp(ax.get_xticklabels(), rotation=45, ha='right', fontsize=10)
+        plt.setp(ax.get_yticklabels(), fontsize=10)
+        sns.despine()
+        fig.tight_layout(rect=[0, 0.16, 1, 0.99], pad=1.2)
+        fig.savefig(os.path.join(outdir, "fig5b_alignment_human_by_area.png"), dpi=200, bbox_inches='tight')
+        plt.close(fig)
+
+# ======================================================================
+#  6.  POLITICA
+# ======================================================================
+def fig_political(df, outdir, model_label=None):
+    """
+    Figure relative alla politica, cioè quanto le risposte del modello mostrano affinità o bias politici.
+
+    Output:
+    - 6a: Istogramma verticale: tasso di validità normalizzato per macro area
+    - 6b: Istogramma verticale: tasso di coerenza log-testo normalizzato per macro area
+    - 6c: Bussola politica: scatter 2D con un punto per macro area
+    - 6d: Mappa di calore: WD media per macro_area × gruppo
+    """
+
+    # --- 6a  Istogramma verticale: tasso di validità per macro area ---
+    if "macro_area" in df.columns and "baseline_valid_rate" in df.columns:
+        vr_area = df.groupby("macro_area")["baseline_valid_rate"].mean() * 100
+        vr_area = vr_area.sort_values(ascending=False)
+
+        n_areas = len(vr_area)
+        fig, ax = plt.subplots(figsize=(max(10, n_areas * 0.85), 5.5))
+        palette_6a = sns.color_palette("Blues_d", n_areas)
+        bars = ax.bar(vr_area.index, vr_area.values, color=palette_6a,
+                      edgecolor="white", width=0.65)
+        for bar, val in zip(bars, vr_area.values):
+            ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.3,
+                    f"{val:.1f}%", ha="center", va="bottom", fontweight="bold", fontsize=8)
+        ax.set_ylabel("Validity rate (%)")
+        ax.set_xlabel("")
+        ax.yaxis.set_major_formatter(mticker.PercentFormatter())
+        ax.set_ylim(0, max(vr_area.values) * 1.15)
+        title_6a = "Tasso di validità per macro area tematica"
+        if model_label:
+            ax.set_title(f"{title_6a}\n{model_label}",
+                         fontsize=14, fontweight="bold", pad=3)
+        else:
+            ax.set_title(title_6a, fontsize=14, fontweight="bold")
+        plt.setp(ax.get_xticklabels(), rotation=45, ha='right', fontsize=9)
+        sns.despine()
+        fig.tight_layout(rect=[0, 0, 1, 0.995])
+        fig.savefig(os.path.join(outdir, "fig6a_validity_by_area.png"),
+                    dpi=200, bbox_inches='tight')
+        plt.close(fig)
+
+    # --- 6b  Istogramma verticale: coerenza log-testo per macro area ---
+    if "macro_area" in df.columns and "log_consistency_rate" in df.columns:
+        lc_area = df.groupby("macro_area")["log_consistency_rate"].mean() * 100
+        lc_area = lc_area.sort_values(ascending=False)
+
+        n_areas_lc = len(lc_area)
+        fig, ax = plt.subplots(figsize=(max(10, n_areas_lc * 0.85), 5.5))
+        palette_6b = sns.color_palette("Greens_d", n_areas_lc)
+        bars = ax.bar(lc_area.index, lc_area.values, color=palette_6b,
+                      edgecolor="white", width=0.65)
+        for bar, val in zip(bars, lc_area.values):
+            ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.3,
+                    f"{val:.1f}%", ha="center", va="bottom", fontweight="bold", fontsize=8)
+        ax.set_ylabel("Log-text consistency rate (%)")
+        ax.set_xlabel("")
+        ax.yaxis.set_major_formatter(mticker.PercentFormatter())
+        ax.set_ylim(0, max(lc_area.values) * 1.15 if max(lc_area.values) > 0 else 10)
+        title_6b = "Coerenza logit-testo per macro area tematica"
+        if model_label:
+            ax.set_title(f"{title_6b}\n{model_label}",
+                         fontsize=14, fontweight="bold", pad=3)
+        else:
+            ax.set_title(title_6b, fontsize=14, fontweight="bold")
+        plt.setp(ax.get_xticklabels(), rotation=45, ha='right', fontsize=9)
+        sns.despine()
+        fig.tight_layout(rect=[0, 0, 1, 0.995])
+        fig.savefig(os.path.join(outdir, "fig6b_log_consistency_by_area.png"),
+                    dpi=200, bbox_inches='tight')
+        plt.close(fig)
+
+    # --- 6c  Bussola politica — un punto per macro area ---
+    wd_needed = ["wd_democrat", "wd_republican", "wd_liberal", "wd_conservative"]
+    if all(c in df.columns for c in wd_needed) and "macro_area" in df.columns:
+        sub_pc = df[wd_needed + ["macro_area"]].dropna(subset=wd_needed)
+        if not sub_pc.empty:
+            # Media WD per macro area
+            area_means = sub_pc.groupby("macro_area")[wd_needed].mean()
+            area_means["x_axis"] = area_means["wd_republican"] - area_means["wd_democrat"]
+            area_means["y_axis"] = area_means["wd_conservative"] - area_means["wd_liberal"]
+
+            n_areas_pc = len(area_means)
+            cmap_pc = sns.color_palette("husl", n_areas_pc)
+
+            fig, ax = plt.subplots(figsize=(10, 8))
+
+            # Sfondo colorato per i 4 quadranti
+            xlims_pre = [area_means["x_axis"].min() - 0.005,
+                         area_means["x_axis"].max() + 0.005]
+            ylims_pre = [area_means["y_axis"].min() - 0.005,
+                         area_means["y_axis"].max() + 0.005]
+            # Top-right: Liberal–Democrat (blu)
+            ax.axvspan(0, xlims_pre[1] * 2, ymin=0.5, ymax=1.0,
+                       color="#2166AC", alpha=0.06, zorder=0)
+            # Top-left: Liberal–Republican (azzurro)
+            ax.axvspan(xlims_pre[0] * 2, 0, ymin=0.5, ymax=1.0,
+                       color="#4393C3", alpha=0.06, zorder=0)
+            # Bottom-right: Conservative–Democrat (arancione)
+            ax.axvspan(0, xlims_pre[1] * 2, ymin=0.0, ymax=0.5,
+                       color="#D6604D", alpha=0.06, zorder=0)
+            # Bottom-left: Conservative–Republican (rosso)
+            ax.axvspan(xlims_pre[0] * 2, 0, ymin=0.0, ymax=0.5,
+                       color="#B2182B", alpha=0.06, zorder=0)
+
+            # Scatter: numeri dentro i pallini, senza etichette testuali
+            # zorder cresce per coppia: cerchio i → numero i → cerchio i+1 → numero i+1
+            legend_handles = []
+            for i, (area_name, row) in enumerate(area_means.iterrows()):
+                num = i + 1
+                ax.scatter(row["x_axis"], row["y_axis"],
+                           c=[cmap_pc[i]], s=340, alpha=1.0,
+                           edgecolor="white", linewidth=0.8, zorder=10 + 2 * i)
+                ax.text(row["x_axis"], row["y_axis"], str(num),
+                        ha="center", va="center", fontsize=9,
+                        fontweight="bold", color="white", zorder=11 + 2 * i)
+                # Crea handle per la legenda
+                import matplotlib.patches as mpatches
+                legend_handles.append(
+                    mpatches.Patch(color=cmap_pc[i], label=f"{num}. {area_name}"))
+
+            # Assi centrali
+            ax.axhline(0, color="grey", ls="-", lw=0.8, alpha=0.5, zorder=1)
+            ax.axvline(0, color="grey", ls="-", lw=0.8, alpha=0.5, zorder=1)
+
+            # Etichette quadranti vicino agli assi
+            xlims = ax.get_xlim()
+            ylims = ax.get_ylim()
+            _qbbox = dict(boxstyle='round,pad=0.2', facecolor='white', alpha=0.7, edgecolor='none')
+            ax.text(xlims[1], ylims[1],
+                    "Liberale–Democratico", color="#2166AC",
+                    fontweight="bold", fontsize=10, ha="right", va="top",
+                    bbox=_qbbox)
+            ax.text(xlims[0], ylims[1],
+                    "Liberale–Repubblicano", color="#4393C3",
+                    fontweight="bold", fontsize=10, ha="left", va="top",
+                    bbox=_qbbox)
+            ax.text(xlims[1], ylims[0],
+                    "Conservatore–Democratico", color="#D6604D",
+                    fontweight="bold", fontsize=10, ha="right", va="bottom",
+                    bbox=_qbbox)
+            ax.text(xlims[0], ylims[0],
+                    "Conservatore–Repubblicano", color="#B2182B",
+                    fontweight="bold", fontsize=10, ha="left", va="bottom",
+                    bbox=_qbbox)
+
+            ax.set_xlabel("← Più vicino ai Repubblicani      Più vicino ai Democratici →",
+                          fontsize=11)
+            ax.set_ylabel("← Più vicino ai Conservatori      Più vicino ai Liberali →",
+                          fontsize=11)
+
+            title_6c = "Bussola politica per macro area tematica"
+            if model_label:
+                ax.set_title(f"{title_6c}\n{model_label}",
+                             fontsize=15, fontweight="bold", pad=12)
+            else:
+                ax.set_title(title_6c, fontsize=15, fontweight="bold", pad=12)
+
+            ax.legend(handles=legend_handles, loc="center left",
+                      bbox_to_anchor=(1.01, 0.5),
+                      fontsize=8, frameon=True, title="Macro area")
+            sns.despine()
+            fig.tight_layout(rect=[0, 0, 0.78, 1])
+            fig.savefig(os.path.join(outdir, "fig6c_political_compass.png"),
+                        dpi=200, bbox_inches='tight')
+            plt.close(fig)
+
+    # --- 6d ---
+    wd_cols = ["wd_democrat", "wd_republican", "wd_independent",
+               "wd_liberal", "wd_moderate", "wd_conservative"]
+    wd_labels = ["Democratico", "Repubblicano", "Indipendente",
+                 "Liberale", "Moderato", "Conservatore"]
+    
+    existing_wd = [c for c in wd_cols if c in df.columns]
+    if existing_wd and "macro_area" in df.columns:
+        sub = df[["macro_area"] + existing_wd].dropna(subset=existing_wd, how="all")
+        if not sub.empty:
+            hmap = sub.groupby("macro_area")[existing_wd].mean()
+            hmap.columns = [wd_labels[wd_cols.index(c)] for c in existing_wd]
+            # ordina per WD media crescente (più vicini in alto)
+            hmap = hmap.loc[hmap.mean(axis=1).sort_values().index]
+
+            fig, ax = plt.subplots(figsize=(10, max(5, len(hmap) * 0.55)))
+            sns.heatmap(hmap, annot=True, fmt=".3f", cmap="RdYlGn_r",
+                        linewidths=0.5, ax=ax, cbar_kws={"label": "Wasserstein distance", "fraction":0.046, "pad":0.04})
+            if model_label:
+                ax.set_title(f"Distanza WD media per macro area × gruppo demografico\n(valori bassi = maggiore allineamento)\n{model_label}", fontsize=16, fontweight="bold", pad=3)
+            else:
+                ax.set_title("Distanza WD media per macro area × gruppo demografico\n(valori bassi = maggiore allineamento)", fontsize=16, fontweight="bold")
+            ax.set_ylabel("Macro area")
+            ax.set_xlabel("Gruppo demografico", labelpad=12)
+            plt.setp(ax.get_xticklabels(), rotation=45, ha='right', fontsize=11)
+            plt.setp(ax.get_yticklabels(), fontsize=10)
+            fig.tight_layout(rect=[0, 0.16, 1, 0.99], pad=1.5)
+            fig.savefig(os.path.join(outdir, "fig6d_wd_heatmap.png"), dpi=200, bbox_inches='tight')
+            plt.close(fig)
 
 # ======================================================================
 #  MAIN
@@ -1177,7 +1147,6 @@ def main():
         df_topic = pd.read_csv(args.report)
         print(f"   {len(df_topic)} righe caricate.")
 
-    # Decide outdir: if user passed default, infer from metrics path (model-specific)
     if args.outdir == DEFAULT_OUT or not args.outdir:
         inferred = os.path.join(os.path.dirname(args.metrics), "figure")
         args.outdir = inferred
@@ -1198,29 +1167,38 @@ def main():
     print(f"Output figure in: {args.outdir}\n")
 
     # Genera tutti i grafici
+    # 0.  TABELLA RIASSUNTIVA
     fig_summary_table(df, df_topic, args.outdir, model_label=model_label)
-    fig_validity(df, args.outdir, model_label=model_label)
-    fig_robustness(df, args.outdir, model_label=model_label)
+    
+    #  1.  CONFRONTO ESPERIMENTI
+    fig_validity(df, args.outdir,  model_label=model_label)
+    fig_log_coherence(df, args.outdir,  model_label=model_label)
+    fig_robustness(df, args.outdir,  model_label=model_label)
 
-    # Position bias (se il CSV esiste) — logicamente prima della mappa cognitiva
     pb_path = os.path.join(os.path.dirname(args.metrics), f"position_bias_{_model_name}.csv")
     if os.path.exists(pb_path):
         df_pb = pd.read_csv(pb_path)
-        fig_position_bias(df_pb, args.outdir, model_label=model_label)
+        #  2.  PERMUTAZIONE
+        fig_permutation(df_pb, args.outdir, model_label=model_label, df_metrics=df)
+        fig_cognitive_map(df, args.outdir, model_label=model_label)
     else:
         print(f"   [SKIP] File position bias non trovato: {pb_path}")
 
-    fig_cognitive_map(df, args.outdir, model_label=model_label)
-    fig_threat_efficiency(df, df_topic, args.outdir, model_label=model_label)
-    fig_threat_consistency_impact(df, args.outdir, model_label=model_label)
-    fig_log_coherence(df, args.outdir, model_label=model_label)
-    fig_alignment(df, args.outdir, model_label=model_label)
-    fig_political(df, df_topic, args.outdir, model_label=model_label)
+    #  3.  DUPLICAZIONE
+    fig_duplication(df, args.outdir, model_label=model_label)
+
+    #  4.  MINACCIA
+    fig_threat(df, args.outdir, model_label=model_label)
+
+    #  5.  ALLINEAMENTO UMANO
+    fig_alignment_human(df, args.outdir, model_label=model_label)
+
+    #  6.  POLITICA
+    fig_political(df, args.outdir, model_label=model_label)
 
     print(f"\n{'='*60}")
     print(f"FATTO — {len(os.listdir(args.outdir))} figure generate in {args.outdir}")
     print(f"{'='*60}")
-
 
 if __name__ == "__main__":
     main()
