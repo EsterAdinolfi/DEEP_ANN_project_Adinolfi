@@ -1,0 +1,30 @@
+\documentclass[../relazione.tex]{subfiles}
+\begin{document}
+
+% ======================================================================
+\section{Introduzione}
+% ======================================================================
+
+I Large Language Model (LLM) producono risposte che riflettono opinioni e bias insiti nei dati di addestramento e nelle successive fasi di allineamento. \textbf{Santurkar et al. (2023)} \cite{santurkar2023whose} hanno quantificato questo fenomeno introducendo l'\textit{OpinionQA}, un dataset derivato dai sondaggi dell'American Trends Panel del Pew Research Center. Misurando l'allineamento tramite la Wasserstein Distance su 60 gruppi demografici statunitensi, gli autori dimostrano un sostanziale \textit{disallineamento} tra le opinioni dei modelli e quelle della popolazione generale. In particolare, le tecniche di allineamento con feedback umano (RLHF) tendono ad aumentare questo divario, sovra-rappresentando le posizioni di fasce demografiche liberali, istruite e benestanti, a discapito di sottogruppi meno rappresentati, come gli over-65 o le persone vedove.
+
+Misurare in modo oggettivo queste opinioni, tuttavia, presenta difficoltà metodologiche. \textbf{Röttger et al. (2024)} \cite{rottger2024political} evidenziano come le valutazioni basate su questionari a scelta multipla forzata, quale per esempio il Political Compass Test, \textit{alterino artificialmente} il comportamento del modello. I risultati \textit{mancano di robustezza alle parafrasi} e, in un terzo delle proposizioni analizzate, i modelli esprimono \textit{opinioni diametralmente opposte} se interrogati in formato aperto anziché vincolato. Per ovviare ai limiti dell'estrazione rigida, gli autori dimostrano l'efficacia dell'uso di un LLM come classificatore per valutare le risposte aperte, validandone l'accuratezza tramite controlli umani a campione.
+
+Per questo motivo, ogni indagine affidabile richiede test di robustezza mirati e deve produrre conclusioni strettamente dipendenti dal contesto.
+
+\subsection*{Obiettivo del progetto}
+Questo progetto è volto a intersecare i contributi dei due articoli sopra citati. 
+
+Da \textit{Santurkar et al. (2023)} \cite{santurkar2023whose} viene ripreso l'utilizzo del dataset \textbf{OpinionQA} (1506 domande su 23 aree tematiche), l'\textbf{approccio quantitativo} basato sulla Wasserstein Distance e la \textbf{struttura del prompt} (domanda seguita dall'elenco delle opzioni precedute da lettera alfabetica).
+
+Da \textit{Röttger et al. (2024)} \cite{rottger2024political} si accoglie la necessità critica di verificare la \textbf{stabilità} dell'output, indagando la fragilità delle risposte rispetto alla formulazione dell'input.
+
+L'analisi viene condotta su modelli open-source non sottoposti ad alignment, impiegando cinque varianti dimensionali della famiglia \textbf{Pythia} (EleutherAI): 160M, 1B, 1.4B, 2.8B e 6.9B. Nello specifico, il progetto valuta sistematicamente:
+\begin{enumerate}
+    \item \textbf{Validità}: la propensione del modello a selezionare effettivamente un'opzione valida all'interno del formato a scelta multipla;
+    \item \textbf{Robustezza}: la stabilità delle risposte a perturbazioni dell'input (permutazione dell'ordine delle opzioni, duplicazione di un'opzione e inserimento di testo minaccioso prima della domanda);
+    \item \textbf{Position bias}: la tendenza sistematica a favorire opzioni in base alla loro collocazione spaziale nel prompt (primacy o recency bias);
+    \item \textbf{Allineamento umano}: la prossimità della distribuzione di probabilità del modello a quella del campione demografico reale di Pew Research;
+    \item \textbf{Coerenza politica}: l'eventuale allineamento sistematico con specifici cluster ideologici (es. democrats/republicans, liberal/conservative).
+\end{enumerate}
+
+\end{document}

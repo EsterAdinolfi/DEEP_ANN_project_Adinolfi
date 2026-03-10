@@ -21,6 +21,17 @@ import seaborn as sns
 # ── stile globale ──────────────────────────────────────────────────────
 sns.set_theme(style="whitegrid", font_scale=1.15)
 PALETTE_MAIN  = ["#4C72B0", "#DD8452", "#55A868", "#C44E52"]
+ALL_MACRO_AREAS = [
+    "Science", "News, social media, data, privacy",
+    "Race", "Gender & sexuality", "Religion", "Immigration",
+    "Economy and inequality", "Personal finance", "Job/career",
+    "Healthcare", "Personal health", "Education",
+    "Crime/security", "Political issues", "Leadership",
+    "Global attitudes and foreign policy", "Community health",
+    "Corporations, tech, banks and automation", "Discrimination",
+    "Relationships and family", "Self-perception and values",
+    "Status in life", "Future",
+]
 PALETTE_POL   = {
     "Democrat":     "#2166AC",
     "Republican":   "#B2182B",
@@ -905,9 +916,10 @@ def fig_alignment_human(df, outdir, model_label=None):
     # --- 5b ---
     sub = df[["macro_area", "alignment_score"]].dropna()
     if not sub.empty:
-        # ordina per mediana decrescente
-        order = (sub.groupby("macro_area")["alignment_score"]
-                 .median().sort_values(ascending=False).index)
+        # ordina per mediana decrescente, includendo tutte le 23 aree
+        medians = sub.groupby("macro_area")["alignment_score"].median()
+        medians = medians.reindex(ALL_MACRO_AREAS, fill_value=np.nan)
+        order = medians.sort_values(ascending=False, na_position='last').index.tolist()
         fig, ax = plt.subplots(figsize=(11, 5))
         sns.boxplot(data=sub, x="macro_area", y="alignment_score", hue="macro_area",
                     order=order, palette="Blues_d", ax=ax, legend=False)
@@ -941,6 +953,7 @@ def fig_political(df, outdir, model_label=None):
     # --- 6a  Istogramma verticale: tasso di validità per macro area ---
     if "macro_area" in df.columns and "baseline_valid_rate" in df.columns:
         vr_area = df.groupby("macro_area")["baseline_valid_rate"].mean() * 100
+        vr_area = vr_area.reindex(ALL_MACRO_AREAS, fill_value=0.0)
         vr_area = vr_area.sort_values(ascending=False)
 
         n_areas = len(vr_area)
@@ -971,6 +984,7 @@ def fig_political(df, outdir, model_label=None):
     # --- 6b  Istogramma verticale: coerenza log-testo per macro area ---
     if "macro_area" in df.columns and "log_consistency_rate" in df.columns:
         lc_area = df.groupby("macro_area")["log_consistency_rate"].mean() * 100
+        lc_area = lc_area.reindex(ALL_MACRO_AREAS, fill_value=0.0)
         lc_area = lc_area.sort_values(ascending=False)
 
         n_areas_lc = len(lc_area)
@@ -1003,8 +1017,9 @@ def fig_political(df, outdir, model_label=None):
     if all(c in df.columns for c in wd_needed) and "macro_area" in df.columns:
         sub_pc = df[wd_needed + ["macro_area"]].dropna(subset=wd_needed)
         if not sub_pc.empty:
-            # Media WD per macro area
+            # Media WD per macro area — reindex per includere tutte le 23 aree
             area_means = sub_pc.groupby("macro_area")[wd_needed].mean()
+            area_means = area_means.reindex(ALL_MACRO_AREAS)
             area_means["x_axis"] = area_means["wd_republican"] - area_means["wd_democrat"]
             area_means["y_axis"] = area_means["wd_conservative"] - area_means["wd_liberal"]
 
@@ -1014,10 +1029,11 @@ def fig_political(df, outdir, model_label=None):
             fig, ax = plt.subplots(figsize=(10, 8))
 
             # Sfondo colorato per i 4 quadranti
-            xlims_pre = [area_means["x_axis"].min() - 0.005,
-                         area_means["x_axis"].max() + 0.005]
-            ylims_pre = [area_means["y_axis"].min() - 0.005,
-                         area_means["y_axis"].max() + 0.005]
+            valid_mask = area_means[["x_axis", "y_axis"]].notna().all(axis=1)
+            xlims_pre = [area_means.loc[valid_mask, "x_axis"].min() - 0.005,
+                         area_means.loc[valid_mask, "x_axis"].max() + 0.005]
+            ylims_pre = [area_means.loc[valid_mask, "y_axis"].min() - 0.005,
+                         area_means.loc[valid_mask, "y_axis"].max() + 0.005]
             # Top-right: Liberal–Democrat (blu)
             ax.axvspan(0, xlims_pre[1] * 2, ymin=0.5, ymax=1.0,
                        color="#2166AC", alpha=0.06, zorder=0)
@@ -1036,16 +1052,19 @@ def fig_political(df, outdir, model_label=None):
             legend_handles = []
             for i, (area_name, row) in enumerate(area_means.iterrows()):
                 num = i + 1
-                ax.scatter(row["x_axis"], row["y_axis"],
-                           c=[cmap_pc[i]], s=340, alpha=1.0,
-                           edgecolor="white", linewidth=0.8, zorder=10 + 2 * i)
-                ax.text(row["x_axis"], row["y_axis"], str(num),
-                        ha="center", va="center", fontsize=9,
-                        fontweight="bold", color="white", zorder=11 + 2 * i)
-                # Crea handle per la legenda
+                has_data = not (pd.isna(row["x_axis"]) or pd.isna(row["y_axis"]))
+                if has_data:
+                    ax.scatter(row["x_axis"], row["y_axis"],
+                               c=[cmap_pc[i]], s=340, alpha=1.0,
+                               edgecolor="white", linewidth=0.8, zorder=10 + 2 * i)
+                    ax.text(row["x_axis"], row["y_axis"], str(num),
+                            ha="center", va="center", fontsize=9,
+                            fontweight="bold", color="white", zorder=11 + 2 * i)
+                # Crea handle per la legenda (sempre, anche senza dati)
                 import matplotlib.patches as mpatches
+                lbl = f"{num}. {area_name}" if has_data else f"{num}. {area_name} (N/D)"
                 legend_handles.append(
-                    mpatches.Patch(color=cmap_pc[i], label=f"{num}. {area_name}"))
+                    mpatches.Patch(color=cmap_pc[i], label=lbl))
 
             # Assi centrali
             ax.axhline(0, color="grey", ls="-", lw=0.8, alpha=0.5, zorder=1)
@@ -1104,12 +1123,15 @@ def fig_political(df, outdir, model_label=None):
         sub = df[["macro_area"] + existing_wd].dropna(subset=existing_wd, how="all")
         if not sub.empty:
             hmap = sub.groupby("macro_area")[existing_wd].mean()
+            hmap = hmap.reindex(ALL_MACRO_AREAS)
             hmap.columns = [wd_labels[wd_cols.index(c)] for c in existing_wd]
             # ordina per WD media crescente (più vicini in alto)
-            hmap = hmap.loc[hmap.mean(axis=1).sort_values().index]
+            hmap = hmap.loc[hmap.mean(axis=1).sort_values(na_position='last').index]
 
             fig, ax = plt.subplots(figsize=(10, max(5, len(hmap) * 0.55)))
-            sns.heatmap(hmap, annot=True, fmt=".3f", cmap="RdYlGn_r",
+            # Annotazione personalizzata per gestire NaN
+            annot_arr = hmap.map(lambda v: f"{v:.3f}" if pd.notna(v) else "N/D")
+            sns.heatmap(hmap, annot=annot_arr, fmt="", cmap="RdYlGn_r",
                         linewidths=0.5, ax=ax, cbar_kws={"label": "Wasserstein distance", "fraction":0.046, "pad":0.04})
             if model_label:
                 ax.set_title(f"Distanza WD media per macro area × gruppo demografico\n(valori bassi = maggiore allineamento)\n{model_label}", fontsize=16, fontweight="bold", pad=3)

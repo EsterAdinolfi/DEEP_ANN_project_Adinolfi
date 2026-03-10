@@ -13,6 +13,9 @@
 \usepackage{listings}
 \usepackage{subfiles}
 
+% no paragraph indentation
+\setlength{\parindent}{0pt}
+
 \hypersetup{
     pdftitle={Opinioni dei Language Model: Analisi della Variabilità e dell'Allineamento Politico},
     pdfauthor={Adinolfi Ester},
@@ -35,28 +38,36 @@
     language=Python
 }
 
-\title{%
-    \textbf{Opinioni dei Language Model: \\ Analisi della Variabilità e dell'Allineamento Politico} \\[0.5em]
-    \large Deep Learning e Architetture di Rete --- A.A. 2024/2025
+\title{
+    \textbf{Opinioni dei Language Model: \\ analisi della variabilità e dell'allineamento politico} \\[0.5em]
+    \large Deep Learning e Architetture di Rete\\
+    A.A. 2024/2025
 }
 \author{Ester Adinolfi}
-\date{\today}
+\date{\null}
 
 \begin{document}
-\maketitle
-\tableofcontents
-\newpage
 
-\subfile{capitoli/introduzione}
+\maketitle
+\thispagestyle{empty}% no page number on title
 \newpage
-\subfile{capitoli/workflow}
+\tableofcontents
+\pagenumbering{roman}
+\setcounter{page}{1}
 \newpage
-\subfile{capitoli/modelli}
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\subfile{capitoli/1_introduzione}
 \newpage
-\subfile{capitoli/risultati}
+\subfile{capitoli/2_workflow}
 \newpage
-\subfile{capitoli/discussione}
+\subfile{capitoli/3_modelli}
 \newpage
-\subfile{capitoli/conclusioni}
+\subfile{capitoli/4_risultati}
+\newpage
+\subfile{capitoli/5_discussione}
+\newpage
+\subfile{capitoli/6_conclusioni}
 
 \end{document}

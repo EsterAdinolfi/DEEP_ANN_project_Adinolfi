@@ -22,104 +22,290 @@ def clean_topic(key, all_bases, battery_groups):
             return potential_base
     return base
 
-# Function to assign macro_area
+# ── 23 macro-aree OpinionQA (Santurkar et al., 2023) ───────────────────
+# Nessuna categoria "Other": ogni domanda è assegnata a una delle 23 aree.
+COARSE_TOPICS = [
+    'Community health',
+    'Corporations, tech, banks and automation',
+    'Crime/security',
+    'Discrimination',
+    'Economy and inequality',
+    'Education',
+    'Future',
+    'Gender & sexuality',
+    'Global attitudes and foreign policy',
+    'Healthcare',
+    'Immigration',
+    'Job/career',
+    'Leadership',
+    'News, social media, data, privacy',
+    'Personal finance',
+    'Personal health',
+    'Political issues',
+    'Race',
+    'Relationships and family',
+    'Religion',
+    'Science',
+    'Self-perception and values',
+    'Status in life',
+]
+
 def assign_macro_area(key, question):
+    """Assegna ogni domanda a una delle 23 macro-aree OpinionQA."""
     key_upper = key.upper()
     question_lower = question.lower()
-    
-    # Institutional Confidence (prioritize CONF prefix)
-    if key_upper.startswith('CONF_') or key_upper.startswith('CONF') or 'institution' in question_lower or 'trust' in question_lower:
-        return 'Institutional Confidence'
-    
-    # Guns
-    if 'GUN' in key_upper or 'gun' in question_lower or 'firearm' in question_lower:
-        return 'Guns'
-    
-    # Education
-    if any(keyword in key_upper for keyword in ['ADMISSION', 'COLSPEECH', 'COLLEGE', 'FREECOLL', 'HIGHED', 'SCHOOL', 'STUDENT', 'EDUC']) or \
-       any(keyword in question_lower for keyword in ['education', 'college', 'school', 'student', 'university', 'higher education']):
+    base = re.sub(r'_W\d+$', '', key_upper)
+    # Prefisso alfabetico pulito (es. GUNRESPKIDSA → GUNRESPKIDS)
+    m = re.match(r'^([A-Z_]+)', base)
+    pfx = m.group(1).rstrip('_') if m else base
+
+    # ── 1. Crime/security ──────────────────────────────────────────────
+    if pfx.startswith('GUN') or pfx.startswith('REASONGUN') or pfx in {
+        'CARRYGUN', 'NOCARRYGUN', 'DEFENDGUN', 'EVEROWN', 'EVERSHOT',
+        'NEVEROWN', 'IMPREASONGUN', 'SHOOTFREQ', 'MARGUN', 'GROWUPGUN',
+        'GROWUPVIOL', 'CRIMEVICTIM', 'CRIM_SENT', 'SAFECRIME',
+        'WORLDDANGER', 'SOCIETY_GUNS'}:
+        return 'Crime/security'
+    # WORRY about crime/violence
+    if pfx.startswith('WORRY') and any(w in question_lower for w in
+            ['home broken', 'terrorist', 'violent crime', 'mass shooting']):
+        return 'Crime/security'
+
+    # ── 2. Education ───────────────────────────────────────────────────
+    if pfx in {'ADMISSION', 'COLSPEECH', 'FREECOLL', 'HIGHED',
+               'INSTN_CLGS', 'INSTN_K', 'SOCIETY_JBCLL'}:
         return 'Education'
-    
-    # Politics (broad keywords)
-    if any(keyword in key_upper for keyword in ['POL', 'ELECT', 'VOTE', 'PARTY', 'GOVERN', 'CONGRESS', 'SENAT', 'DEMOCRA', 'REPUBLICAN', 'GOVAID', 'GOVSIZE', 'GOVT_ROLE', 'GOVWASTE', 'GOVPROTCT', 'COMPROMISE']) or \
-       any(keyword in question_lower for keyword in ['political', 'president', 'party', 'congress', 'senate', 'democrat', 'republican', 'election', 'vote', 'government']):
-        return 'Politics'
-    
-    # Religion
-    if any(keyword in key_upper for keyword in ['RELIG', 'GOD', 'EVOLU', 'EVO', 'GOODEVIL', 'FAITH', 'CHURCH']) or \
-       any(keyword in question_lower for keyword in ['religion', 'church', 'faith', 'god', 'evolution', 'belief']):
+    if pfx.startswith('HIGHEDWRNG'):
+        return 'Education'
+
+    # ── 3. Religion ────────────────────────────────────────────────────
+    if pfx in {'EVOONE', 'EVOTWO', 'EVOTHREE', 'GODMORALIMP', 'GOODEVIL',
+               'INSTN_CHR', 'RELIG_GOV', 'SOCIETY_RELG'}:
         return 'Religion'
-    
-    # Economy (National) - differentiate from Personal Finance
-    if ('ECON' in key_upper and 'SIT' in key_upper) or \
-       any(keyword in key_upper for keyword in ['ECONFAIR', 'BUSPROFIT', 'BUSINESS', 'BILLION', 'CLASS', 'GAP', 'INEQ', 'INDUSTRY', 'GOODJOBS', 'JOBSECURITY', 'JOBTRAIN', 'HIRING', 'GLBLZE']) or \
-       any(keyword in question_lower for keyword in ['economy', 'economic', 'business', 'inequality', 'class', 'industry', 'jobs', 'globalization']):
-        return 'Economy'
-    
-    # Personal Finance
-    if ('FIN' in key_upper and 'SIT' in key_upper) or \
-       any(keyword in key_upper for keyword in ['DEBT', 'ELDFINANCE', 'FINANCE']) or \
-       any(keyword in question_lower for keyword in ['personal finance', 'debt', 'savings', 'income', 'financial']):
-        return 'Personal Finance'
-    
-    # Technology (expanded)
-    if any(keyword in key_upper for keyword in ['TECH', 'AUTO', 'DRONE', 'CAR', 'DNA', 'DNATEST', 'DATAUSE', 'BIOTECH', 'BIO', 'ROBOT', 'INTERNET', 'ONLINE', 'DIGITAL', 'INFO', 'FITTRACK']) or \
-       any(keyword in question_lower for keyword in ['technology', 'autonomous', 'drone', 'dna', 'data', 'biotech', 'robot', 'internet', 'digital', 'online', 'information']):
-        return 'Technology'
-    
-    # Family (expanded)
-    if any(keyword in key_upper for keyword in ['FAM', 'CHILD', 'PARENT', 'CAREGIV', 'ADKIDS', 'COHAB', 'MARRY', 'DIVORCE', 'FATHER', 'MOTHER', 'FERTIL', 'MARRDUR']) or \
-       any(keyword in question_lower for keyword in ['family', 'child', 'parent', 'caregiver', 'marriage', 'divorce', 'children', 'father', 'mother', 'fertility']):
-        return 'Family'
-    
-    # Health (expanded)
-    if any(keyword in key_upper for keyword in ['HEALTH', 'ABORTION', 'BLOODPR', 'ELDCARE', 'MEDIC', 'HOSPITAL', 'DOCTOR']) or \
-       any(keyword in question_lower for keyword in ['health', 'abortion', 'medical', 'hospital', 'doctor', 'healthcare']):
-        return 'Health'
-    
-    # Race/Ethnicity
-    if 'RACE' in key_upper or 'race' in question_lower or 'ethnic' in question_lower or 'racial' in question_lower:
-        return 'Race/Ethnicity'
-    
-    # Immigration
-    if any(keyword in key_upper for keyword in ['IMMIG', 'OPENIDEN', 'IMMCULT']) or \
-       any(keyword in question_lower for keyword in ['immigration', 'immigrant', 'openness', 'border']):
+    if pfx.startswith('EVOBIO') or pfx.startswith('EVOPERS'):
+        return 'Religion'
+
+    # ── 4. Global attitudes and foreign policy ─────────────────────────
+    if pfx.startswith('GAP'):
+        return 'Global attitudes and foreign policy'
+    if pfx in {'ALLIES', 'FP_AUTH', 'PEACESTR', 'SUPERPWR', 'USEXCEPT',
+               'USMILSIZ'}:
+        return 'Global attitudes and foreign policy'
+
+    # ── 5. Leadership ──────────────────────────────────────────────────
+    if pfx in {'CONF', 'ELITEUNDMOD'}:
+        return 'Leadership'
+    if pfx.startswith(('ESSENBIZF', 'ESSENPOLF', 'BETTERBIZ', 'BETTERPOL',
+                        'TRAITBIZMF', 'TRAITBIZWF', 'TRAITPOLMF', 'TRAITPOLWF',
+                        'STYLE')):
+        return 'Leadership'
+
+    # ── 6. Gender & sexuality ──────────────────────────────────────────
+    if pfx in {'GAYMARR', 'ORIENTATIONMOD', 'SOCIETY_SSM', 'SOCIETY_TRANS',
+               'WOMENOBS', 'WOMENOPPS', 'WMNPRZ', 'SEENFEM', 'SEENMASC',
+               'EXECCHF', 'POLCHF', 'EQUALBIZF', 'EQUALPOLF',
+               'EASIERBIZF', 'EASIERPOLF'}:
+        return 'Gender & sexuality'
+    if pfx.startswith(('DIFF', 'BOYSF', 'GIRLSF', 'FEM', 'MASC',
+                        'MOREWMN', 'WHYNOTBIZF', 'WHYNOTPOLF',
+                        'AMNTWMN', 'IMPROVE', 'MAN', 'SPOUSESEX',
+                        'TRANSGEND')):
+        return 'Gender & sexuality'
+
+    # ── 7. Discrimination ──────────────────────────────────────────────
+    if pfx in {'PERSDISCR'}:
+        return 'Discrimination'
+    if pfx.startswith(('HARASS', 'HELPHURT', 'WHADVANT')):
+        return 'Discrimination'
+
+    # ── 8. Race ────────────────────────────────────────────────────────
+    if pfx in {'RACATTN', 'IDIMPORT', 'INTRMAR', 'SOCIETY_RHIST',
+               'SOCIETY_WHT', 'ETHNCMAJ', 'ETHNCMAJMOD'}:
+        return 'Race'
+    if pfx.startswith(('RACESURV', 'PROG_R')):
+        return 'Race'
+
+    # ── 9. Immigration ─────────────────────────────────────────────────
+    if pfx in {'IL_IMM_PRI', 'IMMCOMM', 'IMMCULT', 'IMMIMPACT',
+               'OPENIDEN', 'LEGALIMMIGAMT', 'LEGALIMG', 'UNIMMIGCOMM'}:
         return 'Immigration'
-    
-    # Environment
-    if 'ENV' in key_upper or 'environment' in question_lower or 'climate' in question_lower:
-        return 'Environment'
-    
-    # Crime
-    if 'CRIME' in key_upper or 'crime' in question_lower or 'criminal' in question_lower:
-        return 'Crime'
-    
-    # Personal Security
-    if 'WORRY' in key_upper or 'worry' in question_lower or 'safe' in question_lower or 'security' in question_lower:
-        return 'Personal Security'
-    
-    # Quality of Life (expanded)
-    if any(keyword in key_upper for keyword in ['LIFE', 'COMM', 'COMMUNITY', 'NEIGHBOR', 'CITY']) or \
-       any(keyword in question_lower for keyword in ['quality of life', 'community', 'neighborhood', 'satisfaction']):
-        return 'Quality of Life'
-    
-    # Housing
-    if any(keyword in key_upper for keyword in ['HOUS', 'HOMEASSIST']) or \
-       any(keyword in question_lower for keyword in ['house', 'housing', 'home']):
-        return 'Housing'
-    
-    # Gender (expanded)
-    if any(keyword in key_upper for keyword in ['WOMEN', 'GENDER', 'EQUAL', 'BOYS', 'GIRLS', 'HARASS', 'FEM']) or \
-       any(keyword in question_lower for keyword in ['women', 'gender', 'equality', 'discrimination', 'harassment', 'feminine']):
-        return 'Gender'
-    
-    # Foreign Policy
-    if any(keyword in key_upper for keyword in ['ALLIES', 'FOREIGN', 'MILITARY', 'WAR']) or \
-       any(keyword in question_lower for keyword in ['foreign policy', 'military', 'allies', 'international']):
-        return 'Foreign Policy'
-    
-    # Default
-    return 'Other'
+
+    # ── 10. Political issues ───────────────────────────────────────────
+    if pfx in {'CANDEXP', 'CANMTCHPOL', 'CANQUALPOL', 'COMPROMISEVAL',
+               'DEMDIRCT', 'DIFFPARTY', 'GOVAID', 'GOVPROTCT',
+               'GOVWASTE', 'GOVT_ROLE', 'GOPDIRCT', 'LOCALELECT',
+               'REPRSNTDEM', 'REPRSNTREP', 'VTRGHTPRIV', 'VTRS_VALS',
+               'CNTRYFAIR', 'POSNEGGOV',
+               'POORASSIST'}:
+        return 'Political issues'
+    if pfx.startswith(('POL', 'ELECT_', 'GOVSIZE', 'GOVRESP', 'GOVPRIO',
+                        'GOVPRIORITY', 'POLICY', 'FEDSHARE', 'POP')):
+        return 'Political issues'
+
+    # ── 11. Economy and inequality ─────────────────────────────────────
+    if pfx in {'BUSPROFIT', 'BILLION', 'CLASS', 'GLBLZE', 'NATDEBT',
+               'WORKHARD', 'POOREASY', 'FIN_SITMOST', 'FIN_SITCOMM',
+               'INSTN_LBRUN', 'AVGFAM', 'INDUSTRY'}:
+        return 'Economy and inequality'
+    if pfx.startswith(('ECON', 'INEQ', 'ECIMP', 'ECONFAIR')):
+        return 'Economy and inequality'
+
+    # ── 12. Personal finance ───────────────────────────────────────────
+    if pfx in {'EARN', 'INC', 'INCFUTURE', 'SSCUT', 'SSMONEY',
+               'WORRYBILL', 'WORRYRET', 'FIN_SIT', 'FIN_SITFUT',
+               'FIN_SITGROWUP', 'LOYALTY'}:
+        return 'Personal finance'
+    if pfx.startswith(('DEBT', 'FINANCE', 'ELDFINANCEF', 'BENEFITS',
+                        'WORRY')):
+        # WORRY fallback (worry about debt, bills, retirement → personal finance)
+        # Note: crime-related WORRY was already caught above
+        return 'Personal finance'
+
+    # ── 13. Job/career ─────────────────────────────────────────────────
+    if pfx in {'GOODJOBS', 'JOBBENEFITS', 'JOBSECURITY', 'JOBSFUTURE',
+               'JOBTRAIN'}:
+        return 'Job/career'
+    if pfx.startswith('WRKTRN'):
+        return 'Job/career'
+
+    # ── 14. Healthcare ─────────────────────────────────────────────────
+    if pfx in {'GOVTHC', 'NOGOVTHC', 'SNGLPYER',
+               'ABORTION', 'ABORTIONALLOW', 'ABORTIONRESTR'}:
+        return 'Healthcare'
+
+    # ── 15. Personal health ────────────────────────────────────────────
+    if pfx in {'BIO', 'BLOODPR', 'FERTIL', 'NOWSMK_NHIS'}:
+        return 'Personal health'
+    if pfx.startswith(('EAT', 'FUD', 'WORRYG')):
+        return 'Personal health'
+    if pfx == 'G':
+        return 'Personal health'
+
+    # ── 16. Science ────────────────────────────────────────────────────
+    if pfx in {'SC', 'FUTURE', 'PAST'}:
+        return 'Science'
+    if pfx.startswith(('BIOTECH', 'DNA', 'DNATEST', 'MED', 'SCI', 'SCM',
+                        'SOLVPROB', 'Q', 'PQ', 'RQ')):
+        return 'Science'
+
+    # ── 17. Corporations, tech, banks and automation ───────────────────
+    if pfx in {'INSTN_BNKS', 'INSTN_LGECRP', 'INSTN_TECHCMP',
+               'FITTRACK', 'AUTOLKLY', 'AUTOWKPLC', 'SMARTAPP',
+               'SMARTPHONE', 'HOMEIOT', 'POSNEGCO'}:
+        return 'Corporations, tech, banks and automation'
+    if pfx.startswith(('CARS', 'VOICE', 'DRONE', 'CAREGIV', 'ROBJOB',
+                        'ROBWRK', 'ROBIMPACT', 'HIRING', 'FACE',
+                        'HOMEASSIST')):
+        return 'Corporations, tech, banks and automation'
+
+    # ── 18. News, social media, data, privacy ──────────────────────────
+    if pfx in {'ACCCHECK', 'BENEFITCO', 'BENEFITGOV', 'CONCERNCO',
+               'CONCERNGOV', 'CONTROLCO', 'CONTROLGOV', 'DIGWDOG',
+               'DISAVOID', 'ELECTFTGSNSINT', 'FCFAIR', 'LEAD',
+               'MEDIALOYAL', 'NEWSPREFV', 'ONLINESOURCE', 'PRIVACYNEWS',
+               'PRIVACYREG', 'PUBLICDATA', 'RESTRICTWHO', 'SECUR',
+               'SEEK', 'SHARE', 'SMSHARE', 'SMSHARER', 'SNSUSE',
+               'VIDOFT', 'TALKCMNSNSINT', 'TALKDISASNSINT',
+               'UNDERSTANDCO', 'UNDERSTANDGOV', 'INSTN_MSCENT'}:
+        return 'News, social media, data, privacy'
+    if pfx.startswith(('ANONYMOUS', 'CONCERNGRP', 'CONTROLGRP', 'DATAUSE',
+                        'DB', 'GOVREGV', 'INFO', 'MADEUP', 'MISINF',
+                        'NEWSPROB', 'NEWS_PLATFORM', 'PP', 'PROFILE',
+                        'PWMAN', 'RTBF', 'RTD', 'SMLIKES', 'SOCMEDIAUSE',
+                        'SOURCESKEP', 'TRACKCO', 'TRACKGOV', 'WATCHDOG')):
+        return 'News, social media, data, privacy'
+
+    # ── 19. Future ─────────────────────────────────────────────────────
+    if pfx in {'AGEMAJ', 'ELDCARE', 'OPTIMIST', 'POPPROB', 'ENVC'}:
+        return 'Future'
+    if pfx.startswith(('HAPPEN', 'FTRWORRY', 'FUTRCLASS', 'FUTR_',
+                        'PREDICT')):
+        return 'Future'
+
+    # ── 20. Community health ───────────────────────────────────────────
+    if pfx in {'COMATTACH', 'COMMYRS', 'COMTYPE', 'CITYSIZE',
+               'GROWUPNEAR', 'GROWUPUSR', 'LIFELOC', 'FAMNEAR',
+               'NEIGHKEYS', 'NEIGHKIDS', 'NEIGHKNOW',
+               'SUBURBNEAR', 'BIGHOUSES', 'WANTMOVE', 'WILLMOVE',
+               'TALK_CPS', 'FAVORS_CPS'}:
+        return 'Community health'
+    if pfx.startswith(('COMMIMP', 'NEIGHINTER', 'NEIGHSAME', 'LOCALPROB',
+                        'HOOD_NHIS', 'MOVERURAL', 'MOVESUBURB', 'MOVEURBAN',
+                        'VALUERURAL', 'VALUESUBURB', 'VALUEURBAN',
+                        'PROBRURAL', 'PROBSUBURB', 'PROBURBAN',
+                        'PARTICIPATE')):
+        return 'Community health'
+
+    # ── 21. Status in life (PRIMA di Relationships) ────────────────────
+    if pfx in {'LIFEFIFTY'}:
+        return 'Status in life'
+    if pfx.startswith('SATLIFE'):
+        return 'Status in life'
+
+    # ── 22. Self-perception and values ─────────────────────────────────
+    if pfx in {'HAPPYLIFE', 'PPLRESP', 'E'}:
+        return 'Self-perception and values'
+    if pfx.startswith(('MESUM', 'TRAITS', 'WORK', 'FEEL', 'SOCTRUST',
+                        'PAR', 'PROBOFF', 'SUCCESSIMP')):
+        return 'Self-perception and values'
+
+    # ── 23. Relationships and family ───────────────────────────────────
+    if pfx in {'ADKIDS', 'COHABDUR', 'ENG', 'CAREREL', 'FATHER',
+               'HAVEKIDS', 'LWPSP', 'LWPT', 'MAR', 'MARRDUR',
+               'MOTHER', 'REMARR', 'ROMRELDUR', 'ROMRELSER', 'SIB',
+               'S'}:
+        return 'Relationships and family'
+    if pfx.startswith(('FAMSURV', 'MARRFAM', 'MARRYPREF')):
+        return 'Relationships and family'
+
+    # ── Keyword fallback (per chiavi non coperte sopra) ────────────────
+    if any(w in question_lower for w in ['gun', 'firearm', 'shooting']):
+        return 'Crime/security'
+    if any(w in question_lower for w in ['college', 'university', 'higher education', 'school']):
+        return 'Education'
+    if any(w in question_lower for w in ['immigration', 'immigrant']):
+        return 'Immigration'
+    if any(w in question_lower for w in ['abortion']):
+        return 'Healthcare'
+    if any(w in question_lower for w in ['race ', 'racial', 'ethnic']):
+        return 'Race'
+    if any(w in question_lower for w in ['gender', 'women', 'feminist', 'sexual orientation']):
+        return 'Gender & sexuality'
+    if any(w in question_lower for w in ['religion', 'church', 'faith', 'god']):
+        return 'Religion'
+    if any(w in question_lower for w in ['robot', 'autonomous', 'automation', 'drone', 'driverless']):
+        return 'Corporations, tech, banks and automation'
+    if any(w in question_lower for w in ['social media', 'privacy', 'news', 'data collect']):
+        return 'News, social media, data, privacy'
+    if any(w in question_lower for w in ['economy', 'economic', 'inequality']):
+        return 'Economy and inequality'
+    if any(w in question_lower for w in ['family', 'marriage', 'children', 'spouse', 'partner']):
+        return 'Relationships and family'
+    if any(w in question_lower for w in ['community', 'neighborhood', 'neighbour']):
+        return 'Community health'
+    if any(w in question_lower for w in ['job', 'career', 'employment', 'workforce']):
+        return 'Job/career'
+    if any(w in question_lower for w in ['financial', 'income', 'debt', 'savings']):
+        return 'Personal finance'
+    if any(w in question_lower for w in ['health', 'medical', 'doctor']):
+        return 'Personal health'
+    if any(w in question_lower for w in ['science', 'scientific', 'scientist']):
+        return 'Science'
+    if any(w in question_lower for w in ['future', 'next 30 years', '2050', 'next 20 years']):
+        return 'Future'
+    if any(w in question_lower for w in ['foreign policy', 'military', 'allies', 'international']):
+        return 'Global attitudes and foreign policy'
+    if any(w in question_lower for w in ['leader', 'confidence', 'president handling']):
+        return 'Leadership'
+    if any(w in question_lower for w in ['discrimination', 'harassment']):
+        return 'Discrimination'
+    if any(w in question_lower for w in ['satisfaction', 'satisfied', 'quality of life']):
+        return 'Status in life'
+    if any(w in question_lower for w in ['value', 'identity', 'describe you']):
+        return 'Self-perception and values'
+
+    # Ultima rete di sicurezza: assegna a 'Self-perception and values'
+    return 'Self-perception and values'
 
 # Dictionary to store mappings
 mapping = {}

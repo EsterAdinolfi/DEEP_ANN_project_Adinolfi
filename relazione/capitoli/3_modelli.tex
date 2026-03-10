@@ -1,0 +1,43 @@
+\documentclass[../relazione.tex]{subfiles}
+\begin{document}
+
+% ======================================================================
+\section{Modelli Utilizzati}
+% ======================================================================
+
+\subsection{Famiglia Pythia (EleutherAI)}
+
+\textbf{Pythia} \cite{biderman2023pythia} è una famiglia di modelli causali autoregressivi (decoder-only) addestrati sul corpus \emph{The Pile} ($\sim$300B token). Tutti i modelli condividono:
+\begin{itemize}
+    \item \textbf{Architettura}: GPT-NeoX (transformer decoder-only);
+    \item \textbf{Training}: nessun fine-tuning istruttivo (RLHF, SFT) $\rightarrow$ modelli \emph{base};
+    \item \textbf{Tokenizer}: GPT-NeoX Tokenizer (BPE, vocabolario da 50K token);
+    \item \textbf{Training steps}: 143,000 (equivalenti a $\sim$300B token).
+\end{itemize}
+
+\medskip
+Il framework implementato supporta l'analisi comparativa di 5 modelli Pythia di dimensioni crescenti:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lrc}
+\toprule
+\textbf{Modello} & \textbf{Parametri} & \textbf{Layers} \\
+\midrule
+Pythia-160M  & 160 milioni  & 12 \\
+Pythia-1B    & 1 miliardo   & 16 \\
+Pythia-1.4B  & 1.4 miliardi & 24 \\
+Pythia-2.8B  & 2.8 miliardi & 32 \\
+Pythia-6.9B  & 6.9 miliardi & 32 \\
+\bottomrule
+\end{tabular}
+\caption{Modelli della famiglia Pythia supportati dalla pipeline.}
+\end{table}
+
+\medskip
+La scelta di modelli base (non allineati) è intenzionale: permette di osservare le opinioni ``native'' emergenti dal pre-training, senza l'influenza dell'alignment con feedback umano --- che, come mostrato da Santurkar et al., tende ad amplificare il bias liberal.
+
+\medskip
+\noindent \textbf{Extensibilità:} Il framework è progettato per supportare altri modelli (es. LLaMA, Mistral, GPT-2). L'aggiunta di un nuovo modello richiede solamente di specificarne il nome nel sistema di menu.
+
+\end{document}
