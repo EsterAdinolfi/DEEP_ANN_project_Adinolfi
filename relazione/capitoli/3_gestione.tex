@@ -1,0 +1,28 @@
+\documentclass[../relazione.tex]{subfiles}
+\begin{document}
+
+% ======================================================================
+\section{Sistema di gestione (\protect\path{menu.py})}
+% ======================================================================
+Per semplificare l'esecuzione della pipeline, è stato implementato un sistema di gestione con due modalità operative:
+
+\begin{enumerate}
+    \item \textbf{Modalità automatica}: esecuzione sequenziale completa.
+    \begin{lstlisting}
+python menu.py [--update]
+    \end{lstlisting}
+    Esegue in sequenza tutti gli script (mapping, initialization, experiments, analyze, visualize) per tutti i modelli configurati. Il flag \texttt{--update} forza il ricalcolo di file esistenti;
+    
+    \item \textbf{Modalità interattiva}: menu testuale che permette l'interazione con l'utente.
+    \begin{lstlisting}
+python menu.py --menu [--update]
+    \end{lstlisting}
+    Presenta un menu che permette di:
+    \begin{itemize}
+        \item Eseguire singoli script della pipeline;
+        \item Selezionare modelli specifici per l'analisi;
+        \item Attivare la modalità update per singole operazioni.
+    \end{itemize}
+\end{enumerate}
+
+\end{document}

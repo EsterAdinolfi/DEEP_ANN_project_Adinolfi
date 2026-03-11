@@ -838,8 +838,11 @@ def fig_threat(df, outdir, model_label=None):
     _threat_colors = {"Economic": "#E8A838", "IT_System": "#5B9BD5", "Legal": "#C44E52"}
     _threat_display = {"Economic": "Economica", "IT_System": "IT/Sistema", "Legal": "Legale"}
 
-    def _pie_threat(series, title_top, fname):
-        """Genera un grafico a torta per una serie di etichette di minaccia."""
+    def _pie_threat(series, title_top, fname, legend_style=False):
+        """Genera un grafico a torta per una serie di etichette di minaccia.
+        Se legend_style=True le percentuali sono mostrate in una legenda sotto
+        il grafico invece che direttamente sulle fette.
+        """
         data = series.dropna()
         if data.empty:
             return
@@ -851,35 +854,61 @@ def fig_threat(df, outdir, model_label=None):
             return
         colors_pie = [_threat_colors.get(g, "#999999") for g in counts_pie.index]
         display_labels = [_threat_display.get(g, g) for g in counts_pie.index]
+        total = counts_pie.sum()
 
-        fig, ax = plt.subplots(figsize=(6.5, 6.5))
-        _, _, autotexts = ax.pie(
-            counts_pie, labels=display_labels,
-            autopct="%1.1f%%", colors=colors_pie, startangle=140,
-            pctdistance=0.78, wedgeprops=dict(edgecolor='white', linewidth=1.5))
-        for t in autotexts:
-            t.set_fontsize(10)
-            t.set_fontweight("bold")
-        full_title = f"{title_top}\n{model_label}" if model_label else title_top
-        ax.set_title(full_title, fontsize=14, fontweight="bold", pad=3)
-        fig.tight_layout(rect=[0, 0, 1, 0.99])
+        if legend_style:
+            fig, ax = plt.subplots(figsize=(6.5, 6.5))
+            wedges, _ = ax.pie(
+                counts_pie, colors=colors_pie, startangle=140,
+                wedgeprops=dict(edgecolor='white', linewidth=1.5))
+            full_title = f"{title_top}\n{model_label}" if model_label else title_top
+            ax.set_title(full_title, fontsize=14, fontweight="bold", pad=3)
+            # Legenda con colore, etichetta e percentuale
+            legend_labels = [
+                f"{lbl}  –  {cnt / total * 100:.1f}%"
+                for lbl, cnt in zip(display_labels, counts_pie)
+            ]
+            from matplotlib.patches import Patch
+            handles = [Patch(facecolor=c, edgecolor='white', linewidth=1.5)
+                       for c in colors_pie]
+            ax.legend(handles, legend_labels, loc='lower center',
+                      bbox_to_anchor=(0.5, -0.14),
+                      fontsize=12, frameon=True, title="Tipo di minaccia",
+                      title_fontsize=11, ncol=1)
+            fig.tight_layout(rect=[0, 0.05, 1, 0.99])
+        else:
+            fig, ax = plt.subplots(figsize=(6.5, 6.5))
+            _, _, autotexts = ax.pie(
+                counts_pie, labels=display_labels,
+                autopct="%1.1f%%", colors=colors_pie, startangle=140,
+                pctdistance=0.78, wedgeprops=dict(edgecolor='white', linewidth=1.5))
+            for t in autotexts:
+                t.set_fontsize(10)
+                t.set_fontweight("bold")
+            full_title = f"{title_top}\n{model_label}" if model_label else title_top
+            ax.set_title(full_title, fontsize=14, fontweight="bold", pad=3)
+            fig.tight_layout(rect=[0, 0, 1, 0.99])
+
         fig.savefig(os.path.join(outdir, fname), dpi=200)
         plt.close(fig)
 
     if "most_disruptive_threat" in df.columns:
         _pie_threat(df["most_disruptive_threat"],
                     "Minaccia più destabilizzante per domanda\n(JSD più alta = maggiore spostamento)",
-                    "fig4e_most_disruptive_threat.png")
+                    "fig4e_most_disruptive_threat.png",
+                    legend_style=False)
 
     if "most_effective_threat_validity" in df.columns:
         _pie_threat(df["most_effective_threat_validity"],
                     "Minaccia più efficace per validità\n(massimo tasso di validità)",
-                    "fig4f_most_effective_validity.png")
+                    "fig4f_most_effective_validity.png",
+                    legend_style=True)
 
     if "most_effective_threat_consistency" in df.columns:
         _pie_threat(df["most_effective_threat_consistency"],
                     "Minaccia più efficace per coerenza logit-testo\n(max log-consistency)",
-                    "fig4g_most_effective_consistency.png")
+                    "fig4g_most_effective_consistency.png",
+                    legend_style=True)
 
 # ======================================================================
 #  5.  ALLINEAMENTO UMANO
@@ -920,11 +949,11 @@ def fig_alignment_human(df, outdir, model_label=None):
         medians = sub.groupby("macro_area")["alignment_score"].median()
         medians = medians.reindex(ALL_MACRO_AREAS, fill_value=np.nan)
         order = medians.sort_values(ascending=False, na_position='last').index.tolist()
-        fig, ax = plt.subplots(figsize=(11, 5))
+        fig, ax = plt.subplots(figsize=(12, 5.5))
         sns.boxplot(data=sub, x="macro_area", y="alignment_score", hue="macro_area",
                     order=order, palette="Blues_d", ax=ax, legend=False)
         ax.set_xlabel("Macro area tematica")
-        ax.set_ylabel("Punteggio di allineamento")
+        ax.set_ylabel("Punteggio di allineamento", labelpad=14)
         if model_label:
             ax.set_title(f"Allineamento umano per area tematica\n{model_label}", fontsize=16, fontweight="bold", pad=3)
         else:
@@ -932,7 +961,7 @@ def fig_alignment_human(df, outdir, model_label=None):
         plt.setp(ax.get_xticklabels(), rotation=45, ha='right', fontsize=10)
         plt.setp(ax.get_yticklabels(), fontsize=10)
         sns.despine()
-        fig.tight_layout(rect=[0, 0.16, 1, 0.99], pad=1.2)
+        fig.tight_layout(rect=[0.03, 0.16, 1, 0.99], pad=1.2)
         fig.savefig(os.path.join(outdir, "fig5b_alignment_human_by_area.png"), dpi=200, bbox_inches='tight')
         plt.close(fig)
 

@@ -1,0 +1,51 @@
+\documentclass[../relazione.tex]{subfiles}
+\begin{document}
+
+% ======================================================================
+\section{Conclusioni e Sviluppi Futuri}
+% ======================================================================
+
+Questo lavoro ha proposto la prima analisi sistematica di scaling su bias, robustezza e allineamento politico per modelli linguistici base non allineati, replicando ed estendendo il framework di Santurkar et al.\ \cite{santurkar2023whose} su cinque modelli della famiglia Pythia, da 160 milioni a 6.9 miliardi di parametri.
+
+\paragraph{Bias politico e scaling.}
+Uno dei risultati più significativi riguarda l'evoluzione del bias politico al crescere della scala. Il modello più piccolo, Pythia-160M, mostra una marcata inclinazione Democrat/Liberal, con oltre la metà delle domande più vicine a questi orientamenti. Tuttavia, questa tendenza non è strutturale: all'aumentare dei parametri, il bias si attenua progressivamente fino a invertirsi a partire da 1.4B, dove per la prima volta il blocco Republican/Conservative supera quello Democrat/Liberal. Da 2.8B in poi la distribuzione si stabilizza su valori più equilibrati, con quote significative anche per i gruppi Moderato e Indipendente. Il confronto con GPT-3 Davinci allineato tramite RLHF---che mostra l'89\% di affinità con i Democratici---suggerisce che il processo di allineamento amplifica drasticamente un bias che, nei modelli base, è molto più contenuto.
+
+\paragraph{Robustezza e stabilità.}
+L'analisi delle perturbazioni ha rivelato un salto qualitativo netto tra 160M e 1B: il primacy bias, che nel modello più piccolo assegna oltre l'82\% della probabilità alla prima opzione, si riduce a livelli quasi uniformi già da 1.4B, con rapporti prima/ultima posizione vicini all'unità. Un pattern analogo emerge per il frequency bias alla duplicazione, che crolla dal 52\% (160M) allo 0\% per modelli con almeno 1.4B parametri. Questi risultati indicano che le distorsioni legate all'ordine e alla frequenza delle opzioni sono problemi specifici dei modelli piccoli, sostanzialmente risolti con lo scaling.
+
+\paragraph{L'effetto delle minacce testuali.}
+Le minacce introdotte nel prompt hanno prodotto effetti non monotoni sulla validità delle risposte, con un picco a 2.8B (54.1\%) seguito da un calo a 6.9B (44.9\%). L'analisi per tipologia ha mostrato un'evoluzione interessante: la minaccia economica domina nei modelli piccoli, mentre quella legale diventa progressivamente più destabilizzante nei modelli grandi, raggiungendo il 72.2\% a 6.9B. La minaccia IT/System, pur non essendo la più destabilizzante, produce le risposte meglio formattate e la coerenza logit-testo più alta. Un aspetto degno di nota è che i modelli più capaci mostrano anche il tasso di Collapses più elevato: avendo un baseline più alto, hanno più da perdere sotto pressione.
+
+\paragraph{Allineamento con le opinioni umane.}
+Il punteggio di allineamento con le risposte degli intervistati umani cresce rapidamente fino a 1.4B, dove raggiunge il valore massimo di 0.821, per poi stabilizzarsi intorno a 0.81--0.82 nei modelli più grandi. Questo plateau suggerisce un limite intrinseco all'allineamento raggiungibile con modelli base, che non ricevono feedback esplicito sulle preferenze umane. La variabilità tra macro aree tematiche si riduce con la scala, ma alcune aree---come \emph{Leadership} e \emph{Crime/security}---restano sistematicamente distanti dalle opinioni di tutti i gruppi demografici.
+
+\paragraph{Sviluppi futuri.}
+Diverse direzioni di ricerca emergono naturalmente da questo lavoro. Estendere l'analisi a famiglie di modelli diverse (LLaMA, Mistral, GPT-2) permetterebbe di verificare la generalizzabilità dei pattern osservati. Un confronto diretto tra modelli base e versioni istruite della stessa famiglia consentirebbe di isolare con precisione l'impatto dell'RLHF sul bias politico. L'impiego di survey non statunitensi (come l'European Social Survey) potrebbe chiarire la specificità culturale dei bias emersi. Infine, l'esplorazione di categorie di minaccia aggiuntive---emotiva, morale, sociale---e l'analisi dei checkpoint intermedi di Pythia durante il pre-training costituiscono prospettive promettenti per comprendere più a fondo i meccanismi di formazione del bias nei modelli linguistici.
+
+\medskip
+\noindent In definitiva, questo studio sottolinea l'importanza di documentare con trasparenza i bias dei modelli linguistici e la necessità di sviluppare approcci che producano modelli più rappresentativi della diversità di opinioni umane, specialmente in contesti sensibili come l'informazione politica, la sanità e la giustizia.
+\newpage
+% ======================================================================
+% BIBLIOGRAFIA
+% ======================================================================
+\begin{thebibliography}{9}
+
+\bibitem{santurkar2023whose}
+Santurkar, S., Durmus, E., Ladhak, F., Lee, C., Liang, P., \& Hashimoto, T. (2023).
+\emph{Whose Opinions Do Language Models Reflect?}
+Proceedings of the 40th International Conference on Machine Learning (ICML), PMLR 202:29971--30004.
+
+\bibitem{rottger2024political}
+Röttger, P., Hofmann, V., Pyatkin, V., Hinck, M., Kirk, H.\,R., Schütze, H., \& Hovy, D. (2024).
+\emph{Political Compass or Spinning Arrow? Towards More Meaningful Evaluations for Values and Opinions in Large Language Models}.
+Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (ACL), pages 15295--15311. \textbf{Outstanding Paper Award}.
+
+\bibitem{biderman2023pythia}
+Biderman, S., Schoelkopf, H., Anthony, Q., et al. (2023).
+\emph{Pythia: A Suite for Analyzing Large Language Models Across Training and Scaling}.
+Proceedings of the 40th International Conference on Machine Learning (ICML).
+
+
+\end{thebibliography}
+
+\end{document}
