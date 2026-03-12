@@ -70,4 +70,15 @@ Genera 23 grafici per modello, organizzati in 7 categorie:
     \item \textbf{Politica} (fig6): validità/coerenza per area tematica, bussola politica, heatmap della WD.
 \end{enumerate}
 
+Inoltre, lo stesso script espone una funzione di \textbf{generazione di grafici comparativi} (\path{generate_all_comparative}), invocabile dal menu interattivo come voce dedicata oppure automaticamente quando si generano le figure per tutti i modelli. Questa funzione carica i CSV di tutti e cinque i modelli e produce 8 figure comparative nella cartella \path{risultati/comparative/}:
+\begin{enumerate}
+    \item Violin plot della JSD affiancati per modello;
+    \item Mappe cognitive della permutazione e della duplicazione a confronto;
+    \item Bias di posizione;
+    \item Barre impilate per tipo di minaccia (più destabilizzante, più efficace per validità, più efficace per coerenza);
+    \item Distribuzione dell'allineamento umano;
+    \item Bussola politica;
+    \item Heatmap WD.
+\end{enumerate}
+
 \end{document}

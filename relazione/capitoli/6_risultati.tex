@@ -1,0 +1,289 @@
+\documentclass[../relazione.tex]{subfiles}
+\begin{document}
+
+% ======================================================================
+\section{Analisi dei risultati}
+\label{sec:risultati}
+% ======================================================================
+L'analisi è stata condotta su \textbf{1506 domande} distribuite su \textbf{380 topic} e \textbf{23 macro aree} secondo la tassonomia di OpinionQA \cite{santurkar2023whose}, per cinque modelli della famiglia Pythia: \textbf{160M}, \textbf{1B}, \textbf{1.4B}, \textbf{2.8B} e \textbf{6.9B} parametri. I grafici comparativi sono stati generati affiancando le metriche prodotte per ciascun modello, permettendo così un confronto visivo diretto.
+
+% ======================================================================
+\subsection{Quadro d'insieme}
+\label{sec:comparison_table}
+% ======================================================================
+
+La Tabella~\ref{tab:comparison_5models} riassume tutte le metriche chiave.
+
+% ── Colori per la tabella riassuntiva ──────────────────────────────────
+\definecolor{m1hdr}{HTML}{1A7A6E}
+\definecolor{m1aHdr}{HTML}{1E9080}
+\definecolor{m1bHdr}{HTML}{1A6A9A}
+\definecolor{m1aRow}{HTML}{D5F0EC}
+\definecolor{m1bRow}{HTML}{C5E8F5}
+
+\definecolor{m2hdr}{HTML}{B85C00}
+\definecolor{m2sHdr}{HTML}{D97B10}
+\definecolor{m2Row}{HTML}{FDE9D0}
+
+\definecolor{m3hdr}{HTML}{6A2E8C}
+\definecolor{m3sHdr}{HTML}{8A47B0}
+\definecolor{m3Row}{HTML}{EDE0F5}
+
+\definecolor{m4hdr}{HTML}{9C1515}
+\definecolor{m4sHdr}{HTML}{C22020}
+\definecolor{m4Row}{HTML}{FAE0E0}
+\definecolor{m4Econ}{HTML}{FDF0D0}
+\definecolor{m4IT}{HTML}{D8EEFA}
+\definecolor{m4Leg}{HTML}{F0E0F5}
+
+\definecolor{m5hdr}{HTML}{1E7A3E}
+\definecolor{m5Row}{HTML}{D5F0DC}
+
+\definecolor{m6hdr}{HTML}{1C3A8A}
+\definecolor{m6Row}{HTML}{DAE4F8}
+
+% ───────────────────────────────────────────────────────────────────────
+% sistema manualmente il contatore per eliminare il vecchio table.2 residuo
+\addtocounter{table}{-1}
+
+
+\small
+\setlength{\LTcapwidth}{\textwidth}
+\begin{xltabular}{\textwidth}{X *{5}{c}}
+\toprule
+\textbf{Metrica} & \textbf{160M} & \textbf{1B} & \textbf{1.4B} & \textbf{2.8B} & \textbf{6.9B} \\
+\midrule
+\endfirsthead
+
+\multicolumn{6}{c}{\small\itshape(continua dalla pagina precedente)}\\[2pt]
+\toprule
+\textbf{Metrica} & \textbf{160M} & \textbf{1B} & \textbf{1.4B} & \textbf{2.8B} & \textbf{6.9B} \\
+\midrule
+\endhead
+
+\midrule
+\multicolumn{6}{c}{\small\itshape(continua nella pagina successiva)}\\
+\endfoot
+
+\bottomrule
+\caption{Quadro d'insieme: confronto su cinque modelli Pythia.}
+\label{tab:comparison_5models}\\
+\endlastfoot
+
+%% ── MACRO 1: VALIDITÀ / COERENZA ──
+\rowcolor{m1hdr} \multicolumn{6}{c}{\textcolor{white}{\textbf{Validità e coerenza logit-testo (\%)}}} \\
+\rowcolor{m1aHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Tasso di validità (\%)}}} \\
+\rowcolor{m1aRow} \hspace{1em}Baseline & 1.5 & 7.1 & 16.0 & 11.3 & 14.2 \\
+\rowcolor{m1aRow} \hspace{1em}Permutazione & 3.4 & 8.1 & 15.3 & 10.8 & 14.3 \\
+\rowcolor{m1aRow} \hspace{1em}Duplicazione & 1.0 & 8.2 & 14.9 & 9.2 & 14.0 \\
+\rowcolor{m1aRow} \hspace{1em}Minaccia & 1.5 & 33.9 & 60.4 & 54.1 & 44.9 \\
+\rowcolor{m1aRow} \hspace{1em}\textit{Media generale} & \textit{1.8} & \textit{14.3} & \textit{26.7} & \textit{21.4} & \textit{21.8} \\
+
+\rowcolor{m1bHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Tasso di coerenza logit-testo (\%)}}} \\
+\rowcolor{m1bRow} \hspace{1em}Baseline & 1.4 & 5.4 & 8.6 & 7.7 & 11.0 \\
+\rowcolor{m1bRow} \hspace{1em}Permutazione & 3.4 & 7.1 & 9.0 & 7.2 & 11.4 \\
+\rowcolor{m1bRow} \hspace{1em}Duplicazione & 1.0 & 6.2 & 7.5 & 6.3 & 11.2 \\
+\rowcolor{m1bRow} \hspace{1em}Minaccia & 1.4 & 22.0 & 28.5 & 37.3 & 37.3 \\
+\rowcolor{m1bRow} \hspace{1em}\textit{Media generale} & \textit{1.8} & \textit{10.2} & \textit{13.4} & \textit{14.6} & \textit{17.7} \\
+
+%% ── MACRO 2: PERMUTAZIONE ──
+\rowcolor{m2hdr} \multicolumn{6}{c}{\textcolor{white}{\textbf{Permutazione}}} \\
+\rowcolor{m2sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Robustezza (JSD)}}} \\
+\rowcolor{m2Row} \hspace{1em}Media & 0.279 & 0.055 & 0.011 & 0.011 & 0.014 \\
+\rowcolor{m2Row} \hspace{1em}Mediana & 0.293 & 0.042 & 0.006 & 0.005 & 0.008 \\
+\rowcolor{m2Row} \hspace{1em}Dev.\ std & 0.135 & 0.049 & 0.014 & 0.015 & 0.019 \\
+
+\rowcolor{m2sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Position bias (\%)}}} \\
+\rowcolor{m2Row} \hspace{1em}Instabile & 77.5 & 5.0 & 0.0 & 0.1 & 0.0 \\
+\rowcolor{m2Row} \hspace{1em}Stabile & 19.3 & 36.7 & 3.4 & 2.7 & 5.8 \\
+\rowcolor{m2Row} \hspace{1em}Robusto & 3.3 & 58.2 & 96.6 & 97.2 & 94.2 \\
+
+\rowcolor{m2sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Position bias (probabilità)}}} \\
+\rowcolor{m2Row} \hspace{1em}$P(\text{prima posizione})$ & 0.825 & 0.539 & 0.356 & 0.371 & 0.359 \\
+\rowcolor{m2Row} \hspace{1em}$\frac{P(\text{prima posizione})}{P(\text{ultima posizione})}$ & 11.13 & 2.29 & 1.15 & 1.23 & 1.27 \\
+
+%% ── MACRO 3: DUPLICAZIONE ──
+\rowcolor{m3hdr} \multicolumn{6}{c}{\textcolor{white}{\textbf{Duplicazione}}} \\
+\rowcolor{m3sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Robustezza (JSD)}}} \\
+\rowcolor{m3Row} \hspace{1em}Media & 0.177 & 0.040 & 0.012 & 0.013 & 0.016 \\
+\rowcolor{m3Row} \hspace{1em}Mediana & 0.156 & 0.029 & 0.009 & 0.008 & 0.010 \\
+\rowcolor{m3Row} \hspace{1em}Dev.\ std & 0.120 & 0.039 & 0.012 & 0.015 & 0.018 \\
+
+\rowcolor{m3sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Frequency bias (\%)}}} \\
+\rowcolor{m3Row} \hspace{1em}Instabile & 52.2 & 1.9 & 0.0 & 0.1 & 0.0 \\
+\rowcolor{m3Row} \hspace{1em}Stabile & 36.0 & 26.4 & 1.6 & 3.0 & 5.4 \\
+\rowcolor{m3Row} \hspace{1em}Robusto & 11.8 & 71.7 & 98.4 & 96.9 & 94.6 \\
+
+%% ── MACRO 4: MINACCIA ──
+\rowcolor{m4hdr} \multicolumn{6}{c}{\textcolor{white}{\textbf{Minaccia}}} \\
+\rowcolor{m4sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Robustezza (JSD)}}} \\
+\rowcolor{m4Row} \hspace{1em}Media & 0.0038 & 0.0039 & 0.0009 & 0.0016 & 0.0018 \\
+\rowcolor{m4Row} \hspace{1em}Mediana & 0.0024 & 0.0022 & 0.0005 & 0.0009 & 0.0013 \\
+\rowcolor{m4Row} \hspace{1em}Dev.\ std & 0.0042 & 0.0054 & 0.0012 & 0.0019 & 0.0019 \\
+
+\rowcolor{m4sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Resistenza delta-based (\%)}}} \\
+\rowcolor{m4Row} \hspace{1em}Peggiorata & 1.4 & 2.2 & 1.2 & 3.9 & 8.2 \\
+\rowcolor{m4Row} \hspace{1em}Stabile & 95.9 & 52.0 & 35.6 & 31.4 & 32.5 \\
+\rowcolor{m4Row} \hspace{1em}Migliorata & 2.7 & 45.8 & 63.2 & 64.7 & 59.4 \\
+
+\rowcolor{m4sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Validità per tipo di minaccia (\%)}}} \\
+\rowcolor{m4Econ} \hspace{1em}\textcolor{m4hdr}{\textbullet}~Economica & 2.3 & 27.6 & 43.9 & 40.0 & 24.9 \\
+\rowcolor{m4IT} \hspace{1em}\textcolor{m3hdr}{\textbullet}~IT/Sistema & 1.0 & 33.3 & 78.1 & 72.2 & 70.2 \\
+\rowcolor{m4Leg} \hspace{1em}\textcolor{m4sHdr}{\textbullet}~Legale & 1.2 & 40.8 & 59.2 & 50.1 & 39.6 \\
+
+\rowcolor{m4sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Coerenza logit-testo per tipo di minaccia (\%)}}} \\
+\rowcolor{m4Econ} \hspace{1em}\textcolor{m4hdr}{\textbullet}~Economica & 2.1 & 16.9 & 21.4 & 28.6 & 20.6 \\
+\rowcolor{m4IT} \hspace{1em}\textcolor{m3hdr}{\textbullet}~IT/Sistema & 1.0 & 23.2 & 38.3 & 51.7 & 57.3 \\
+\rowcolor{m4Leg} \hspace{1em}\textcolor{m4sHdr}{\textbullet}~Legale & 1.2 & 26.0 & 25.8 & 31.5 & 34.0 \\
+
+\rowcolor{m4sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Minaccia più destabilizzante (JSD)}}} \\
+\rowcolor{m4Row} \hspace{1em}Tipo prevalente & Econ & Econ & Legale & IT/Sis & Legale \\
+
+%% ── MACRO 5: ALLINEAMENTO ──
+\rowcolor{m5hdr} \multicolumn{6}{c}{\textcolor{white}{\textbf{Allineamento umano}}} \\
+\rowcolor{m5Row} \hspace{1em}Media & 0.661 & 0.787 & 0.821 & 0.809 & 0.812 \\
+\rowcolor{m5Row} \hspace{1em}Mediana & 0.683 & 0.819 & 0.843 & 0.829 & 0.836 \\
+\rowcolor{m5Row} \hspace{1em}Aree più allineate & \tiny Self-p., Status & \tiny Pers.\ h., Religion & \tiny Qual.\ life, Immig. & \tiny Status, Immig. & \tiny Health., Immig. \\
+\rowcolor{m5Row} \hspace{1em}Aree meno allineate & \tiny Pers.\ fin., Family & \tiny Family, Job/car. & \tiny Family, Guns & \tiny Leader., Crime & \tiny Leader., Family \\
+
+%% ── MACRO 6: POLITICA ──
+\rowcolor{m6hdr} \multicolumn{6}{c}{\textcolor{white}{\textbf{Affinità politica (\%)}}} \\
+\rowcolor{m6Row} \hspace{1em}Democratici & 25.4 & 20.4 & 17.3 & 17.1 & 17.3 \\
+\rowcolor{m6Row} \hspace{1em}Liberali & 25.0 & 14.3 & 13.0 & 13.8 & 14.8 \\
+\rowcolor{m6Row} \hspace{1em}Repubblicani & 25.6 & 19.0 & 19.5 & 21.5 & 18.8 \\
+\rowcolor{m6Row} \hspace{1em}Conservativi & 8.1 & 14.2 & 16.4 & 14.9 & 16.6 \\
+\rowcolor{m6Row} \hspace{1em}Moderati & 8.7 & 16.3 & 17.3 & 16.7 & 16.8 \\
+\rowcolor{m6Row} \hspace{1em}Indipendenti & 7.2 & 15.8 & 16.4 & 16.0 & 15.7 \\
+\rowcolor{m6Row} \hspace{1em}D + L & 50.4 & 34.7 & 30.4 & 30.8 & 32.2 \\
+\rowcolor{m6Row} \hspace{1em}R + C & 33.7 & 33.2 & 35.9 & 36.5 & 35.4 
+\end{xltabular}
+
+
+% ======================================================================
+\subsection{Validità delle risposte e coerenza logit-testo}
+% ======================================================================
+
+Il \textbf{tasso di validità}, in percentuale, della baseline \emph{non} segue un andamento \emph{monotono}: partendo da 160M (1.5\,\%) raggiunge il picco a 1.4B (16.0\,\%), scende a 2.8B (11.3\,\%) e risale parzialmente a 6.9B (14.2\,\%). Nessun modello supera il 16\,\%, confermando che i modelli \emph{base} non istruiti producono risposte nel formato atteso solo in una minoranza di casi. Anche l'effetto delle minacce testuali è \emph{non monotono}: il picco si registra a \textbf{1.4B (60.4\,\%)}, superando sia 2.8B (54.1\,\%) sia 6.9B (44.9\,\%). Pythia-1.4B si rivela essere, dunque, il modello più in grado di produrre risposte valide, rispetto alla regex usata, all'interno della famiglia Pythia.
+
+Per quanto riguarda la \textbf{coerenza logit-testo}, il pattern è simile, ma con differenze più marcate: nelle risposte base, il modello più coerente è \textbf{6.9B (11.0\,\%)}. Sotto minaccia, invece, 2.8B e 6.9B raggiungono lo stesso tasso (37.3\,\%). Poichè il tasso è più basso nella baseline del 2.8B (7.7\,\%), si può ipotizzare che 2.8B sia più suscettibile alla minaccia.
+
+Sia nel caso della validità che della coerenza, la \textbf{minaccia} testuale si rivela essere essenziale per aumentare significativamente le performance, soprattutto nei modelli più grandi.
+
+% ======================================================================
+\subsection{Robustezza e stabilità}
+% ======================================================================
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{\risultati/comparative/comp_jsd_violins.png}
+\caption{Distribuzione della JSD per tipo di perturbazione, affiancata per i cinque modelli. La larghezza della forma indica la densità delle domande a ciascun livello di JSD. La linea verde indica la soglia di robustezza (0.05), mentre quella rossa la soglia di stabilità (0.15).}
+\label{fig:comp_jsd}
+\end{figure}
+
+Il salto qualitativo più netto avviene tra 160M e 1B: Pythia-160M presenta una JSD media di permutazione pari a 0.279 (77.5\,\% delle domande instabili), mentre già da 1B la JSD scende a 0.055 e il tasso di robustezza supera il 58\,\%. Anche per quanto riguarda la duplicazione la robustezza media passa da 0.177 (in Pythia-160M) a 0.040 (in Pythia-1B), con il tasso di robustezza che passa dall'11.8\,\% al 71.7\,\%. 
+Da 1.4B in poi la robustezza, sia per la permutazione sia per la duplicazione, si stabilizza sopra il 94\,\%, con position e frequency bias quasi azzerati (Tabella~\ref{tab:comparison_5models}).
+
+La Figura~\ref{fig:comp_jsd} mostra come le distribuzioni JSD convergano verso valori prossimi a zero nei modelli più grandi, con il violino che collassa alla base dell'asse per tutte e tre le perturbazioni. 
+
+I risultati migliori si hanno con le minacce, che raggiungono JSD medie inferiori a 0.0038 già a partire da 160M, confermando l'efficacia di questo tipo di perturbazione per ottenere risposte più stabili e coerenti. Tuttavia, il tasso di peggioramento con la minaccia cresce con la scala: 1.2\,\% (1.4B) $\to$ 3.9\,\% (2.8B) $\to$ 8.2\,\% (6.9B). I modelli più grandi, avendo un tasso di validità nella baseline più alto, hanno "più da perdere" sotto pressione.
+
+% ======================================================================
+\subsection{Bias di posizione e di frequenza}
+% ======================================================================
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{\risultati/comparative/comp_position_bias.png}
+\caption{Probabilità media assegnata per posizione dell'opzione, per modello. La linea rossa tratteggiata indica il valore uniforme atteso ($\approx 0.31$).}
+\label{fig:comp_position_bias}
+\end{figure}
+
+Il primacy bias di Pythia-160M è estremo: la prima opzione riceve l'82.5\,\% della probabilità, 11 volte più dell'ultima (Figura~\ref{fig:comp_position_bias}). Da 1.4B in poi il rapporto prima/ultima posizione converge a $\sim$\,1.2. Il frequency bias segue un pattern analogo: 52.2\,\% di domande instabili in 160M, azzerato da 1.4B in poi.
+
+% ======================================================================
+\subsection{Mappe cognitive}
+% ======================================================================
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{\risultati/comparative/comp_cognitive_maps.png}
+\caption{Mappe cognitive (permutazione): ogni punto è una domanda, posizionata in base al tasso di validità e alla JSD alla permutazione. Le soglie (0.15 e 0.50) definiscono i quattro quadranti: \emph{Rumore generativo}, \emph{Rifiuto coerente}, \emph{Bias di posizione}, \emph{Risposta affidabile}.}
+\label{fig:comp_cognitive_maps}
+\end{figure}
+
+Le mappe cognitive (Figura~\ref{fig:comp_cognitive_maps}) rivelano un pattern chiaro: Pythia-160M popola quasi esclusivamente i quadranti a bassa validità (76.1\,\% rumore, 22.4\,\% rifiuto), mentre da 1B compare il quadrante \emph{Risposta affidabile} (7.0\,\%) e raggiunge il 16.0\,\% a 1.4B, per poi ridiscendere al 14.2\,\% in 6.9B, confermando il pattern non monotono già osservato per la validità.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{\risultati/comparative/comp_dup_cognitive_maps.png}
+\caption{Mappe cognitive (duplicazione): stessa struttura della Figura~\ref{fig:comp_cognitive_maps}, con la JSD alla duplicazione sull'asse orizzontale.}
+\label{fig:comp_dup_cognitive_maps}
+\end{figure}
+
+Le mappe per la duplicazione (Figura~\ref{fig:comp_dup_cognitive_maps}) confermano lo stesso andamento: il frequency bias è grave solo in 160M (51.5\,\% nel quadrante rumore generativo), mentre già da 1B il grosso delle domande si concentra nel quadrante \emph{Rifiuto coerente} (stabile, non valido) e il quadrante \emph{Risposta affidabile} cresce monotonicamente con la scala.
+
+% ======================================================================
+\subsection{Efficacia per tipo di minaccia}
+% ======================================================================
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{\risultati/comparative/comp_threats_stacked.png}
+\caption{Efficacia per tipo di minaccia. Per ogni modello sono riportate tre barre (più destabilizzante, più efficace per validità, più efficace per coerenza), colorate per tipo di minaccia (Economica, IT/Sistema, Legale). L'altezza di ogni colore rappresenta la percentuale di domande per cui quel tipo domina.}
+\label{fig:comp_threats}
+\end{figure}
+
+La minaccia \textbf{economica} domina tra le più destabilizzanti nei modelli piccoli (160M: 37.6\,\%, 1B: 57.4\,\%). A 1.4B il quadro cambia: IT/Sistema (34.5\,\%) e legale (34.5\,\%) si equivalgono perfettamente. Nei modelli più grandi la minaccia \textbf{legale} diventa nettamente dominante (6.9B: 72.2\,\%).
+
+In termini di \emph{efficacia sulla validità}, la minaccia economica è quasi monopolistica in 160M (98.9\,\%) ma perde terreno progressivamente a favore di IT/Sistema, che già a 1.4B raggiunge validità del 78.1\,\% e coerenza logit-testo del 38.3\,\% (Tabella~\ref{tab:comparison_5models}).
+
+% ======================================================================
+\subsection{Allineamento con le risposte umane}
+% ======================================================================
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{\risultati/comparative/comp_alignment.png}
+\caption{Distribuzione dell'alignment score per modello. Le linee trattegiate indicano media ($\mu$) e mediana.}
+\label{fig:comp_alignment}
+\end{figure}
+
+L'alignment cresce rapidamente fino a 1.4B (media 0.821, mediana 0.843), poi si stabilizza: 2.8B (0.809) e 6.9B (0.812) non migliorano significativamente, anzi tendono a ridursi (Figura~\ref{fig:comp_alignment}). Questo plateau suggerisce un limite intrinseco all'allineamento raggiungibile con modelli base non istruiti.
+
+% ======================================================================
+\subsection{Bias politico}
+% ======================================================================
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{\risultati/comparative/comp_political_compass.png}
+\caption{Bussola politica per macro area tematica: ogni punto numerato rappresenta una macro area, posizionata in base all'affinità con i quattro gruppi politici.}
+\label{fig:comp_political_compass}
+\end{figure}
+
+La tendenza democratica/liberale di Pythia-160M (D+L\,=\,50.4\,\%) si attenua progressivamente fino a 1.4B (D+L\,=\,30.4\,\%, R+C\,=\,35.9\,\%), dove avviene un \emph{crossover}: da 1.4B in poi il blocco repubblicano/conservativo supera quello democratico/liberale. La distribuzione si stabilizza attorno a D+L\,$\approx$\,30--32\,\% e R+C\,$\approx$\,35--36\,\%, con quote significative di moderati ($\sim$\,16\,\%) e indipendenti ($\sim$\,16\,\%).
+
+La Figura~\ref{fig:comp_political_compass} visualizza l'evoluzione della bussola politica: in 160M le macro aree si concentrano nel quadrante \emph{liberale-democratico}, migrando progressivamente verso il polo \emph{conservatore-repubblicano} nei modelli più grandi. Il confronto con GPT-3 Davinci (89\,\% di affinità Democrat, \cite{santurkar2023whose}) indica che l'RLHF \emph{amplifica drasticamente} il bias preesistente nei dati di pre-training.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{\risultati/comparative/comp_wd_heatmaps.png}
+\caption{Heatmap della Wasserstein Distance (WD) per macro area~$\times$~gruppo demografico. Colori più intensi indicano maggiore distanza dal gruppo.}
+\label{fig:comp_wd_heatmaps}
+\end{figure}
+
+Le heatmap WD (Figura~\ref{fig:comp_wd_heatmaps}) mostrano che le distanze tra modello e gruppi demografici si riducono con la scala, ma mantengono pattern stabili: le macro aree \emph{Leadership} e \emph{Crime/security} restano sistematicamente le più distanti per tutti i gruppi, in tutti i modelli.
+
+% ======================================================================
+\subsection{Limitazioni}
+% ======================================================================
+
+\begin{itemize}
+    \item \textbf{Basso tasso di validità e di coerenza logit-testo}: anche i modelli che ottengono i migliori risultati raggiungono tassi di validità e coerenza inferiori al 16\,\%, confermando che ciò rimane un limite dei modelli non istruiti, o comunque dei modelli testati;
+    \item \textbf{Permutazione e duplicazione}: sebbene i modelli sembrino mostrare una certa robustezza a queste perturbazioni, rimangono deboli a livello di validità e coerenza logit-testo (vd. punto precedente);
+    \item \textbf{Minaccia}: sebbene sia la perturbazione più efficace, il tasso di peggioramento cresce con la scala, indicando che i modelli più grandi sono più suscettibili a questa perturbazione. Questa può essere considerata un'arma a doppio taglio: da un lato può essere usata per migliorare le performance, dall'altro può essere interpretata come una snaturalizzazione dell'interazione utente-llm;
+    \item \textbf{Allineamento}: l'allineamento con le risposte umane sembra raggiungere un plateau a partire da 1.4B, suggerendo che i modelli base non istruiti potrebbero avere un limite intrinseco in questo senso;
+    \item \textbf{Bias politico}: le affinità politiche tendono a stabilizzarsi attorno a D+L\,$\approx$\,30--32\,\% e R+C\,$\approx$\,35--36\,\%. Questo indica che non c'è una vera e propria predisposizione a un blocco politico, ma piuttosto una distribuzione relativamente equilibrata, con una leggera tendenza verso il conservatorismo/repubblicanesimo nei modelli più grandi.
+\end{itemize}
+
+\end{document}

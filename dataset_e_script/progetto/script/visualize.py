@@ -16,6 +16,7 @@ import matplotlib
 matplotlib.use('Agg')  # Anti-Grain Geometry. Backend non-interattivo = disegnare il grafico direttamente nella memoria RAM e salvarlo su disco, senza mai aprire una finestra pop-up sul monitor
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
+from matplotlib.patches import Patch
 import seaborn as sns
 
 # ── stile globale ──────────────────────────────────────────────────────
@@ -176,7 +177,7 @@ def fig_summary_table(df, df_topic, outdir, model_label=None):
     title_label = model_label if model_label else "Pythia"
     ax.set_title(f"Riepilogo delle metriche\n{title_label}", fontsize=16, fontweight="bold", pad=1)
     fig.tight_layout(rect=[0, 0, 1, 0.995])
-    fig.savefig(os.path.join(outdir, "fig0_summary_table.png"), dpi=200)
+    fig.savefig(os.path.join(outdir, "fig0_summary_table.png"), dpi=300)
     plt.close(fig)
 
 # ======================================================================
@@ -209,7 +210,7 @@ def fig_validity(df, outdir, model_label=None):
     ax.yaxis.set_major_formatter(mticker.PercentFormatter())
     sns.despine()
     fig.tight_layout(rect=[0, 0, 1, 0.995])
-    fig.savefig(os.path.join(outdir, "fig1a_validity.png"), dpi=200)
+    fig.savefig(os.path.join(outdir, "fig1a_validity.png"), dpi=300)
     plt.close(fig)
 
 def fig_log_coherence(df, outdir, model_label=None):
@@ -266,7 +267,7 @@ def fig_log_coherence(df, outdir, model_label=None):
     ax.yaxis.set_major_formatter(mticker.PercentFormatter())
     sns.despine()
     fig.tight_layout(rect=[0, 0, 1, 0.995])
-    fig.savefig(os.path.join(outdir, "fig1b_log_coherence.png"), dpi=200)
+    fig.savefig(os.path.join(outdir, "fig1b_log_coherence.png"), dpi=300)
     plt.close(fig)
 
 def fig_robustness(df, outdir, model_label=None):
@@ -294,7 +295,7 @@ def fig_robustness(df, outdir, model_label=None):
     ax.legend(fontsize=9)
     sns.despine()
     fig.tight_layout(rect=[0, 0, 1, 0.995])
-    fig.savefig(os.path.join(outdir, "fig1c_jsd.png"), dpi=200, bbox_inches='tight')
+    fig.savefig(os.path.join(outdir, "fig1c_jsd.png"), dpi=300, bbox_inches='tight')
     plt.close(fig)
 
 # ======================================================================
@@ -357,7 +358,7 @@ def fig_permutation(df, outdir, model_label=None, df_metrics=None):
         ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.55), ncol=3, fontsize=10, frameon=True)
         sns.despine(left=True)
         fig.tight_layout(rect=[0, 0.00, 1, 0.99])
-        fig.savefig(os.path.join(outdir, "fig2a_perm_stability.png"), dpi=200, bbox_inches='tight')
+        fig.savefig(os.path.join(outdir, "fig2a_perm_stability.png"), dpi=300, bbox_inches='tight')
         plt.close(fig)
 
     # --- 2b  ---
@@ -385,7 +386,7 @@ def fig_permutation(df, outdir, model_label=None, df_metrics=None):
     ax.legend(fontsize=9)
     sns.despine()
     fig.tight_layout(rect=[0, 0, 1, 0.99])
-    fig.savefig(os.path.join(outdir, "fig2b_position_bias.png"), dpi=200, bbox_inches='tight')
+    fig.savefig(os.path.join(outdir, "fig2b_position_bias.png"), dpi=300, bbox_inches='tight')
     plt.close(fig)
 
     # --- 2c ---
@@ -412,7 +413,7 @@ def fig_permutation(df, outdir, model_label=None, df_metrics=None):
     ax.legend(fontsize=9)
     sns.despine()
     fig.tight_layout(rect=[0, 0, 1, 0.99])
-    fig.savefig(os.path.join(outdir, "fig2c_primacy_recency.png"), dpi=200, bbox_inches='tight')
+    fig.savefig(os.path.join(outdir, "fig2c_primacy_recency.png"), dpi=300, bbox_inches='tight')
     plt.close(fig)
 
 def fig_cognitive_map(df, outdir, model_label=None):
@@ -516,7 +517,7 @@ def fig_cognitive_map(df, outdir, model_label=None):
 
     fig.tight_layout(rect=[0, 0.05, 1, 1])
     fig.savefig(os.path.join(outdir, "fig2d_cognitive_map.png"),
-                dpi=200, bbox_inches='tight')
+                dpi=300, bbox_inches='tight')
     plt.close(fig)
 
 # ======================================================================
@@ -574,7 +575,7 @@ def fig_duplication(df, outdir, model_label=None):
     sns.despine(left=True)
     fig.tight_layout(rect=[0, 0.00, 1, 0.99])
     fig.savefig(os.path.join(outdir, "fig3a_dup_stability.png"),
-                dpi=200, bbox_inches='tight')
+                dpi=300, bbox_inches='tight')
     plt.close(fig)
 
     # --- 3b  Mappa cognitiva: validità vs JSD duplicazione ---
@@ -659,7 +660,7 @@ def fig_duplication(df, outdir, model_label=None):
     sns.despine()
     fig.tight_layout(rect=[0, 0.05, 1, 1])
     fig.savefig(os.path.join(outdir, "fig3b_dup_cognitive_map.png"),
-                dpi=200, bbox_inches='tight')
+                dpi=300, bbox_inches='tight')
     plt.close(fig)
 
 # ======================================================================
@@ -719,7 +720,7 @@ def fig_threat(df, outdir, model_label=None):
     ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.55), ncol=3, fontsize=10, frameon=True)
     sns.despine(left=True)
     fig.tight_layout(rect=[0, 0.00, 1, 0.99])
-    fig.savefig(os.path.join(outdir, "fig4a_threat_resistance.png"), dpi=200, bbox_inches='tight')
+    fig.savefig(os.path.join(outdir, "fig4a_threat_resistance.png"), dpi=300, bbox_inches='tight')
     plt.close(fig)
 
     # --- 4b ---
@@ -759,7 +760,7 @@ def fig_threat(df, outdir, model_label=None):
             ax.yaxis.set_major_formatter(mticker.PercentFormatter())
             sns.despine()
             fig.tight_layout(rect=[0, 0, 1, 0.995])
-            fig.savefig(os.path.join(outdir, "fig4b_threat_validity.png"), dpi=200)
+            fig.savefig(os.path.join(outdir, "fig4b_threat_validity.png"), dpi=300)
             plt.close(fig)
 
     # --- 4c  Coerenza logit-testo per tipo di minaccia (vs Baseline) ---
@@ -804,7 +805,7 @@ def fig_threat(df, outdir, model_label=None):
             ax.yaxis.set_major_formatter(mticker.PercentFormatter())
             sns.despine()
             fig.tight_layout(rect=[0, 0, 1, 0.995])
-            fig.savefig(os.path.join(outdir, "fig4c_threat_log_coherence.png"), dpi=200)
+            fig.savefig(os.path.join(outdir, "fig4c_threat_log_coherence.png"), dpi=300)
             plt.close(fig)
 
     # --- 4d ---
@@ -828,7 +829,7 @@ def fig_threat(df, outdir, model_label=None):
         ax.legend(fontsize=9)
         sns.despine()
         fig.tight_layout(rect=[0, 0, 1, 0.995])
-        fig.savefig(os.path.join(outdir, "fig4d_threat_jsd.png"), dpi=200)
+        fig.savefig(os.path.join(outdir, "fig4d_threat_jsd.png"), dpi=300)
         plt.close(fig)
     
     # --- 4e / 4f / 4g  (torte per tipo di minaccia) ---
@@ -889,7 +890,7 @@ def fig_threat(df, outdir, model_label=None):
             ax.set_title(full_title, fontsize=14, fontweight="bold", pad=3)
             fig.tight_layout(rect=[0, 0, 1, 0.99])
 
-        fig.savefig(os.path.join(outdir, fname), dpi=200)
+        fig.savefig(os.path.join(outdir, fname), dpi=300)
         plt.close(fig)
 
     if "most_disruptive_threat" in df.columns:
@@ -939,7 +940,7 @@ def fig_alignment_human(df, outdir, model_label=None):
     ax.legend()
     sns.despine()
     fig.tight_layout(rect=[0, 0, 1, 0.995])
-    fig.savefig(os.path.join(outdir, "fig5a_alignment_human.png"), dpi=200)
+    fig.savefig(os.path.join(outdir, "fig5a_alignment_human.png"), dpi=300)
     plt.close(fig)
 
     # --- 5b ---
@@ -962,7 +963,7 @@ def fig_alignment_human(df, outdir, model_label=None):
         plt.setp(ax.get_yticklabels(), fontsize=10)
         sns.despine()
         fig.tight_layout(rect=[0.03, 0.16, 1, 0.99], pad=1.2)
-        fig.savefig(os.path.join(outdir, "fig5b_alignment_human_by_area.png"), dpi=200, bbox_inches='tight')
+        fig.savefig(os.path.join(outdir, "fig5b_alignment_human_by_area.png"), dpi=300, bbox_inches='tight')
         plt.close(fig)
 
 # ======================================================================
@@ -1007,7 +1008,7 @@ def fig_political(df, outdir, model_label=None):
         sns.despine()
         fig.tight_layout(rect=[0, 0, 1, 0.995])
         fig.savefig(os.path.join(outdir, "fig6a_validity_by_area.png"),
-                    dpi=200, bbox_inches='tight')
+                    dpi=300, bbox_inches='tight')
         plt.close(fig)
 
     # --- 6b  Istogramma verticale: coerenza log-testo per macro area ---
@@ -1038,7 +1039,7 @@ def fig_political(df, outdir, model_label=None):
         sns.despine()
         fig.tight_layout(rect=[0, 0, 1, 0.995])
         fig.savefig(os.path.join(outdir, "fig6b_log_consistency_by_area.png"),
-                    dpi=200, bbox_inches='tight')
+                    dpi=300, bbox_inches='tight')
         plt.close(fig)
 
     # --- 6c  Bussola politica — un punto per macro area ---
@@ -1138,7 +1139,7 @@ def fig_political(df, outdir, model_label=None):
             sns.despine()
             fig.tight_layout(rect=[0, 0, 0.78, 1])
             fig.savefig(os.path.join(outdir, "fig6c_political_compass.png"),
-                        dpi=200, bbox_inches='tight')
+                        dpi=300, bbox_inches='tight')
             plt.close(fig)
 
     # --- 6d ---
@@ -1171,8 +1172,534 @@ def fig_political(df, outdir, model_label=None):
             plt.setp(ax.get_xticklabels(), rotation=45, ha='right', fontsize=11)
             plt.setp(ax.get_yticklabels(), fontsize=10)
             fig.tight_layout(rect=[0, 0.16, 1, 0.99], pad=1.5)
-            fig.savefig(os.path.join(outdir, "fig6d_wd_heatmap.png"), dpi=200, bbox_inches='tight')
+            fig.savefig(os.path.join(outdir, "fig6d_wd_heatmap.png"), dpi=300, bbox_inches='tight')
             plt.close(fig)
+
+
+# ######################################################################
+#  GRAFICI COMPARATIVI MULTI-MODELLO
+# ######################################################################
+
+MODEL_KEYS   = ["pythia_160m", "pythia_1b", "pythia_1.4b", "pythia_2.8b", "pythia_6.9b"]
+MODEL_LABELS = ["160M", "1B", "1.4B", "2.8B", "6.9B"]
+THREAT_COLORS = {"Economic": "#E8A838", "IT_System": "#5B9BD5", "Legal": "#C44E52"}
+THREAT_DISPLAY = {"Economic": "Economica", "IT_System": "IT/Sistema", "Legal": "Legale"}
+
+RISULTATI_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "risultati")
+COMPARATIVE_OUT = os.path.join(RISULTATI_DIR, "comparative")
+
+
+def _load_all_models():
+    """Carica analysis_metrics e position_bias per tutti i modelli disponibili."""
+    data = {}
+    for key, label in zip(MODEL_KEYS, MODEL_LABELS):
+        mdir = os.path.join(RISULTATI_DIR, key)
+        metrics_path = os.path.join(mdir, f"analysis_metrics_{key}.csv")
+        pb_path = os.path.join(mdir, f"position_bias_{key}.csv")
+        if not os.path.exists(metrics_path):
+            print(f"   [SKIP] {key}: file metriche non trovato.")
+            continue
+        df = pd.read_csv(metrics_path)
+        df_pb = pd.read_csv(pb_path) if os.path.exists(pb_path) else None
+        data[label] = {"df": df, "df_pb": df_pb, "key": key}
+    return data
+
+
+# ── Comp 1: Violin JSD ──────────────────────────────────────────────
+def fig_comp_jsd_violins(data, outdir):
+    labels = list(data.keys())
+    n = len(labels)
+    fig, axes = plt.subplots(1, n, figsize=(4.2 * n, 5), sharey=True)
+    if n == 1:
+        axes = [axes]
+
+    jsd_cols   = ["jsd_permutation", "jsd_duplication", "jsd_threat"]
+    jsd_labels = ["Permutazione", "Duplicazione", "Minaccia"]
+    colors     = ["#4C72B0", "#DD8452", "#55A868"]
+
+    for ax, label in zip(axes, labels):
+        df = data[label]["df"]
+        melted = df[jsd_cols].melt(var_name="Cond", value_name="JSD")
+        melted["Cond"] = melted["Cond"].map(dict(zip(jsd_cols, jsd_labels)))
+        melted = melted.dropna()
+        sns.violinplot(data=melted, x="Cond", y="JSD", hue="Cond",
+                       palette=dict(zip(jsd_labels, colors)),
+                       inner="quartile", cut=0, ax=ax, legend=False)
+        ax.axhline(0.15, color="red", ls="--", lw=0.8)
+        ax.axhline(0.05, color="green", ls=":", lw=0.8)
+        ax.set_title(label, fontsize=14, fontweight="bold")
+        ax.set_xlabel("")
+        if ax != axes[0]:
+            ax.set_ylabel("")
+        else:
+            ax.set_ylabel("JSD")
+        ax.tick_params(axis='x', rotation=25)
+
+    fig.suptitle("Distribuzione JSD per tipo di perturbazione",
+                 fontsize=16, fontweight="bold", y=1.02)
+    fig.tight_layout()
+    fig.savefig(os.path.join(outdir, "comp_jsd_violins.png"),
+                dpi=300, bbox_inches='tight')
+    plt.close(fig)
+
+
+# ── Comp 2: Mappe cognitive (permutazione) ───────────────────────────
+def fig_comp_cognitive_maps(data, outdir):
+    labels = list(data.keys())
+    n = len(labels)
+    fig, axes = plt.subplots(1, n, figsize=(4.5 * n, 3.0), sharey=True, sharex=True)
+    if n == 1:
+        axes = [axes]
+
+    colors_map = {
+        "Risposta affidabile": "#2ca02c",
+        "Bias di posizione":   "#ff7f0e",
+        "Rifiuto coerente":    "#7f7f7f",
+        "Rumore generativo":   "#d62728",
+    }
+    quad_order = list(colors_map.keys())
+
+    def _quad(row):
+        v, j = row["baseline_valid_rate"], row["jsd_permutation"]
+        if v > 0.5 and j <= 0.15:
+            return "Risposta affidabile"
+        elif v > 0.5 and j > 0.15:
+            return "Bias di posizione"
+        elif v <= 0.5 and j <= 0.15:
+            return "Rifiuto coerente"
+        else:
+            return "Rumore generativo"
+
+    for ax, label in zip(axes, labels):
+        df = data[label]["df"]
+        sub = df.dropna(subset=["jsd_permutation", "baseline_valid_rate"]).copy()
+        if sub.empty:
+            ax.set_title(label)
+            continue
+        sub["_quad"] = sub.apply(_quad, axis=1)
+        for q in quad_order:
+            mask = sub["_quad"] == q
+            if mask.any():
+                ax.scatter(sub.loc[mask, "jsd_permutation"],
+                           sub.loc[mask, "baseline_valid_rate"],
+                           c=colors_map[q], s=20, alpha=0.6,
+                           edgecolor="white", linewidth=0.3, label=q)
+        ax.axvline(0.15, color="red", ls="--", lw=1, alpha=0.4)
+        ax.axhline(0.50, color="red", ls="--", lw=1, alpha=0.4)
+        ax.set_title(label, fontsize=14, fontweight="bold")
+        ax.set_xlabel("JSD Perm." if ax == axes[n // 2] else "")
+        if ax == axes[0]:
+            ax.set_ylabel("Validity rate")
+        ax.set_ylim(-0.08, 1.15)
+        ax.set_yticks([0, 1])
+        ax.set_yticklabels(["0", "1"])
+        xmax = max(0.65, sub["jsd_permutation"].max() * 1.1)
+        ax.set_xlim(-0.02, xmax)
+
+    handles = [Patch(facecolor=colors_map[q], label=q) for q in quad_order]
+    fig.legend(handles=handles, loc="lower center", ncol=4, fontsize=9,
+               bbox_to_anchor=(0.5, -0.10), frameon=True)
+    fig.suptitle("Mappa cognitiva: validità vs instabilità alla permutazione",
+                 fontsize=16, fontweight="bold", y=1.04)
+    fig.tight_layout()
+    fig.savefig(os.path.join(outdir, "comp_cognitive_maps.png"),
+                dpi=300, bbox_inches='tight')
+    plt.close(fig)
+
+
+# ── Comp 3: Mappe cognitive (duplicazione) ───────────────────────────
+def fig_comp_dup_cognitive_maps(data, outdir):
+    labels = list(data.keys())
+    n = len(labels)
+    fig, axes = plt.subplots(1, n, figsize=(4.5 * n, 3.0), sharey=True, sharex=True)
+    if n == 1:
+        axes = [axes]
+
+    colors_map = {
+        "Risposta affidabile": "#2ca02c",
+        "Frequency bias":      "#ff7f0e",
+        "Rifiuto coerente":    "#7f7f7f",
+        "Rumore generativo":   "#d62728",
+    }
+    quad_order = list(colors_map.keys())
+
+    def _quad(row):
+        v = row["baseline_valid_rate"]
+        j = row["jsd_duplication"] if pd.notna(row.get("jsd_duplication")) else None
+        if j is None:
+            return None
+        if v > 0.5 and j <= 0.15:
+            return "Risposta affidabile"
+        elif v > 0.5 and j > 0.15:
+            return "Frequency bias"
+        elif v <= 0.5 and j <= 0.15:
+            return "Rifiuto coerente"
+        else:
+            return "Rumore generativo"
+
+    for ax, label in zip(axes, labels):
+        df = data[label]["df"]
+        sub = df.dropna(subset=["jsd_duplication", "baseline_valid_rate"]).copy()
+        if sub.empty:
+            ax.set_title(label)
+            continue
+        sub["_quad"] = sub.apply(_quad, axis=1)
+        sub = sub.dropna(subset=["_quad"])
+        for q in quad_order:
+            mask = sub["_quad"] == q
+            if mask.any():
+                ax.scatter(sub.loc[mask, "jsd_duplication"],
+                           sub.loc[mask, "baseline_valid_rate"],
+                           c=colors_map[q], s=20, alpha=0.6,
+                           edgecolor="white", linewidth=0.3, label=q)
+        ax.axvline(0.15, color="red", ls="--", lw=1, alpha=0.4)
+        ax.axhline(0.50, color="red", ls="--", lw=1, alpha=0.4)
+        ax.set_title(label, fontsize=14, fontweight="bold")
+        ax.set_xlabel("JSD Dup." if ax == axes[n // 2] else "")
+        if ax == axes[0]:
+            ax.set_ylabel("Validity rate")
+        ax.set_ylim(-0.08, 1.15)
+        ax.set_yticks([0, 1])
+        ax.set_yticklabels(["0", "1"])
+        xmax = max(0.65, sub["jsd_duplication"].max() * 1.1)
+        ax.set_xlim(-0.02, xmax)
+
+    handles = [Patch(facecolor=colors_map[q], label=q) for q in quad_order]
+    fig.legend(handles=handles, loc="lower center", ncol=4, fontsize=9,
+               bbox_to_anchor=(0.5, -0.10), frameon=True)
+    fig.suptitle("Mappa cognitiva: validità vs instabilità alla duplicazione",
+                 fontsize=16, fontweight="bold", y=1.04)
+    fig.tight_layout()
+    fig.savefig(os.path.join(outdir, "comp_dup_cognitive_maps.png"),
+                dpi=300, bbox_inches='tight')
+    plt.close(fig)
+
+
+# ── Comp 4: Position bias ───────────────────────────────────────────
+def fig_comp_position_bias(data, outdir):
+    labels = [l for l in data if data[l]["df_pb"] is not None]
+    n = len(labels)
+    if n == 0:
+        print("   [SKIP] Position bias: dati non disponibili.")
+        return
+    fig, axes = plt.subplots(1, n, figsize=(3.8 * n, 4.5), sharey=True)
+    if n == 1:
+        axes = [axes]
+
+    for ax, label in zip(axes, labels):
+        df_pb = data[label]["df_pb"]
+        pos_mean = df_pb.groupby("position_label")["prob"].mean().sort_index()
+        uniform = (1.0 / df_pb["n_options"]).mean()
+        colors = [PALETTE_MAIN[i % len(PALETTE_MAIN)] for i in range(len(pos_mean))]
+        bars = ax.bar(pos_mean.index, pos_mean.values, color=colors,
+                      edgecolor="white", width=0.5)
+        for bar, val in zip(bars, pos_mean.values):
+            ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.005,
+                    f"{val:.3f}", ha="center", va="bottom", fontsize=8, fontweight="bold")
+        ax.axhline(uniform, color="red", ls="--", lw=1)
+        ax.set_title(label, fontsize=14, fontweight="bold")
+        ax.set_xlabel("")
+        if ax == axes[0]:
+            ax.set_ylabel("Prob. media")
+
+    fig.suptitle("Bias di posizione: probabilità media per posizione",
+                 fontsize=16, fontweight="bold", y=1.02)
+    fig.tight_layout()
+    fig.savefig(os.path.join(outdir, "comp_position_bias.png"),
+                dpi=300, bbox_inches='tight')
+    plt.close(fig)
+
+
+# ── Comp 5: Allineamento umano ──────────────────────────────────────
+def fig_comp_alignment(data, outdir):
+    labels = list(data.keys())
+    n = len(labels)
+    fig, axes = plt.subplots(1, n, figsize=(3.8 * n, 4), sharey=True, sharex=True)
+    if n == 1:
+        axes = [axes]
+
+    for ax, label in zip(axes, labels):
+        al = data[label]["df"]["alignment_score"].dropna()
+        ax.hist(al, bins=25, color=PALETTE_MAIN[1], edgecolor="white", alpha=0.85)
+        ax.axvline(al.mean(), color="red", ls="--", lw=1.2,
+                   label=f"μ={al.mean():.3f}")
+        ax.axvline(al.median(), color="blue", ls=":", lw=1.2,
+                   label=f"med={al.median():.3f}")
+        ax.set_title(label, fontsize=14, fontweight="bold")
+        ax.legend(fontsize=8)
+        if ax == axes[0]:
+            ax.set_ylabel("N. domande")
+        ax.set_xlabel("")
+    axes[n // 2].set_xlabel("Alignment score")
+
+    fig.suptitle("Distribuzione dell'allineamento con le risposte umane",
+                 fontsize=16, fontweight="bold", y=1.02)
+    fig.tight_layout()
+    fig.savefig(os.path.join(outdir, "comp_alignment.png"),
+                dpi=300, bbox_inches='tight')
+    plt.close(fig)
+
+
+# ── Comp 6: Bussola politica ────────────────────────────────────────
+def fig_comp_political_compass(data, outdir):
+    labels = list(data.keys())
+    n = len(labels)
+    fig, axes = plt.subplots(1, n, figsize=(5.5 * n, 7), sharey=True, sharex=True)
+    if n == 1:
+        axes = [axes]
+
+    wd_cols = ["wd_democrat", "wd_republican", "wd_liberal", "wd_conservative"]
+    cmap_pc = sns.color_palette("husl", len(ALL_MACRO_AREAS))
+
+    legend_handles = []
+    for ax, label in zip(axes, labels):
+        df = data[label]["df"]
+        existing_wd = [c for c in wd_cols if c in df.columns]
+        if len(existing_wd) < 4 or "macro_area" not in df.columns:
+            ax.set_title(label)
+            continue
+        area_means = df.groupby("macro_area")[existing_wd].mean()
+        area_means = area_means.reindex(ALL_MACRO_AREAS)
+        area_means["x_axis"] = area_means["wd_republican"] - area_means["wd_democrat"]
+        area_means["y_axis"] = area_means["wd_conservative"] - area_means["wd_liberal"]
+
+        # Quadrant background colors
+        valid_mask = area_means[["x_axis", "y_axis"]].notna().all(axis=1)
+        if valid_mask.any():
+            xlims_pre = [area_means.loc[valid_mask, "x_axis"].min() - 0.005,
+                         area_means.loc[valid_mask, "x_axis"].max() + 0.005]
+            ylims_pre = [area_means.loc[valid_mask, "y_axis"].min() - 0.005,
+                         area_means.loc[valid_mask, "y_axis"].max() + 0.005]
+            ax.axvspan(0, xlims_pre[1] * 2, ymin=0.5, ymax=1.0,
+                       color="#2166AC", alpha=0.06, zorder=0)
+            ax.axvspan(xlims_pre[0] * 2, 0, ymin=0.5, ymax=1.0,
+                       color="#4393C3", alpha=0.06, zorder=0)
+            ax.axvspan(0, xlims_pre[1] * 2, ymin=0.0, ymax=0.5,
+                       color="#D6604D", alpha=0.06, zorder=0)
+            ax.axvspan(xlims_pre[0] * 2, 0, ymin=0.0, ymax=0.5,
+                       color="#B2182B", alpha=0.06, zorder=0)
+
+        legend_handles_local = []
+        for i, (area_name, row) in enumerate(area_means.iterrows()):
+            num = i + 1
+            has_data = pd.notna(row["x_axis"]) and pd.notna(row["y_axis"])
+            if has_data:
+                ax.scatter(row["x_axis"], row["y_axis"],
+                           c=[cmap_pc[i]], s=240, alpha=1.0,
+                           edgecolor="white", linewidth=0.6, zorder=10 + 2*i)
+                ax.text(row["x_axis"], row["y_axis"], str(num),
+                        ha="center", va="center", fontsize=7,
+                        fontweight="bold", color="white", zorder=11 + 2*i)
+            lbl = f"{num}. {area_name}" if has_data else f"{num}. {area_name} (N/D)"
+            legend_handles_local.append(
+                Patch(color=cmap_pc[i], label=lbl))
+
+        if not legend_handles:
+            legend_handles = legend_handles_local
+
+        ax.axhline(0, color="grey", ls="-", lw=0.6, alpha=0.5, zorder=1)
+        ax.axvline(0, color="grey", ls="-", lw=0.6, alpha=0.5, zorder=1)
+
+        # Quadrant labels
+        xlims = ax.get_xlim()
+        ylims = ax.get_ylim()
+        _qbbox = dict(boxstyle='round,pad=0.15', facecolor='white',
+                      alpha=0.7, edgecolor='none')
+        ax.text(xlims[1], ylims[1], "Lib-Dem", color="#2166AC",
+                fontweight="bold", fontsize=7, ha="right", va="top", bbox=_qbbox)
+        ax.text(xlims[0], ylims[1], "Lib-Rep", color="#4393C3",
+                fontweight="bold", fontsize=7, ha="left", va="top", bbox=_qbbox)
+        ax.text(xlims[1], ylims[0], "Con-Dem", color="#D6604D",
+                fontweight="bold", fontsize=7, ha="right", va="bottom", bbox=_qbbox)
+        ax.text(xlims[0], ylims[0], "Con-Rep", color="#B2182B",
+                fontweight="bold", fontsize=7, ha="left", va="bottom", bbox=_qbbox)
+
+        ax.set_title(label, fontsize=14, fontweight="bold")
+        if ax == axes[0]:
+            ax.set_ylabel("← Conserv.  Liberale →", fontsize=9)
+        if ax == axes[n // 2]:
+            ax.set_xlabel("← Repubbl.  Democratico →", fontsize=9)
+
+    # Shared macro area legend below
+    fig.legend(handles=legend_handles, loc="lower center",
+               ncol=4, fontsize=7, frameon=True,
+               bbox_to_anchor=(0.5, -0.18), title="Macro area",
+               title_fontsize=8)
+    fig.suptitle("Bussola politica per macro area tematica",
+                 fontsize=16, fontweight="bold", y=1.02)
+    fig.tight_layout()
+    fig.savefig(os.path.join(outdir, "comp_political_compass.png"),
+                dpi=300, bbox_inches='tight')
+    plt.close(fig)
+
+
+# ── Comp 7: Heatmap WD ──────────────────────────────────────────────
+def fig_comp_wd_heatmaps(data, outdir):
+    labels = list(data.keys())
+    n = len(labels)
+    wd_cols   = ["wd_democrat", "wd_republican", "wd_independent",
+                 "wd_liberal", "wd_moderate", "wd_conservative"]
+    wd_labels = ["Dem.", "Rep.", "Ind.", "Lib.", "Mod.", "Cons."]
+
+    fig, axes = plt.subplots(1, n, figsize=(4.5 * n, 10))
+    if n == 1:
+        axes = [axes]
+
+    all_vals = []
+    for label in labels:
+        df = data[label]["df"]
+        existing = [c for c in wd_cols if c in df.columns]
+        if existing:
+            sub = df.groupby("macro_area")[existing].mean()
+            all_vals.extend(sub.values.flatten())
+    all_vals = [v for v in all_vals if not np.isnan(v)]
+    vmin = min(all_vals) * 0.95 if all_vals else None
+    vmax = max(all_vals) * 1.05 if all_vals else None
+
+    for idx_ax, (ax, label) in enumerate(zip(axes, labels)):
+        df = data[label]["df"]
+        existing = [c for c in wd_cols if c in df.columns]
+        if not existing or "macro_area" not in df.columns:
+            ax.set_title(label)
+            continue
+        hmap = df.groupby("macro_area")[existing].mean()
+        hmap = hmap.reindex(ALL_MACRO_AREAS)
+        hmap.columns = [wd_labels[wd_cols.index(c)] for c in existing]
+        hmap = hmap.loc[hmap.mean(axis=1).sort_values(na_position='last').index]
+        annot_arr = hmap.map(lambda v: f"{v:.2f}" if pd.notna(v) else "")
+        sns.heatmap(hmap, annot=annot_arr, fmt="", cmap="RdYlGn_r",
+                    linewidths=0.3, ax=ax, vmin=vmin, vmax=vmax,
+                    cbar=(idx_ax == n - 1),
+                    cbar_kws={"label": "WD", "fraction": 0.04, "pad": 0.02}
+                    if idx_ax == n - 1 else {})
+        ax.set_title(label, fontsize=14, fontweight="bold")
+        if idx_ax > 0:
+            ax.set_yticklabels([])
+            ax.set_ylabel("")
+        else:
+            ax.set_ylabel("")
+        ax.set_xlabel("")
+        plt.setp(ax.get_xticklabels(), rotation=45, ha='right', fontsize=9)
+        plt.setp(ax.get_yticklabels(), fontsize=8)
+
+    fig.suptitle("Wasserstein Distance: macro area × gruppo demografico",
+                 fontsize=16, fontweight="bold", y=1.01)
+    fig.tight_layout()
+    fig.savefig(os.path.join(outdir, "comp_wd_heatmaps.png"),
+                dpi=300, bbox_inches='tight')
+    plt.close(fig)
+
+
+# ── Comp 8: Minacce (barre impilate) ────────────────────────────────
+def fig_comp_threats_stacked(data, outdir):
+    labels = list(data.keys())
+    threat_order = ["Economic", "IT_System", "Legal"]
+    metrics = [
+        ("most_disruptive_threat",          "Destab."),
+        ("most_effective_threat_validity",   "Validità"),
+        ("most_effective_threat_consistency","Coerenza"),
+    ]
+
+    n_models = len(labels)
+    n_metrics = len(metrics)
+    bar_width = 0.22
+    group_width = n_metrics * bar_width + 0.18
+
+    fig, ax = plt.subplots(figsize=(max(10, n_models * 2.8), 6))
+    x_centers = np.arange(n_models) * group_width
+
+    for m_idx, (col, metric_label) in enumerate(metrics):
+        bottoms = np.zeros(n_models)
+        for threat_type in threat_order:
+            heights = []
+            for label in labels:
+                df = data[label]["df"]
+                if col in df.columns:
+                    series = df[col].dropna()
+                    total = len(series)
+                    pct = (series == threat_type).sum() / total * 100 if total > 0 else 0
+                else:
+                    pct = 0
+                heights.append(pct)
+            ax.bar(x_centers + m_idx * bar_width, heights,
+                   bar_width, bottom=bottoms,
+                   color=THREAT_COLORS[threat_type],
+                   edgecolor="white", linewidth=0.5)
+            for i, (h, b) in enumerate(zip(heights, bottoms)):
+                if h > 8:
+                    ax.text(x_centers[i] + m_idx * bar_width, b + h / 2,
+                            f"{h:.0f}%", ha="center", va="center",
+                            fontsize=7, fontweight="bold", color="white")
+            bottoms = bottoms + np.array(heights)
+
+    # Model labels ABOVE the bar groups
+    for i, label in enumerate(labels):
+        ax.text(x_centers[i] + bar_width, 104, label,
+                ha="center", va="bottom", fontsize=12, fontweight="bold")
+
+    # Metric labels below bars
+    for i in range(n_models):
+        for m_idx, (_, metric_label) in enumerate(metrics):
+            ax.text(x_centers[i] + m_idx * bar_width, -4, metric_label,
+                    ha="center", va="top", fontsize=6.5, rotation=35)
+
+    ax.set_xticks([])
+    ax.set_ylim(0, 115)
+    ax.set_ylabel("% domande")
+    ax.set_title("Efficacia per tipo di minaccia",
+                 fontsize=16, fontweight="bold", pad=10)
+
+    # Legend BELOW the chart
+    handles = [Patch(facecolor=THREAT_COLORS[t], label=THREAT_DISPLAY[t])
+               for t in threat_order]
+    ax.legend(handles=handles, loc="lower center", ncol=3, fontsize=10,
+              frameon=True, bbox_to_anchor=(0.5, -0.14))
+    sns.despine()
+    fig.tight_layout(rect=[0, 0.10, 1, 0.97])
+    fig.savefig(os.path.join(outdir, "comp_threats_stacked.png"),
+                dpi=300, bbox_inches='tight')
+    plt.close(fig)
+
+
+# ── Entry point: genera tutti i grafici comparativi ──────────────────
+def generate_all_comparative(outdir=None):
+    """Genera tutti i grafici comparativi multi-modello."""
+    if outdir is None:
+        outdir = COMPARATIVE_OUT
+    os.makedirs(outdir, exist_ok=True)
+
+    print("Caricamento dati di tutti i modelli...")
+    data = _load_all_models()
+    if not data:
+        print("Nessun dato trovato. Esegui prima analyze.py per almeno un modello.")
+        return False
+
+    print(f"Modelli caricati: {list(data.keys())}")
+    print(f"Output in: {outdir}\n")
+
+    print("  [1/8] Violin JSD...")
+    fig_comp_jsd_violins(data, outdir)
+    print("  [2/8] Mappe cognitive (permutazione)...")
+    fig_comp_cognitive_maps(data, outdir)
+    print("  [3/8] Mappe cognitive (duplicazione)...")
+    fig_comp_dup_cognitive_maps(data, outdir)
+    print("  [4/8] Position bias...")
+    fig_comp_position_bias(data, outdir)
+    print("  [5/8] Allineamento umano...")
+    fig_comp_alignment(data, outdir)
+    print("  [6/8] Bussole politiche...")
+    fig_comp_political_compass(data, outdir)
+    print("  [7/8] Heatmap WD...")
+    fig_comp_wd_heatmaps(data, outdir)
+    print("  [8/8] Minacce (barre impilate)...")
+    fig_comp_threats_stacked(data, outdir)
+
+    n_files = len([f for f in os.listdir(outdir) if f.endswith('.png')])
+    print(f"\n{'='*60}")
+    print(f"FATTO — {n_files} grafici comparativi in {outdir}")
+    print(f"{'='*60}")
+    return True
+
 
 # ======================================================================
 #  MAIN

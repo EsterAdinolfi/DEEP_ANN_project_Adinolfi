@@ -16,7 +16,7 @@ Nello specifico, la pipeline analizza 5 varianti di dimensioni crescenti:
 % Come indicato dagli autori del paper di Pythia (Biderman et al.), per valutare la reale capacità del modello è utile osservare i parametri \emph{Non-Embedding}, ovvero quelli effettivamente dedicati all'elaborazione logica della rete, escludendo il "dizionario" di traduzione dei token (che ha un peso proporzionalmente enorme sui modelli più piccoli).
 \begin{table}[h]
 \centering
-\begin{tabular}{lrlc}
+\begin{tabular}{lccc}
 \toprule
 \textbf{Modello} & \textbf{Parametri totali} & \textbf{Parametri di non-embedding} & \textbf{Layer interni} \\
 \midrule
@@ -34,9 +34,7 @@ Pythia-6.9B  & 6.9 miliardi & $\sim$6.4 miliardi & 32 \\
 
 Un aspetto metodologico cruciale del progetto riguarda l'assenza di \emph{fine-tuning}. I modelli Pythia impiegati sono modelli "base": non sono stati sottoposti a successive procedure di allineamento con feedback umano (come le tecniche RLHF). 
 
-L'impiego di questa specifica tipologia di modelli è funzionale a quanto dimostrato nell'articolo di Santurkar et al. (2023): poiché l'allineamento tende ad amplificare artificialmente i bias del modello verso posizioni demografiche specifiche (spesso riconducibili a fasce istruite e di orientamento \emph{liberal}), testare modelli base permette di misurare le opinioni nella loro forma "nativa". 
+L'impiego di questa specifica tipologia di modelli è funzionale a quanto dimostrato nell'articolo di Santurkar et al. (2023): poiché l'allineamento tende ad amplificare artificialmente i bias del modello verso posizioni demografiche specifiche (spesso riconducibili a fasce istruite e di orientamento \emph{liberale}), testare modelli base permette di misurare le opinioni nella loro forma "nativa". 
 
-\subsection{Estensibilità della pipeline}
-Il framework software sviluppato per questo progetto è stato comunque progettato per essere altamente flessibile. Se in futuro si desiderasse estendere l'analisi ad altre famiglie, l'architettura supporta l'integrazione immediata semplicemente specificando il nome del nuovo modello nel sistema di configurazione.
 
-\end{document}autori del paper di Pythia (Biderman et al.)
+\end{document}

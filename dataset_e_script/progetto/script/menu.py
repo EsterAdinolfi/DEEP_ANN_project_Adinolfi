@@ -443,6 +443,7 @@ def display_menu():
     print("  [7] Installa/aggiorna dipendenze (requirements.txt)")
     print("  [8] Esegui SOLO gli esperimenti (modalità server)")
     print("  [9] Analisi risultati + Visualizzazione grafici")
+    print(" [10] Genera grafici comparativi multi-modello")
     print("\n  [0] Esci")
     print("-" * 70)
 
@@ -542,6 +543,10 @@ def interactive_menu():
                 for model in models:
                     print(f"\n▸ Modello: {model}")
                     run_visualize(model, force_update=update_mode)
+                if len(models) == len(AVAILABLE_MODELS):
+                    print_header("GRAFICI COMPARATIVI MULTI-MODELLO")
+                    from visualize import generate_all_comparative
+                    generate_all_comparative()
             
             elif choice == '7':
                 # Installa/aggiorna dipendenze
@@ -566,6 +571,12 @@ def interactive_menu():
                     else:
                         print(f"\u2717 Analisi fallita per {model}, visualizzazione saltata.")
             
+            elif choice == '10':
+                # Grafici comparativi multi-modello
+                print_header("GENERAZIONE GRAFICI COMPARATIVI")
+                from visualize import generate_all_comparative
+                generate_all_comparative()
+
             else:
                 print("\n✗ Scelta non valida. Riprova.")
             
