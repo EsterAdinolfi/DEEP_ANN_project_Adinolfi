@@ -202,9 +202,18 @@ class ExperimentsAnalyzer:
                             mask = df_resp[attr] == group_name
                             sub = df_resp.loc[mask, key].dropna()
                             counts = sub.value_counts()
-                            total = sum(counts.get(lbl, 0) for lbl in valid_labels)
+                            dist_counts = {}
+                            for lbl in valid_labels:
+                                code = valid_opts[lbl]
+                                c_val = 0
+                                for key_in_counts, val in counts.items():
+                                    if key_in_counts == lbl or str(key_in_counts) == str(code):
+                                        c_val += val
+                                dist_counts[lbl] = c_val
+                            
+                            total = sum(dist_counts.values())
                             if total > 0:
-                                dist = {lbl: counts.get(lbl, 0) / total for lbl in valid_labels}
+                                dist = {lbl: c / total for lbl, c in dist_counts.items()}
                             else:
                                 dist = {lbl: 0.0 for lbl in valid_labels}
                             distributions[key][group_name] = dist
