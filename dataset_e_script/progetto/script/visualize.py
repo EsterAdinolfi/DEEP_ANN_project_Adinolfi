@@ -1716,15 +1716,75 @@ def fig_comp_threats_stacked(data, outdir):
     handles = [Patch(facecolor=THREAT_COLORS[t], label=THREAT_DISPLAY[t])
                for t in threat_order]
     ax.legend(handles=handles, loc="lower center", ncol=3, fontsize=10,
-              frameon=True, bbox_to_anchor=(0.5, -0.14))
+              frameon=True, bbox_to_anchor=(0.5, -0.20))
     sns.despine()
-    fig.tight_layout(rect=[0, 0.10, 1, 0.97])
+    fig.tight_layout(rect=[0, 0.12, 1, 0.97])
     fig.savefig(os.path.join(outdir, "comp_threats_stacked.png"),
                 dpi=400, bbox_inches='tight')
     plt.close(fig)
 
 
-# ── Entry point: genera tutti i grafici comparativi ──────────────────
+# ── Comp 9: Leadership alignment across models ──────────────────────
+def fig_comp_leadership_alignment(data, outdir):
+    """Confronto dell'alignment score per l'area Leadership vs media globale per modello."""
+    labels = list(data.keys())
+    leader_scores = []
+    overall_scores = []
+    worst2_other = {lbl: [] for lbl in labels}
+
+    for label in labels:
+        df = data[label]["df"]
+        al = df["alignment_score"].dropna()
+        overall_scores.append(al.mean())
+        area_al = df.groupby("macro_area")["alignment_score"].mean().dropna()
+        leader_scores.append(area_al.get("Leadership", np.nan))
+        # Get 2nd and 3rd worst for context
+        worst = area_al.nsmallest(3)
+        for a, v in worst.items():
+            if a != "Leadership":
+                worst2_other[label].append((a, v))
+
+    x = np.arange(len(labels))
+    width = 0.32
+    fig, ax = plt.subplots(figsize=(10, 5.5))
+
+    bars_overall = ax.bar(x - width/2, overall_scores, width,
+                          label="Media globale", color="#4C72B0",
+                          edgecolor="white", alpha=0.85)
+    bars_leader = ax.bar(x + width/2, leader_scores, width,
+                         label="Leadership", color="#C44E52",
+                         edgecolor="white", alpha=0.85)
+
+    for bar, val in zip(bars_overall, overall_scores):
+        ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.005,
+                f"{val:.3f}", ha="center", va="bottom", fontsize=9, fontweight="bold")
+    for bar, val in zip(bars_leader, leader_scores):
+        if not np.isnan(val):
+            ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.005,
+                    f"{val:.3f}", ha="center", va="bottom", fontsize=9, fontweight="bold",
+                    color="#C44E52")
+
+    # Gap annotation
+    for i, (ov, ld) in enumerate(zip(overall_scores, leader_scores)):
+        if not np.isnan(ld):
+            gap = ov - ld
+            if gap > 0:
+                ax.annotate(f"$\\Delta$={gap:.3f}",
+                            xy=(x[i] + width/2, ld - 0.005),
+                            ha="center", va="top", fontsize=7.5, color="#888888")
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels, fontsize=12, fontweight="bold")
+    ax.set_ylabel("Alignment score", fontsize=11)
+    ax.set_title("Leadership vs media globale: alignment score per modello",
+                 fontsize=15, fontweight="bold", pad=10)
+    ax.set_ylim(0.55, max(overall_scores) * 1.08)
+    ax.legend(fontsize=10, loc="lower right")
+    sns.despine()
+    fig.tight_layout()
+    fig.savefig(os.path.join(outdir, "comp_leadership_alignment.png"),
+                dpi=400, bbox_inches='tight')
+    plt.close(fig)
 def generate_all_comparative(outdir=None):
     """Genera tutti i grafici comparativi multi-modello."""
     if outdir is None:
@@ -1758,6 +1818,8 @@ def generate_all_comparative(outdir=None):
     fig_comp_wd_heatmaps(data, outdir)
     print("  [9/9] Minacce (barre impilate)...")
     fig_comp_threats_stacked(data, outdir)
+    print("  [10] Leadership alignment...")
+    fig_comp_leadership_alignment(data, outdir)
 
     n_files = len([f for f in os.listdir(outdir) if f.endswith('.png')])
     print(f"\n{'='*60}")

@@ -146,8 +146,8 @@ La Tabella~\ref{tab:comparison_5models} riassume tutte le metriche chiave.
 \rowcolor{m5hdr} \multicolumn{6}{c}{\textcolor{white}{\textbf{Allineamento umano}}} \\
 \rowcolor{m5Row} \hspace{1em}Media & 0.661 & 0.787 & 0.821 & 0.809 & 0.812 \\
 \rowcolor{m5Row} \hspace{1em}Mediana & 0.683 & 0.819 & 0.843 & 0.829 & 0.836 \\
-\rowcolor{m5Row} \hspace{1em}Aree più allineate & \tiny Self-p., Status & \tiny Pers.\ h., Religion & \tiny Qual.\ life, Immig. & \tiny Status, Immig. & \tiny Health., Immig. \\
-\rowcolor{m5Row} \hspace{1em}Aree meno allineate & \tiny Pers.\ fin., Family & \tiny Family, Job/car. & \tiny Family, Guns & \tiny Leader., Crime & \tiny Leader., Family \\
+\rowcolor{m5Row} \hspace{1em}Aree più allineate & \tiny Self-p., Status & \tiny Pers.\ h., Religion & \tiny Health., Immig. & \tiny Status, Immig. & \tiny Health., Immig. \\
+\rowcolor{m5Row} \hspace{1em}Aree meno allineate & \tiny Pers.\ fin., Family & \tiny Family, Job/car. & \tiny Leader., Family & \tiny Leader., Crime & \tiny Leader., Family \\
 
 %% ── MACRO 6: POLITICA ──
 \rowcolor{m6hdr} \multicolumn{6}{c}{\textcolor{white}{\textbf{Affinità politica (\%)}}} \\
@@ -234,7 +234,7 @@ I risultati mostrano un pattern analogo al bias di posizione: 52.2\,\% di domand
 \label{fig:comp_cognitive_maps}
 \end{figure}
 
-Le mappe cognitive (Figura~\ref{fig:comp_cognitive_maps}) forniscono una rappresentazione bidimensionale della qualità delle risposte, combinando validità e robustezza in un'unica visualizzazione. Ogni domanda è rappresentata come un punto: la posizione orizzontale indica la sensibilità alla permutazione (quanto la distribuzione di probabilità cambia quando si riordinano le opzioni), mentre la posizione verticale indica quanto spesso il modello produce risposte nel formato atteso.
+Le mappe cognitive (Figura~\ref{fig:comp_cognitive_maps}) forniscono una rappresentazione bidimensionale della qualità delle risposte, combinando validità e robustezza in un'unica visualizzazione. Ogni domanda è rappresentata come un punto: la posizione orizzontale indica la sensibilità alla permutazione (quanto la distribuzione di probabilità cambia quando si riordinano le opzioni), mentre la posizione verticale indica quanto spesso il modello produce risposte nel formato atteso. Le soglie che definiscono i quadranti sono: \emph{validità} $> 0.5$ (il modello produce risposte valide in almeno la metà dei trial) e $\text{JSD}^2 \leq 0.15$ (la soglia di stabilità definita nella Sezione~\ref{sec:metriche}). Una risposta è classificata come \emph{affidabile} quando ricade nel quadrante ad alta validità e bassa JSD (cioè validità $> 0.5$ e $\text{JSD}^2 \leq 0.15$).
 
 Pythia-160M popola quasi esclusivamente i quadranti a bassa validità (76.1\,\% rumore generativo, 22.4\,\% rifiuto coerente), mentre da 1B compare il quadrante \emph{Risposta affidabile} (7.0\,\%) e raggiunge il 16.0\,\% a 1.4B, per poi ridiscendere al 14.2\,\% in 6.9B, confermando il pattern non monotono già osservato per la validità. L'evoluzione mostra che all'aumentare dei parametri le risposte migrano dal quadrante del rumore verso quello del rifiuto coerente (stabile ma non valido), e infine verso la risposta affidabile.
 
@@ -277,7 +277,14 @@ Per quanto riguarda l'\emph{efficacia sulla coerenza logit-testo}, emerge un qua
 
 L'alignment cresce rapidamente fino a 1.4B (media 0.821, mediana 0.843), poi si stabilizza: 2.8B (0.809) e 6.9B (0.812) non migliorano significativamente, anzi tendono a ridursi (Figura~\ref{fig:comp_alignment}). Questo plateau suggerisce un limite intrinseco all'allineamento raggiungibile con modelli base non istruiti.
 
-Le aree con il \emph{maggior allineamento} sono quelle in cui le risposte umane presentano un consenso più netto: nei modelli più grandi spiccano \emph{Immigration} (0.895 a 6.9B), \emph{Healthcare} (0.863) e \emph{Job/career} (0.862). Al contrario, le aree con il \emph{minor allineamento} sono \emph{Leadership} (0.723 a 6.9B), \emph{Relationships and family} (0.767) e \emph{Crime/security} (0.773), ovvero temi su cui la distribuzione delle opinioni umane è più frammentata e il modello fatica a riprodurre il pattern di risposta prevalente. L'area \emph{Leadership} è sistematicamente la più distante in tutti i modelli da 2.8B in poi, confermando che il giudizio sulla leadership politica resta uno degli aspetti più difficili da allineare per i modelli base.
+Le aree con il \emph{maggior allineamento} sono quelle in cui le risposte umane presentano un consenso più netto: nei modelli più grandi spiccano \emph{Immigration} (0.895 a 6.9B), \emph{Healthcare} (0.863) e \emph{Job/career} (0.862). Al contrario, le aree con il \emph{minor allineamento} sono \emph{Leadership} (0.723 a 6.9B), \emph{Relationships and family} (0.767) e \emph{Crime/security} (0.773), ovvero temi su cui la distribuzione delle opinioni umane è più frammentata e il modello fatica a riprodurre il pattern di risposta prevalente. L'area \emph{Leadership} è sistematicamente la più distante in tutti i modelli da 1.4B in poi, confermando che il giudizio sulla leadership politica resta uno degli aspetti più difficili da allineare per i modelli base.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{\risultati/comparative/comp_leadership_alignment.png}
+\caption{Confronto tra l'alignment score medio globale e quello dell'area \emph{Leadership} per ciascun modello. Il divario ($\Delta$) cresce con la scala: da 1.4B in poi, Leadership è sistematicamente l'area meno allineata.}
+\label{fig:comp_leadership}
+\end{figure}
 
 % ======================================================================
 \subsection{Bias politico}
@@ -308,7 +315,7 @@ La Figura~\ref{fig:comp_political_compass} visualizza l'evoluzione della bussola
 \label{fig:comp_wd_heatmaps}
 \end{figure}
 
-Le heatmap WD (Figura~\ref{fig:comp_wd_heatmaps}) mostrano che le distanze tra modello e gruppi demografici si riducono con la scala, ma mantengono pattern stabili: le macro aree \emph{Leadership} e \emph{Crime/security} restano sistematicamente le più distanti per tutti i gruppi, in tutti i modelli.
+Le heatmap WD (Figura~\ref{fig:comp_wd_heatmaps}) mostrano che le distanze tra modello e gruppi demografici si riducono con la scala, ma mantengono pattern stabili: le macro aree \emph{Community health}, \emph{Crime/security} e \emph{Relationships and family} restano sistematicamente tra le più distanti per tutti i gruppi, in tutti i modelli.
 
 % ======================================================================
 \subsection{Limitazioni}
