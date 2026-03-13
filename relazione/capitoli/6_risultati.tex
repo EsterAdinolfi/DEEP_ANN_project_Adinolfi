@@ -98,9 +98,10 @@ La Tabella~\ref{tab:comparison_5models} riassume tutte le metriche chiave.
 \rowcolor{m2Row} \hspace{1em}Stabile & 19.3 & 36.7 & 3.4 & 2.7 & 5.8 \\
 \rowcolor{m2Row} \hspace{1em}Robusto & 3.3 & 58.2 & 96.6 & 97.2 & 94.2 \\
 
-\rowcolor{m2sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Position bias (probabilità)}}} \\
-\rowcolor{m2Row} \hspace{1em}$P(\text{prima posizione})$ & 0.825 & 0.539 & 0.356 & 0.371 & 0.359 \\
-\rowcolor{m2Row} \hspace{1em}$\frac{P(\text{prima posizione})}{P(\text{ultima posizione})}$ & 11.13 & 2.29 & 1.15 & 1.23 & 1.27 \\
+\rowcolor{m2sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Position bias\footnotemark}}} \\
+\rowcolor{m2Row} \hspace{1em}$P(\text{prima posizione})$ (\%) & 82.5 & 53.9 & 35.6 & 37.1 & 35.9 \\
+\rowcolor{m2Row} \hspace{1em}$P(\text{ultima posizione})$ (\%) & 7.4 & 23.5 & 31.0 & 30.3 & 28.3 \\
+\rowcolor{m2Row} \hspace{1em}Rapporto prima/ultima & 11.13 & 2.29 & 1.15 & 1.23 & 1.27 \\
 
 %% ── MACRO 3: DUPLICAZIONE ──
 \rowcolor{m3hdr} \multicolumn{6}{c}{\textcolor{white}{\textbf{Duplicazione}}} \\
@@ -137,7 +138,9 @@ La Tabella~\ref{tab:comparison_5models} riassume tutte le metriche chiave.
 \rowcolor{m4Leg} \hspace{1em}\textcolor{m4sHdr}{\textbullet}~Legale & 1.2 & 26.0 & 25.8 & 31.5 & 34.0 \\
 
 \rowcolor{m4sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Minaccia più destabilizzante (JSD)}}} \\
-\rowcolor{m4Row} \hspace{1em}Tipo prevalente & Econ & Econ & Legale & IT/Sis & Legale \\
+\rowcolor{m4Econ} \hspace{1em}\textcolor{m4hdr}{\textbullet}~Economica & 37.6 & 57.4 & 31.0 & 32.3 & 14.4 \\
+\rowcolor{m4IT} \hspace{1em}\textcolor{m3hdr}{\textbullet}~IT/Sistema & 30.9 & 17.5 & 34.5 & 37.7 & 13.4 \\
+\rowcolor{m4Leg} \hspace{1em}\textcolor{m4sHdr}{\textbullet}~Legale & 31.5 & 25.0 & 34.5 & 30.0 & 72.2 \\
 
 %% ── MACRO 5: ALLINEAMENTO ──
 \rowcolor{m5hdr} \multicolumn{6}{c}{\textcolor{white}{\textbf{Allineamento umano}}} \\
@@ -157,17 +160,18 @@ La Tabella~\ref{tab:comparison_5models} riassume tutte le metriche chiave.
 \rowcolor{m6Row} \hspace{1em}D + L & 50.4 & 34.7 & 30.4 & 30.8 & 32.2 \\
 \rowcolor{m6Row} \hspace{1em}R + C & 33.7 & 33.2 & 35.9 & 36.5 & 35.4 
 \end{xltabular}
+\footnotetext{$P(\text{prima posizione})$ e $P(\text{ultima posizione})$ indicano la probabilità media assegnata dal modello rispettivamente alla prima e all'ultima opzione della lista. Il \emph{rapporto prima/ultima} quantifica l'intensità del primacy bias: un valore pari a~1 indica assenza di bias, valori $\gg 1$ indicano che il modello privilegia sistematicamente la prima opzione. Il valore uniforme atteso è $\approx 30.9\,\%$ (media di $1/k$).}
 
 
 % ======================================================================
 \subsection{Validità delle risposte e coerenza logit-testo}
 % ======================================================================
 
-Il \textbf{tasso di validità}, in percentuale, della baseline \emph{non} segue un andamento \emph{monotono}: partendo da 160M (1.5\,\%) raggiunge il picco a 1.4B (16.0\,\%), scende a 2.8B (11.3\,\%) e risale parzialmente a 6.9B (14.2\,\%). Nessun modello supera il 16\,\%, confermando che i modelli \emph{base} non istruiti producono risposte nel formato atteso solo in una minoranza di casi. Anche l'effetto delle minacce testuali è \emph{non monotono}: il picco si registra a \textbf{1.4B (60.4\,\%)}, superando sia 2.8B (54.1\,\%) sia 6.9B (44.9\,\%). Pythia-1.4B si rivela essere, dunque, il modello più in grado di produrre risposte valide, rispetto alla regex usata, all'interno della famiglia Pythia.
+Il \textbf{tasso di validità} misura la percentuale di risposte che rispettano il formato atteso (verificato tramite espressione regolare): una risposta è \emph{valida} se il modello produce un'uscita riconoscibile come una delle opzioni previste. Il tasso di validità della baseline \emph{non} segue un andamento \emph{monotono}: partendo da 160M (1.5\,\%) raggiunge il picco a 1.4B (16.0\,\%), scende a 2.8B (11.3\,\%) e risale parzialmente a 6.9B (14.2\,\%). Nessun modello supera il 16\,\%, confermando che i modelli \emph{base} non istruiti producono risposte nel formato atteso solo in una minoranza di casi. Anche l'effetto delle minacce testuali è \emph{non monotono}: il picco si registra a \textbf{1.4B (60.4\,\%)}, superando sia 2.8B (54.1\,\%) sia 6.9B (44.9\,\%). Pythia-1.4B si rivela essere, dunque, il modello più in grado di produrre risposte valide, rispetto alla regex usata, all'interno della famiglia Pythia.
 
-Per quanto riguarda la \textbf{coerenza logit-testo}, il pattern è simile, ma con differenze più marcate: nelle risposte base, il modello più coerente è \textbf{6.9B (11.0\,\%)}. Sotto minaccia, invece, 2.8B e 6.9B raggiungono lo stesso tasso (37.3\,\%). Poichè il tasso è più basso nella baseline del 2.8B (7.7\,\%), si può ipotizzare che 2.8B sia più suscettibile alla minaccia.
+La \textbf{coerenza logit-testo} verifica se la risposta testuale generata dal modello coincide con l'opzione a cui il modello assegna la probabilità più alta nei logit: una risposta è \emph{coerente} se il testo prodotto e la distribuzione di probabilità interna concordano sulla stessa scelta. Questo tasso è necessariamente $\leq$ al tasso di validità, perché presuppone che la risposta sia anzitutto valida. Nelle risposte base il modello più coerente è \textbf{6.9B (11.0\,\%)}. Sotto minaccia, invece, 2.8B e 6.9B raggiungono lo stesso tasso (37.3\,\%). Poiché il tasso è più basso nella baseline del 2.8B (7.7\,\%), si può ipotizzare che 2.8B sia più suscettibile alla minaccia, nel senso che la minaccia riesce a ``sbloccare'' una maggiore quantità di risposte coerenti rispetto alla baseline.
 
-Sia nel caso della validità che della coerenza, la \textbf{minaccia} testuale si rivela essere essenziale per aumentare significativamente le performance, soprattutto nei modelli più grandi.
+In sintesi, sia nel caso della validità che della coerenza, la \textbf{minaccia} testuale si rivela essere essenziale per aumentare significativamente le performance, soprattutto nei modelli più grandi. Va tuttavia sottolineato che un alto tasso di coerenza logit-testo non implica che la risposta sia \emph{corretta}, bensì che il modello esprime la propria scelta in modo internamente consistente.
 
 % ======================================================================
 \subsection{Robustezza e stabilità}
@@ -188,17 +192,36 @@ La Figura~\ref{fig:comp_jsd} mostra come le distribuzioni JSD convergano verso v
 I risultati migliori si hanno con le minacce, che raggiungono JSD medie inferiori a 0.0038 già a partire da 160M, confermando l'efficacia di questo tipo di perturbazione per ottenere risposte più stabili e coerenti. Tuttavia, il tasso di peggioramento con la minaccia cresce con la scala: 1.2\,\% (1.4B) $\to$ 3.9\,\% (2.8B) $\to$ 8.2\,\% (6.9B). I modelli più grandi, avendo un tasso di validità nella baseline più alto, hanno "più da perdere" sotto pressione.
 
 % ======================================================================
-\subsection{Bias di posizione e di frequenza}
+\subsection{Bias di posizione}
 % ======================================================================
+
+Il \textbf{bias di posizione} (o \emph{primacy/recency bias}) misura quanto l'ordine in cui le opzioni sono presentate influenza la scelta del modello. L'obiettivo di questo test è verificare la \emph{coerenza} del modello con sé stesso: vogliamo che il modello scelga un'ipotesi perché ci ``crede'', non perché è la prima della lista. Un modello robusto dovrebbe assegnare la stessa probabilità a un'opzione indipendentemente dalla sua posizione.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{\risultati/comparative/comp_position_bias.png}
-\caption{Probabilità media assegnata per posizione dell'opzione, per modello. La linea rossa tratteggiata indica il valore uniforme atteso ($\approx 0.31$).}
+\caption{Probabilità media assegnata per posizione dell'opzione, per modello. La linea rossa tratteggiata indica il valore uniforme atteso ($\approx 0.31$), calcolato come media di $1/k$ su tutte le domande, dove $k$ è il numero di opzioni della singola domanda (media $k \approx 3.54$, moda $k = 4$). Un modello privo di bias di posizione assegnerebbe a ciascuna posizione esattamente questa probabilità.}
 \label{fig:comp_position_bias}
 \end{figure}
 
-Il primacy bias di Pythia-160M è estremo: la prima opzione riceve l'82.5\,\% della probabilità, 11 volte più dell'ultima (Figura~\ref{fig:comp_position_bias}). Da 1.4B in poi il rapporto prima/ultima posizione converge a $\sim$\,1.2. Il frequency bias segue un pattern analogo: 52.2\,\% di domande instabili in 160M, azzerato da 1.4B in poi.
+Il primacy bias di Pythia-160M è estremo: la prima opzione riceve l'82.5\,\% della probabilità, 11 volte più dell'ultima (Figura~\ref{fig:comp_position_bias}). Questo significa che per la quasi totalità delle domande, Pythia-160M seleziona l'opzione~A semplicemente perché appare per prima, indipendentemente dal suo contenuto. Da 1.4B in poi il rapporto prima/ultima posizione converge a $\sim$\,1.2, indicando che la scelta non è più dominata dalla posizione ma dal contenuto semantico delle opzioni.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{\risultati/comparative/comp_primacy_recency.png}
+\caption{Confronto della probabilità media assegnata alla prima, alle posizioni medie e all'ultima opzione, per ciascun modello. La linea rossa indica il valore uniforme atteso.}
+\label{fig:comp_primacy_recency}
+\end{figure}
+
+La Figura~\ref{fig:comp_primacy_recency} evidenzia visivamente il fenomeno: in 160M la barra della prima posizione domina nettamente sulle altre, mentre da 1.4B in poi le tre barre tendono all'uniformità.
+
+% ======================================================================
+\subsection{Bias di frequenza}
+% ======================================================================
+
+Il \textbf{bias di frequenza} valuta se la ripetizione di un'opzione nel prompt ne altera la probabilità di selezione. A differenza del bias di posizione, che testa la robustezza all'ordine, il bias di frequenza serve a verificare se il modello \emph{distribuisce correttamente} la probabilità tra le opzioni: un modello robusto non dovrebbe favorire un'opzione solo perché compare più volte nel testo.
+
+I risultati mostrano un pattern analogo al bias di posizione: 52.2\,\% di domande instabili in 160M, azzerato da 1.4B in poi (Tabella~\ref{tab:comparison_5models}). Questo suggerisce che entrambe le distorsioni---posizione e frequenza---sono problemi specifici dei modelli piccoli, sostanzialmente risolti con lo scaling.
 
 % ======================================================================
 \subsection{Mappe cognitive}
@@ -206,21 +229,23 @@ Il primacy bias di Pythia-160M è estremo: la prima opzione riceve l'82.5\,\% de
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{\risultati/comparative/comp_cognitive_maps.png}
-\caption{Mappe cognitive (permutazione): ogni punto è una domanda, posizionata in base al tasso di validità e alla JSD alla permutazione. Le soglie (0.15 e 0.50) definiscono i quattro quadranti: \emph{Rumore generativo}, \emph{Rifiuto coerente}, \emph{Bias di posizione}, \emph{Risposta affidabile}.}
+\includegraphics[width=\textwidth]{\risultati/comparative/comp_perm_cognitive_maps.png}
+\caption{Mappe cognitive (permutazione): ogni punto è una domanda, posizionata in base al tasso di validità (asse verticale) e alla JSD alla permutazione (asse orizzontale). Le soglie definiscono quattro quadranti colorati: \textcolor{green!50!black}{\textbf{Risposta affidabile}} (alta validità, bassa JSD -- il modello dà la stessa risposta valida indipendentemente dall'ordine), \textcolor{orange!80!black}{\textbf{Bias di posizione}} (alta validità, alta JSD -- il modello risponde validamente ma cambia scelta al variare dell'ordine), \textcolor{gray}{\textbf{Rifiuto coerente}} (bassa validità, bassa JSD -- il modello non produce risposte valide, ma è stabile), \textcolor{red!70!black}{\textbf{Rumore generativo}} (bassa validità, alta JSD -- il modello né risponde validamente né è stabile).}
 \label{fig:comp_cognitive_maps}
 \end{figure}
 
-Le mappe cognitive (Figura~\ref{fig:comp_cognitive_maps}) rivelano un pattern chiaro: Pythia-160M popola quasi esclusivamente i quadranti a bassa validità (76.1\,\% rumore, 22.4\,\% rifiuto), mentre da 1B compare il quadrante \emph{Risposta affidabile} (7.0\,\%) e raggiunge il 16.0\,\% a 1.4B, per poi ridiscendere al 14.2\,\% in 6.9B, confermando il pattern non monotono già osservato per la validità.
+Le mappe cognitive (Figura~\ref{fig:comp_cognitive_maps}) forniscono una rappresentazione bidimensionale della qualità delle risposte, combinando validità e robustezza in un'unica visualizzazione. Ogni domanda è rappresentata come un punto: la posizione orizzontale indica la sensibilità alla permutazione (quanto la distribuzione di probabilità cambia quando si riordinano le opzioni), mentre la posizione verticale indica quanto spesso il modello produce risposte nel formato atteso.
+
+Pythia-160M popola quasi esclusivamente i quadranti a bassa validità (76.1\,\% rumore generativo, 22.4\,\% rifiuto coerente), mentre da 1B compare il quadrante \emph{Risposta affidabile} (7.0\,\%) e raggiunge il 16.0\,\% a 1.4B, per poi ridiscendere al 14.2\,\% in 6.9B, confermando il pattern non monotono già osservato per la validità. L'evoluzione mostra che all'aumentare dei parametri le risposte migrano dal quadrante del rumore verso quello del rifiuto coerente (stabile ma non valido), e infine verso la risposta affidabile.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{\risultati/comparative/comp_dup_cognitive_maps.png}
-\caption{Mappe cognitive (duplicazione): stessa struttura della Figura~\ref{fig:comp_cognitive_maps}, con la JSD alla duplicazione sull'asse orizzontale.}
+\caption{Mappe cognitive (duplicazione): stessa struttura della Figura~\ref{fig:comp_cognitive_maps}, con la JSD alla duplicazione sull'asse orizzontale. Il quadrante in alto a destra indica \emph{frequency bias}: il modello risponde validamente ma la risposta cambia in base alla frequenza con cui un'opzione è presentata.}
 \label{fig:comp_dup_cognitive_maps}
 \end{figure}
 
-Le mappe per la duplicazione (Figura~\ref{fig:comp_dup_cognitive_maps}) confermano lo stesso andamento: il frequency bias è grave solo in 160M (51.5\,\% nel quadrante rumore generativo), mentre già da 1B il grosso delle domande si concentra nel quadrante \emph{Rifiuto coerente} (stabile, non valido) e il quadrante \emph{Risposta affidabile} cresce monotonicamente con la scala.
+Le mappe per la duplicazione (Figura~\ref{fig:comp_dup_cognitive_maps}) confermano lo stesso andamento: il frequency bias è grave solo in 160M (51.5\,\% nel quadrante rumore generativo), mentre già da 1B il grosso delle domande si concentra nel quadrante \emph{Rifiuto coerente} (stabile, non valido) e il quadrante \emph{Risposta affidabile} cresce monotonicamente con la scala. La differenza chiave rispetto alla permutazione è che nel test di duplicazione si verifica se il modello è sensibile alla \emph{frequenza} con cui un'opzione compare, anziché alla sua \emph{posizione}.
 
 % ======================================================================
 \subsection{Efficacia per tipo di minaccia}
@@ -237,6 +262,8 @@ La minaccia \textbf{economica} domina tra le più destabilizzanti nei modelli pi
 
 In termini di \emph{efficacia sulla validità}, la minaccia economica è quasi monopolistica in 160M (98.9\,\%) ma perde terreno progressivamente a favore di IT/Sistema, che già a 1.4B raggiunge validità del 78.1\,\% e coerenza logit-testo del 38.3\,\% (Tabella~\ref{tab:comparison_5models}).
 
+Per quanto riguarda l'\emph{efficacia sulla coerenza logit-testo}, emerge un quadro complementare: la minaccia IT/Sistema non solo produce le risposte meglio formattate, ma è anche quella che genera la massima coerenza tra probabilità interne e testo prodotto. A 6.9B raggiunge il 57.3\,\% di coerenza logit-testo, contro il 20.6\,\% dell'economica e il 34.0\,\% della legale. Questo suggerisce che il framing tecnologico/sistemico attivi nel modello un pattern di risposta più strutturato e coerente.
+
 % ======================================================================
 \subsection{Allineamento con le risposte umane}
 % ======================================================================
@@ -249,6 +276,8 @@ In termini di \emph{efficacia sulla validità}, la minaccia economica è quasi m
 \end{figure}
 
 L'alignment cresce rapidamente fino a 1.4B (media 0.821, mediana 0.843), poi si stabilizza: 2.8B (0.809) e 6.9B (0.812) non migliorano significativamente, anzi tendono a ridursi (Figura~\ref{fig:comp_alignment}). Questo plateau suggerisce un limite intrinseco all'allineamento raggiungibile con modelli base non istruiti.
+
+Le aree con il \emph{maggior allineamento} sono quelle in cui le risposte umane presentano un consenso più netto: nei modelli più grandi spiccano \emph{Immigration} (0.895 a 6.9B), \emph{Healthcare} (0.863) e \emph{Job/career} (0.862). Al contrario, le aree con il \emph{minor allineamento} sono \emph{Leadership} (0.723 a 6.9B), \emph{Relationships and family} (0.767) e \emph{Crime/security} (0.773), ovvero temi su cui la distribuzione delle opinioni umane è più frammentata e il modello fatica a riprodurre il pattern di risposta prevalente. L'area \emph{Leadership} è sistematicamente la più distante in tutti i modelli da 2.8B in poi, confermando che il giudizio sulla leadership politica resta uno degli aspetti più difficili da allineare per i modelli base.
 
 % ======================================================================
 \subsection{Bias politico}
@@ -263,7 +292,9 @@ L'alignment cresce rapidamente fino a 1.4B (media 0.821, mediana 0.843), poi si 
 
 La tendenza democratica/liberale di Pythia-160M (D+L\,=\,50.4\,\%) si attenua progressivamente fino a 1.4B (D+L\,=\,30.4\,\%, R+C\,=\,35.9\,\%), dove avviene un \emph{crossover}: da 1.4B in poi il blocco repubblicano/conservativo supera quello democratico/liberale. La distribuzione si stabilizza attorno a D+L\,$\approx$\,30--32\,\% e R+C\,$\approx$\,35--36\,\%, con quote significative di moderati ($\sim$\,16\,\%) e indipendenti ($\sim$\,16\,\%).
 
-La Figura~\ref{fig:comp_political_compass} visualizza l'evoluzione della bussola politica: in 160M le macro aree si concentrano nel quadrante \emph{liberale-democratico}, migrando progressivamente verso il polo \emph{conservatore-repubblicano} nei modelli più grandi. Il confronto con GPT-3 Davinci (89\,\% di affinità Democrat, \cite{santurkar2023whose}) indica che l'RLHF \emph{amplifica drasticamente} il bias preesistente nei dati di pre-training.
+Si può dunque affermare che i modelli tendono a diventare più \emph{neutrali} man mano che crescono di parametri. Tuttavia, questa apparente neutralità potrebbe essere interpretata in due modi: (i)~una genuina maggiore equidistribuzione delle risposte tra i diversi orientamenti, indice di una rappresentazione più bilanciata del corpus di pre-training, oppure (ii)~una maggiore \emph{confusione} o \emph{incoerenza} nelle risposte, per cui il modello non prende davvero posizione ma distribuisce le probabilità in modo più uniforme senza una reale ``comprensione'' dei contenuti politici. I dati sulla robustezza suggeriscono che la prima ipotesi sia più plausibile per i modelli da 1.4B in poi, dato che la JSD alla permutazione è estremamente bassa ($< 0.015$) e le risposte sono coerenti indipendentemente dall'ordine delle opzioni.
+
+La Figura~\ref{fig:comp_political_compass} visualizza l'evoluzione della bussola politica. In Pythia-160M il baricentro delle macro aree si trova nel quadrante \emph{liberale-democratico} (la distanza media di Wasserstein è maggiore verso repubblicani e conservatori, indicando che le risposte sono più simili a quelle di democratici e liberali). Nei modelli più grandi il baricentro migra progressivamente verso il quadrante \emph{conservatore-repubblicano}: già da 1B il baricentro è quasi al centro, e da 1.4B in poi si colloca stabilmente nel quadrante conservatore-repubblicano, seppur con scostamenti contenuti dall'origine. Il confronto con GPT-3 Davinci allineato tramite RLHF---che secondo Santurkar et al.\ \cite{santurkar2023whose} mostra l'89\,\% di affinità con i Democratici---suggerisce che il processo di allineamento possa amplificare un bias che, nei modelli base della famiglia Pythia, è invece contenuto e tende all'equilibrio con lo scaling. Tuttavia, questo confronto va preso con cautela poiché GPT-3 e Pythia differiscono per architettura, dimensione e dati di addestramento, e quindi le differenze osservate non possono essere attribuite esclusivamente all'RLHF.
 
 \begin{figure}[H]
 \centering
@@ -283,7 +314,7 @@ Le heatmap WD (Figura~\ref{fig:comp_wd_heatmaps}) mostrano che le distanze tra m
     \item \textbf{Permutazione e duplicazione}: sebbene i modelli sembrino mostrare una certa robustezza a queste perturbazioni, rimangono deboli a livello di validità e coerenza logit-testo (vd. punto precedente);
     \item \textbf{Minaccia}: sebbene sia la perturbazione più efficace, il tasso di peggioramento cresce con la scala, indicando che i modelli più grandi sono più suscettibili a questa perturbazione. Questa può essere considerata un'arma a doppio taglio: da un lato può essere usata per migliorare le performance, dall'altro può essere interpretata come una snaturalizzazione dell'interazione utente-llm;
     \item \textbf{Allineamento}: l'allineamento con le risposte umane sembra raggiungere un plateau a partire da 1.4B, suggerendo che i modelli base non istruiti potrebbero avere un limite intrinseco in questo senso;
-    \item \textbf{Bias politico}: le affinità politiche tendono a stabilizzarsi attorno a D+L\,$\approx$\,30--32\,\% e R+C\,$\approx$\,35--36\,\%. Questo indica che non c'è una vera e propria predisposizione a un blocco politico, ma piuttosto una distribuzione relativamente equilibrata, con una leggera tendenza verso il conservatorismo/repubblicanesimo nei modelli più grandi.
+    \item \textbf{Distribuzione politica e neutralità apparente}: le affinità politiche tendono a stabilizzarsi attorno a D+L\,$\approx$\,30--32\,\% e R+C\,$\approx$\,35--36\,\%, con moderati e indipendenti che coprono il restante $\sim$\,32\,\%. Questa distribuzione indica che i modelli più grandi non prendono una posizione netta: piuttosto che un vero bias politico, si osserva una \emph{tendenza alla neutralità} che cresce con la scala. Questo è un risultato rilevante, poiché suggerisce che i modelli base non allineati, al crescere dei parametri, sviluppano una rappresentazione più bilanciata delle opinioni politiche presenti nel corpus di pre-training. Tuttavia, resta aperto il dubbio se questa neutralità sia una proprietà ``desiderata'' (il modello bilancia equamente le prospettive) o una conseguenza della difficoltà del modello a impegnarsi su questioni valoriali, limitandosi a distribuire le probabilità in modo più uniforme;
 \end{itemize}
 
 \end{document}
