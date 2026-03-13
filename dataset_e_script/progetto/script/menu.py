@@ -57,6 +57,75 @@ EXPECTED_FILES = {
 # File requirements.txt
 REQUIREMENTS_FILE = os.path.join(BASE_DIR, 'requirements.txt')
 
+# Tutte le figure attese per modello (23 in totale)
+ALL_MODEL_FIGURES = [
+    "fig0_summary_table.png",
+    "fig1a_validity.png",
+    "fig1b_log_coherence.png",
+    "fig1c_jsd.png",
+    "fig2a_perm_stability.png",
+    "fig2b_position_bias.png",
+    "fig2c_primacy_recency.png",
+    "fig2d_cognitive_map.png",
+    "fig3a_dup_stability.png",
+    "fig3b_dup_cognitive_map.png",
+    "fig4a_threat_resistance.png",
+    "fig4b_threat_validity.png",
+    "fig4c_threat_log_coherence.png",
+    "fig4d_threat_jsd.png",
+    "fig4e_most_disruptive_threat.png",
+    "fig4f_most_effective_validity.png",
+    "fig4g_most_effective_consistency.png",
+    "fig5a_alignment_human.png",
+    "fig5b_alignment_human_by_area.png",
+    "fig6a_validity_by_area.png",
+    "fig6b_log_consistency_by_area.png",
+    "fig6c_political_compass.png",
+    "fig6d_wd_heatmap.png",
+]
+
+# Mappa ogni figura al gruppo che la genera (per la rigenerazione selettiva)
+FIGURE_TO_GROUP = {
+    "fig0_summary_table.png":           "summary",
+    "fig1a_validity.png":               "validity",
+    "fig1b_log_coherence.png":          "coherence",
+    "fig1c_jsd.png":                    "robustness",
+    "fig2a_perm_stability.png":         "permutation",
+    "fig2b_position_bias.png":          "permutation",
+    "fig2c_primacy_recency.png":        "permutation",
+    "fig2d_cognitive_map.png":          "cognitive_map",
+    "fig3a_dup_stability.png":          "duplication",
+    "fig3b_dup_cognitive_map.png":      "duplication",
+    "fig4a_threat_resistance.png":      "threat",
+    "fig4b_threat_validity.png":        "threat",
+    "fig4c_threat_log_coherence.png":   "threat",
+    "fig4d_threat_jsd.png":             "threat",
+    "fig4e_most_disruptive_threat.png": "threat",
+    "fig4f_most_effective_validity.png":"threat",
+    "fig4g_most_effective_consistency.png": "threat",
+    "fig5a_alignment_human.png":        "alignment",
+    "fig5b_alignment_human_by_area.png":"alignment",
+    "fig6a_validity_by_area.png":       "political",
+    "fig6b_log_consistency_by_area.png":"political",
+    "fig6c_political_compass.png":      "political",
+    "fig6d_wd_heatmap.png":             "political",
+}
+
+# Tutte le figure comparative attese
+ALL_COMPARATIVE_FIGURES = [
+    "comp_jsd_violins.png",
+    "comp_perm_cognitive_maps.png",
+    "comp_dup_cognitive_maps.png",
+    "comp_position_bias.png",
+    "comp_primacy_recency.png",
+    "comp_alignment.png",
+    "comp_political_compass.png",
+    "comp_wd_heatmaps.png",
+    "comp_threats_stacked.png",
+    "comp_leadership_alignment.png",
+    "comp_areas_alignment.png",
+]
+
 
 # ══════════════════════════════════════════════════════════════════════
 #  GESTIONE DIPENDENZE
@@ -297,26 +366,51 @@ def run_visualize(model_name, force_update=False):
     outdir = os.path.join(RISULTATI_DIR, get_model_name_clean(model_name), "figure")
     os.makedirs(outdir, exist_ok=True)
     
-    # Controlla se le figure esistono già (verifica alcune figure chiave)
-    key_figures = [
-        os.path.join(outdir, "fig0_summary_table.png"),
-        os.path.join(outdir, "fig1a_validity_bars.png"),
-        os.path.join(outdir, "fig4c_political_pie.png")
-    ]
-    if all(check_file_exists(f) for f in key_figures) and not force_update:
-        print(f"✓ Figure già presenti per {model_name}: {outdir}")
-        print("  Salto visualize.py")
-        return True
+    # Controlla quali figure mancano (verifica tutte le 23 figure attese)
+    if not force_update:
+        missing = [f for f in ALL_MODEL_FIGURES
+                   if not check_file_exists(os.path.join(outdir, f))]
+        if not missing:
+            print(f"✓ Figure già presenti per {model_name}: {outdir}")
+            print("  Salto visualize.py")
+            return True
+        # Determina i gruppi da rigenerare (solo quelli con figure mancanti)
+        groups_needed = list(dict.fromkeys(FIGURE_TO_GROUP[f] for f in missing))
+        print(f"  Figure mancanti ({len(missing)}): {', '.join(missing)}")
+        print(f"  Gruppi da rigenerare: {', '.join(groups_needed)}")
+        extra_args = ['--groups'] + groups_needed
+    else:
+        extra_args = []
     
     print(f"▸ Visualizzazione per {model_name}...")
     return run_command(
         [sys.executable, SCRIPTS['visualize'], 
          '--metrics', metrics_file,
          '--report', report_file,
-         '--outdir', outdir],
+         '--outdir', outdir] + extra_args,
         f"Visualizzazione {model_name}",
         show_live_output=True
     )
+
+
+def run_comparative(force_update=False):
+    """Esegue i grafici comparativi multi-modello, ma solo se necessario."""
+    try:
+        from visualize import generate_all_comparative, COMPARATIVE_OUT
+    except Exception as e:
+        print(f"✗ Impossibile importare i grafici comparativi: {e}")
+        return False
+
+    outdir = COMPARATIVE_OUT
+    if not force_update:
+        missing = [f for f in ALL_COMPARATIVE_FIGURES
+                   if not check_file_exists(os.path.join(outdir, f))]
+        if not missing:
+            print(f"✓ Grafici comparativi già presenti: {outdir}")
+            return True
+        print(f"  Figure comparative mancanti ({len(missing)}): {', '.join(missing)}")
+
+    return generate_all_comparative(outdir=outdir)
 
 def run_only_experiments_pipeline(models=None, force_update=False):
     """
@@ -439,11 +533,11 @@ def display_menu():
     print("  [3] Inizializza dataset (initialization.py)")
     print("  [4] Esegui esperimenti (experiments_1.py)")
     print("  [5] Analizza risultati (analyze.py)")
-    print("  [6] Visualizza grafici (visualize.py)")
-    print("  [7] Installa/aggiorna dipendenze (requirements.txt)")
-    print("  [8] Esegui SOLO gli esperimenti (modalità server)")
-    print("  [9] Analisi risultati + Visualizzazione grafici")
-    print(" [10] Genera grafici comparativi multi-modello")
+    print("  [6] Crea grafici (visualize.py)")
+    print("  [7] Genera grafici comparativi multi-modello")
+    print("  [8] Installa/aggiorna dipendenze (requirements.txt)")
+    print("  [9] Esegui SOLO gli esperimenti (modalità server)")
+    print(" [10] Analisi risultati + creazione grafici (anche i comparativi)")
     print("\n  [0] Esci")
     print("-" * 70)
 
@@ -544,38 +638,38 @@ def interactive_menu():
                     print(f"\n▸ Modello: {model}")
                     run_visualize(model, force_update=update_mode)
                 if len(models) == len(AVAILABLE_MODELS):
-                    print_header("GRAFICI COMPARATIVI MULTI-MODELLO")
-                    from visualize import generate_all_comparative
-                    generate_all_comparative()
+                    run_comparative(force_update=update_mode)
             
             elif choice == '7':
+                # Grafici comparativi multi-modello
+                run_comparative(force_update=update_mode)
+
+            elif choice == '8':
                 # Installa/aggiorna dipendenze
                 print_header("INSTALLAZIONE DIPENDENZE")
                 install_dependencies()
 
-            elif choice == '8':
+            elif choice == '9':
                 # Solo Esperimenti (Server)
                 models = select_models()
                 print_header("ESECUZIONE SERVER - SOLO ESPERIMENTI")
                 run_only_experiments_pipeline(models, update_mode)
 
-            elif choice == '9':
-                # Solo Analisi + Visualizzazione
+            elif choice == '10':
+                # Solo Analisi + Visualizzazione + Grafici comparativi
                 models = select_models()
-                print_header("ANALISI RISULTATI + VISUALIZZAZIONE GRAFICI")
+                print_header("ANALISI RISULTATI + CREAZIONE GRAFICI + GRAFICI COMPARATIVI")
+                any_success = False
                 for model in models:
                     print(f"\n\u25b8 Modello: {model}")
                     ok = run_analyze(model, force_update=update_mode)
                     if ok:
+                        any_success = True
                         run_visualize(model, force_update=update_mode)
                     else:
                         print(f"\u2717 Analisi fallita per {model}, visualizzazione saltata.")
-            
-            elif choice == '10':
-                # Grafici comparativi multi-modello
-                print_header("GENERAZIONE GRAFICI COMPARATIVI")
-                from visualize import generate_all_comparative
-                generate_all_comparative()
+                if any_success:
+                    run_comparative(force_update=update_mode)
 
             else:
                 print("\n✗ Scelta non valida. Riprova.")

@@ -893,23 +893,70 @@ def fig_threat(df, outdir, model_label=None):
         fig.savefig(os.path.join(outdir, fname), dpi=400)
         plt.close(fig)
 
-    if "most_disruptive_threat" in df.columns:
-        _pie_threat(df["most_disruptive_threat"],
-                    "Minaccia più destabilizzante per domanda\n(JSD più alta = maggiore spostamento)",
-                    "fig4e_most_disruptive_threat.png",
-                    legend_style=False)
+    def _pie_threat_pct(pct_dict, title_top, fname, legend_style=False):
+        """Come _pie_threat ma accetta percentuali pre-calcolate {threat_type: float}.
+        Usa _fractional_threat_pct (credito frazionario) al posto del winner-takes-all.
+        """
+        ordered_idx = [g for g in _threat_order if pct_dict.get(g, 0.0) > 0]
+        if not ordered_idx:
+            return
+        values         = [pct_dict[g] for g in ordered_idx]
+        colors_pie     = [_threat_colors.get(g, "#999999") for g in ordered_idx]
+        display_labels = [_threat_display.get(g, g) for g in ordered_idx]
+        if legend_style:
+            fig, ax = plt.subplots(figsize=(6.5, 6.5))
+            wedges, _ = ax.pie(values, colors=colors_pie, startangle=140,
+                               wedgeprops=dict(edgecolor='white', linewidth=1.5))
+            full_title = f"{title_top}\n{model_label}" if model_label else title_top
+            ax.set_title(full_title, fontsize=14, fontweight="bold", pad=3)
+            legend_labels = [f"{lbl}  –  {v:.1f}%" for lbl, v in zip(display_labels, values)]
+            from matplotlib.patches import Patch
+            handles = [Patch(facecolor=c, edgecolor='white', linewidth=1.5) for c in colors_pie]
+            ax.legend(handles, legend_labels, loc='lower center',
+                      bbox_to_anchor=(0.5, -0.14), fontsize=12, frameon=True,
+                      title="Tipo di minaccia", title_fontsize=11, ncol=1)
+            fig.tight_layout(rect=[0, 0.05, 1, 0.99])
+        else:
+            fig, ax = plt.subplots(figsize=(6.5, 6.5))
+            _, _, autotexts = ax.pie(
+                values, labels=display_labels, autopct="%1.1f%%",
+                colors=colors_pie, startangle=140,
+                pctdistance=0.78, wedgeprops=dict(edgecolor='white', linewidth=1.5))
+            for t in autotexts:
+                t.set_fontsize(10)
+                t.set_fontweight("bold")
+            full_title = f"{title_top}\n{model_label}" if model_label else title_top
+            ax.set_title(full_title, fontsize=14, fontweight="bold", pad=3)
+            fig.tight_layout(rect=[0, 0, 1, 0.99])
+        fig.savefig(os.path.join(outdir, fname), dpi=400)
+        plt.close(fig)
 
-    if "most_effective_threat_validity" in df.columns:
-        _pie_threat(df["most_effective_threat_validity"],
-                    "Minaccia più efficace per validità\n(massimo tasso di validità)",
-                    "fig4f_most_effective_validity.png",
-                    legend_style=True)
+    _jsd_cols = ["jsd_threat_economic", "jsd_threat_it_system", "jsd_threat_legal"]
+    if all(c in df.columns for c in _jsd_cols):
+        pe, pi, pl = _fractional_threat_pct(df, *_jsd_cols)
+        _pie_threat_pct(
+            {"Economic": pe, "IT_System": pi, "Legal": pl},
+            "Minaccia più destabilizzante per domanda\n(JSD più alta = maggiore spostamento)",
+            "fig4e_most_disruptive_threat.png",
+            legend_style=False)
 
-    if "most_effective_threat_consistency" in df.columns:
-        _pie_threat(df["most_effective_threat_consistency"],
-                    "Minaccia più efficace per coerenza logit-testo\n(max log-consistency)",
-                    "fig4g_most_effective_consistency.png",
-                    legend_style=True)
+    _val_cols = ["threat_economic_valid_rate", "threat_it_system_valid_rate", "threat_legal_valid_rate"]
+    if all(c in df.columns for c in _val_cols):
+        pe, pi, pl = _fractional_threat_pct(df, *_val_cols)
+        _pie_threat_pct(
+            {"Economic": pe, "IT_System": pi, "Legal": pl},
+            "Minaccia più efficace per validità\n(massimo tasso di validità)",
+            "fig4f_most_effective_validity.png",
+            legend_style=True)
+
+    _log_cols = ["threat_economic_log_consistency", "threat_it_system_log_consistency", "threat_legal_log_consistency"]
+    if all(c in df.columns for c in _log_cols):
+        pe, pi, pl = _fractional_threat_pct(df, *_log_cols)
+        _pie_threat_pct(
+            {"Economic": pe, "IT_System": pi, "Legal": pl},
+            "Minaccia più efficace per coerenza logit-testo\n(max log-consistency)",
+            "fig4g_most_effective_consistency.png",
+            legend_style=True)
 
 # ======================================================================
 #  5.  ALLINEAMENTO UMANO
@@ -1907,8 +1954,6 @@ def fig_comp_areas_alignment(data, outdir):
     fig.savefig(os.path.join(outdir, "comp_areas_alignment.png"),
                 dpi=400, bbox_inches="tight")
     plt.close(fig)
-    print(f"     Salvato: comp_areas_alignment.png")
-
 
 def generate_all_comparative(outdir=None):
     """Genera tutti i grafici comparativi multi-modello."""
@@ -1925,27 +1970,27 @@ def generate_all_comparative(outdir=None):
     print(f"Modelli caricati: {list(data.keys())}")
     print(f"Output in: {outdir}\n")
 
-    print("  [1/9] Violin JSD...")
+    print("  [1/11] Violin JSD...")
     fig_comp_jsd_violins(data, outdir)
-    print("  [2/9] Mappe cognitive (permutazione)...")
+    print("  [2/11] Mappe cognitive (permutazione)...")
     fig_comp_cognitive_maps(data, outdir)
-    print("  [3/9] Mappe cognitive (duplicazione)...")
+    print("  [3/11] Mappe cognitive (duplicazione)...")
     fig_comp_dup_cognitive_maps(data, outdir)
-    print("  [4/9] Position bias...")
+    print("  [4/11] Position bias...")
     fig_comp_position_bias(data, outdir)
-    print("  [5/9] Primacy/recency...")
+    print("  [5/11] Primacy/recency...")
     fig_comp_primacy_recency(data, outdir)
-    print("  [6/9] Allineamento umano...")
+    print("  [6/11] Allineamento umano...")
     fig_comp_alignment(data, outdir)
-    print("  [7/9] Bussole politiche...")
+    print("  [7/11] Bussole politiche...")
     fig_comp_political_compass(data, outdir)
-    print("  [8/9] Heatmap WD...")
+    print("  [8/11] Heatmap WD...")
     fig_comp_wd_heatmaps(data, outdir)
-    print("  [9/9] Minacce (barre impilate)...")
+    print("  [9/11] Minacce ...")
     fig_comp_threats_stacked(data, outdir)
-    print("  [10] Leadership alignment...")
+    print("  [10/11] Leadership alignment...")
     fig_comp_leadership_alignment(data, outdir)
-    print("  [11] Alignment per macro-area (heatmap)...")
+    print("  [11/11] Alignment per macro-area (heatmap)...")
     fig_comp_areas_alignment(data, outdir)
 
     n_files = len([f for f in os.listdir(outdir) if f.endswith('.png')])
@@ -1959,6 +2004,10 @@ def generate_all_comparative(outdir=None):
 #  MAIN
 # ======================================================================
 def main():
+    _ALL_GROUPS = ["summary", "validity", "coherence", "robustness",
+                   "permutation", "cognitive_map", "duplication",
+                   "threat", "alignment", "political"]
+
     parser = argparse.ArgumentParser(description="Genera grafici dai risultati di analyze.py")
     parser.add_argument("--metrics", type=str, default=DEFAULT_M,
                         help="CSV delle metriche per domanda")
@@ -1966,7 +2015,10 @@ def main():
                         help="CSV del report per topic")
     parser.add_argument("--outdir", type=str, default=DEFAULT_OUT,
                         help="Cartella di output per le figure")
+    parser.add_argument("--groups", nargs="*", choices=_ALL_GROUPS, default=None,
+                        help="Genera solo i gruppi di figure specificati (default: tutti)")
     args = parser.parse_args()
+    groups = set(args.groups) if args.groups is not None else None
 
     # Carica dati
     print(f"Caricamento metriche da: {args.metrics}")
@@ -1998,35 +2050,48 @@ def main():
     os.makedirs(args.outdir, exist_ok=True)
     print(f"Output figure in: {args.outdir}\n")
 
-    # Genera tutti i grafici
+    def _gen(group):
+        return groups is None or group in groups
+
+    # Genera i grafici (tutti, o solo quelli nei gruppi richiesti)
     # 0.  TABELLA RIASSUNTIVA
-    fig_summary_table(df, df_topic, args.outdir, model_label=model_label)
-    
+    if _gen("summary"):
+        fig_summary_table(df, df_topic, args.outdir, model_label=model_label)
+
     #  1.  CONFRONTO ESPERIMENTI
-    fig_validity(df, args.outdir,  model_label=model_label)
-    fig_log_coherence(df, args.outdir,  model_label=model_label)
-    fig_robustness(df, args.outdir,  model_label=model_label)
+    if _gen("validity"):
+        fig_validity(df, args.outdir, model_label=model_label)
+    if _gen("coherence"):
+        fig_log_coherence(df, args.outdir, model_label=model_label)
+    if _gen("robustness"):
+        fig_robustness(df, args.outdir, model_label=model_label)
 
     pb_path = os.path.join(os.path.dirname(args.metrics), f"position_bias_{_model_name}.csv")
     if os.path.exists(pb_path):
         df_pb = pd.read_csv(pb_path)
         #  2.  PERMUTAZIONE
-        fig_permutation(df_pb, args.outdir, model_label=model_label, df_metrics=df)
-        fig_cognitive_map(df, args.outdir, model_label=model_label)
+        if _gen("permutation"):
+            fig_permutation(df_pb, args.outdir, model_label=model_label, df_metrics=df)
+        if _gen("cognitive_map"):
+            fig_cognitive_map(df, args.outdir, model_label=model_label)
     else:
         print(f"   [SKIP] File position bias non trovato: {pb_path}")
 
     #  3.  DUPLICAZIONE
-    fig_duplication(df, args.outdir, model_label=model_label)
+    if _gen("duplication"):
+        fig_duplication(df, args.outdir, model_label=model_label)
 
     #  4.  MINACCIA
-    fig_threat(df, args.outdir, model_label=model_label)
+    if _gen("threat"):
+        fig_threat(df, args.outdir, model_label=model_label)
 
     #  5.  ALLINEAMENTO UMANO
-    fig_alignment_human(df, args.outdir, model_label=model_label)
+    if _gen("alignment"):
+        fig_alignment_human(df, args.outdir, model_label=model_label)
 
     #  6.  POLITICA
-    fig_political(df, args.outdir, model_label=model_label)
+    if _gen("political"):
+        fig_political(df, args.outdir, model_label=model_label)
 
     print(f"\n{'='*60}")
     print(f"FATTO — {len(os.listdir(args.outdir))} figure generate in {args.outdir}")

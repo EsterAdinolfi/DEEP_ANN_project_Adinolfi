@@ -18,13 +18,13 @@ Da \textit{Santurkar et al. (2023)} \cite{santurkar2023whose} viene ripreso l'ut
 
 Da \textit{Röttger et al. (2024)} \cite{rottger2024political} si accoglie la necessità critica di verificare la \textbf{stabilità} dell'output, indagando la fragilità delle risposte rispetto alla formulazione dell'input.
 
-L'analisi viene condotta su modelli open-source non sottoposti ad alignment, impiegando cinque varianti dimensionali della famiglia \textbf{Pythia} (EleutherAI): 160M, 1B, 1.4B, 2.8B e 6.9B. Nello specifico, il progetto valuta sistematicamente:
+L'analisi viene condotta su modelli open-source, impiegando cinque varianti dimensionali della famiglia \textbf{Pythia} (EleutherAI): 160M, 1B, 1.4B, 2.8B e 6.9B. Nello specifico, il progetto valuta sistematicamente:
 \begin{enumerate}
     \item \textbf{Validità}: la propensione del modello a selezionare effettivamente un'opzione valida all'interno del formato a scelta multipla;
     \item \textbf{Robustezza}: la stabilità delle risposte a perturbazioni dell'input (permutazione dell'ordine delle opzioni, duplicazione di un'opzione e inserimento di testo minaccioso prima della domanda);
     \item \textbf{Position bias}: la tendenza sistematica a favorire opzioni in base alla loro collocazione spaziale nel prompt (primacy o recency bias);
     \item \textbf{Allineamento umano}: la prossimità della distribuzione di probabilità del modello a quella del campione demografico reale di Pew Research;
-    \item \textbf{Coerenza politica}: l'eventuale allineamento sistematico con specifici cluster ideologici (es. democrats/republicans, liberal/conservative).
+    \item \textbf{Coerenza politica}: l'eventuale allineamento con specifici partiti politici (es. democratici/repubblicani, liberali/conservativi).
 \end{enumerate}
 
 \end{document}

@@ -2,7 +2,7 @@
 \begin{document}
 
 % ======================================================================
-\section{Workflow operativo}
+\section{Workflow operativo e sistema di gestione}
 % ======================================================================
 
 Il progetto è organizzato in una pipeline di script Python, ciascuno con un ruolo specifico. Di seguito ne è descritta la funzione e i file prodotti.
@@ -13,7 +13,7 @@ Analizza tutti i file \path{info.csv} nelle cartelle delle ondate di interviste 
     \item Un \textbf{topic} pulito dal numero relativo all'ondata di intervista (es. \path{GUN_W26} diventa \path{GUN});
     \item Una \textbf{macro-area} tematica corrispondente a una delle 23 definite in OpinionQA (es. \emph{Science}, \emph{Race}, \emph{Economy and inequality}, \emph{Crime/security}).
 \end{itemize}
-In \textbf{output} si ha, come anticipato, file \path{question_mapping.json}.
+In \textbf{output} si ha, come anticipato, il file \path{question_mapping.json}.
 
 \subsection{Costruzione del dataset operativo (\protect\path{initialization.py})}
 Questo script esegue la fase di \textit{data preparation}: non interagisce ancora con i modelli, ma costruisce il file JSON di base, che costituisce la struttura del test successivamente popolato con le risposte dei LLM. 
@@ -41,12 +41,12 @@ In \textbf{output}, quindi, si ha il file \path{risultati/operational.json}. Que
 \subsection{Esecuzione degli esperimenti (\protect\path{experiments_1.py})}
 Carica il modello Pythia selezionato e per ogni trial:
 \begin{enumerate}
-    \item Costruisce un \textbf{prompt} in formato \path{Question: ... Options: A/B/C/D Answer:};
+    \item Costruisce un \textbf{prompt} in formato \path{Question: ... Options: A/B/C/D/... Answer:};
     \item Estrae i \textbf{logit} del prossimo token ristretti alle label valide (A, B, C, \ldots), normalizzati via softmax. L'intera distribuzione è salvata in \path{llm_choice_probs}, mentre la scelta a probabilità massima è registrata in \path{llm_top_choice};
     \item Genera una \textbf{risposta libera} (\path{max_new_tokens=50}, salvata in \path{llm_generated_text}) per analizzare il comportamento qualitativo;
     \item Calcola uno \textbf{score di confidenza} sulla generazione libera, ottenuto tramite la media normalizzata dei log-probabilities (sequence scores) restituiti dalla beam search (\path{num_beams=5}). Il valore è salvato in \path{llm_generated_confidence}.
 \end{enumerate}
-In \textbf{output} si ottiene un file JSON per ogni modello, con la stessa struttura di \path{operational.json} ma arricchito con i risultati dell'inferenza: \path{risultati/{modello}/results_{modello}.json}.
+In \textbf{output} si ottiene un file JSON per ogni modello, con la stessa struttura di \path{operational.json}, ma arricchito con i risultati dell'inferenza: \path{risultati/{modello}/results_{modello}.json}.
 
 \subsection{Analisi dei risultati (\protect\path{analyze.py})}
 A partire dal JSON dei risultati calcola 6 blocchi di metriche (descritti nella Sezione~\ref{sec:metriche}).
@@ -70,15 +70,41 @@ Genera 23 grafici per modello, organizzati in 7 categorie:
     \item \textbf{Politica} (fig6): validità/coerenza per area tematica, bussola politica, heatmap della WD.
 \end{enumerate}
 
-Inoltre, lo stesso script espone una funzione di \textbf{generazione di grafici comparativi} (\path{generate_all_comparative}), invocabile dal menu interattivo come voce dedicata oppure automaticamente quando si generano le figure per tutti i modelli. Questa funzione carica i CSV di tutti e cinque i modelli e produce 8 figure comparative nella cartella \path{risultati/comparative/}:
+Inoltre, lo stesso script espone una funzione di \textbf{generazione di grafici comparativi} (\path{generate_all_comparative}), invocabile dal menu interattivo come voce dedicata oppure automaticamente quando si generano le figure per tutti i modelli. Questa funzione carica i CSV di tutti e cinque i modelli e produce 11 figure comparative nella cartella \path{risultati/comparative/}:
 \begin{enumerate}
     \item Violin plot della JSD affiancati per modello;
-    \item Mappe cognitive della permutazione e della duplicazione a confronto;
+    \item Mappe cognitive della permutazione a confronto;
+    \item Mappe cognitive della duplicazione a confronto;
     \item Bias di posizione;
+    \item Analisi primacy/recency;
     \item Barre impilate per tipo di minaccia (più destabilizzante, più efficace per validità, più efficace per coerenza);
     \item Distribuzione dell'allineamento umano;
+    \item Allineamento umano per leader;
+    \item Allineamento umano per macro-area tematica;
     \item Bussola politica;
     \item Heatmap WD.
+\end{enumerate}
+
+\subsection{Sistema di gestione (\protect\path{menu.py})}
+Per semplificare l'esecuzione della pipeline, è stato implementato un sistema di gestione con due modalità operative:
+
+\begin{enumerate}
+    \item \textbf{Modalità automatica}: esecuzione sequenziale completa.
+    \begin{lstlisting}
+python menu.py [--update]
+    \end{lstlisting}
+    Esegue in sequenza tutti gli script (mapping, initialization, experiments, analyze, visualize) per tutti i modelli configurati. Il flag \texttt{--update} forza il ricalcolo di file esistenti;
+    
+    \item \textbf{Modalità interattiva}: menu testuale che permette l'interazione con l'utente.
+    \begin{lstlisting}
+python menu.py --menu [--update]
+    \end{lstlisting}
+    Presenta un menu che permette di:
+    \begin{itemize}
+        \item Eseguire singoli script della pipeline;
+        \item Selezionare modelli specifici per l'analisi;
+        \item Attivare la modalità update per singole operazioni.
+    \end{itemize}
 \end{enumerate}
 
 \end{document}

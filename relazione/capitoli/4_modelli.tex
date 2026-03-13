@@ -1,0 +1,40 @@
+\documentclass[../relazione.tex]{subfiles}
+\begin{document}
+
+% ======================================================================
+\section{Modelli utilizzati}
+% ======================================================================
+
+\subsection{Famiglia Pythia (EleutherAI)}
+
+L'analisi sperimentale di questo progetto è condotta su \textbf{Pythia} \cite{biderman2023pythia}, una suite di modelli linguistici open-source sviluppata da EleutherAI. 
+
+La particolarità di Pythia è che tutti i suoi modelli sono stati addestrati esattamente sugli stessi dati (il corpus \emph{The Pile}, contenente circa 300 miliardi di token) e condividono la medesima struttura interna (architettura GPT-NeoX). 
+Questa forte uniformità metodologica è ideale per scopi di ricerca, poiché permette di confrontare modelli di taglie diverse con la certezza che le variazioni di comportamento dipendano esclusivamente dalle dimensioni della rete, e non da differenze nei dati o nelle procedure di addestramento.
+
+Nello specifico, la pipeline analizza 5 varianti di dimensioni crescenti:
+% Come indicato dagli autori del paper di Pythia (Biderman et al.), per valutare la reale capacità del modello è utile osservare i parametri \emph{Non-Embedding}, ovvero quelli effettivamente dedicati all'elaborazione logica della rete, escludendo il "dizionario" di traduzione dei token (che ha un peso proporzionalmente enorme sui modelli più piccoli).
+\begin{table}[h]
+\centering
+\begin{tabular}{lccc}
+\toprule
+\textbf{Modello} & \textbf{Parametri totali} & \textbf{Parametri di non-embedding} & \textbf{Layer interni} \\
+\midrule
+Pythia-160M  & 160 milioni  & $\sim$85 milioni   & 12 \\
+Pythia-1B    & 1 miliardo   & $\sim$806 milioni  & 16 \\
+Pythia-1.4B  & 1.4 miliardi & $\sim$1.2 miliardi & 24 \\
+Pythia-2.8B  & 2.8 miliardi & $\sim$2.5 miliardi & 32 \\
+Pythia-6.9B  & 6.9 miliardi & $\sim$6.4 miliardi & 32 \\
+\bottomrule
+\end{tabular}
+\caption{Modelli della famiglia Pythia analizzati nel progetto. Sono evidenziati sia i parametri totali sia quelli di non-embedding, cioè quelli effettivamente dedicati all'elaborazione logica della rete.}
+\end{table}
+
+\subsection{L'importanza di utilizzare modelli "base"}
+
+Un aspetto metodologico cruciale del progetto riguarda l'assenza di \emph{fine-tuning}. I modelli Pythia impiegati sono modelli "base": non sono stati sottoposti a successive procedure di allineamento con feedback umano (come le tecniche RLHF). 
+
+L'impiego di questa specifica tipologia di modelli è funzionale a quanto dimostrato nell'articolo di Santurkar et al. (2023): poiché l'allineamento tende ad amplificare artificialmente i bias del modello verso posizioni demografiche specifiche (spesso riconducibili a fasce istruite e di orientamento \emph{liberale}), testare modelli base permette di misurare le opinioni nella loro forma "nativa". 
+
+
+\end{document}
