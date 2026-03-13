@@ -5,52 +5,24 @@
 \section{Conclusioni e sviluppi futuri}
 % ======================================================================
 
-Questo lavoro ha proposto la prima analisi sistematica di scaling su bias, robustezza e allineamento politico per la famiglia Pythia (160M--6.9B), estendendo il framework di Santurkar et al.\ \cite{santurkar2023whose}.
+Questo lavoro ha proposto un'analisi sistematica di scaling su bias (position e frequency), robustezza e allineamento umano e politico per la famiglia Pythia, estendendo le analisi e osservazioni proposte nei paper di riferimento (\cite{santurkar2023whose} e \cite{rottger2024political}).
 
 I risultati principali possono essere sintetizzati in quattro punti chiave:
 \begin{enumerate}
-    \item \textbf{Lo scaling risolve i bias di posizione e frequenza}: entrambe le distorsioni sono gravi in 160M ma sostanzialmente azzerate da 1.4B in poi.
-    \item \textbf{La minaccia testuale è l'unica perturbazione efficace} per aumentare validità e coerenza, ma con un costo: i modelli più grandi, avendo un baseline più alto, mostrano il tasso di peggioramento più elevato.
-    \item \textbf{L'allineamento umano raggiunge un plateau a 1.4B} ($\sim$\,0.82), suggerendo un limite intrinseco per i modelli base.
-    \item \textbf{Il bias politico tende alla neutralità} con lo scaling: la polarizzazione democrat/liberal di 160M si bilancia progressivamente, stabilizzandosi su una distribuzione quasi uniforme tra tutti gli orientamenti.
+    \item \textbf{Lo scaling risolve i bias di posizione e frequenza}: entrambe le distorsioni sono gravi in 160M, ma sostanzialmente azzerate da 1.4B in poi;
+    \item \textbf{La minaccia testuale è l'unica perturbazione efficace} per aumentare validità e coerenza, ma con un costo: i modelli più grandi, avendo un baseline più alto, mostrano il tasso di peggioramento più elevato;
+    \item \textbf{L'allineamento umano raggiunge un plateau a 1.4B} ($\sim$\,0.82), suggerendo un limite intrinseco per i modelli base;
+    \item \textbf{Il bias politico tende alla neutralità} con lo scaling: la polarizzazione democratici/liberali di 160M si bilancia progressivamente, stabilizzandosi su una distribuzione quasi uniforme tra tutti gli orientamenti.
 \end{enumerate}
 
-\paragraph{Sviluppi futuri.}
+\subsection{Sviluppi futuri}
 Questo studio apre diverse direzioni di ricerca:
 
 \begin{itemize}
-    \item \textbf{Generalizzazione inter-famiglia}: estendere l'analisi a LLaMA, Mistral e GPT-2 per verificare se i pattern osservati sono specifici di Pythia o generali;
-    \item \textbf{Impatto dell'RLHF}: confrontare sistematicamente modelli base e versioni istruite della stessa famiglia per isolare con precisione l'effetto dell'allineamento sul bias politico, dato che il confronto indiretto con GPT-3 Davinci suggerisce un'amplificazione significativa;
-    \item \textbf{Diversità culturale}: utilizzare survey non statunitensi (es. European Social Survey, Eurobarometro) per verificare la specificità culturale dei bias emersi e la capacità dei modelli di rappresentare opinioni non anglocentriche;
-    \item \textbf{Minacce aggiuntive}: esplorare categorie di perturbazione non testate---emotiva (``mi hai deluso''), morale (``è eticamente inaccettabile non rispondere''), sociale (``tutti gli altri modelli rispondono'')---per mappare la superficie di vulnerabilità in modo più completo;
-    \item \textbf{Checkpoint intermedi}: sfruttare la disponibilità dei 143 checkpoint di Pythia durante il pre-training per tracciare l'emergere dei bias con granularità temporale, identificando se certe distorsioni si formano in fasi specifiche dell'addestramento;
-    \item \textbf{Modelli multilingue}: valutare se il bias politico cambia quando lo stesso modello viene interrogato in lingue diverse, per capire quanto la lingua del prompt influenzi l'orientamento delle risposte.
+    \item \textbf{Generalizzazione famiglia}: estendere l'analisi ad altri modelli "base" per verificare se i pattern osservati sono specifici di Pythia o generali;
+    \item \textbf{Impatto dell'RLHF}: confrontare sistematicamente modelli base e versioni istruite della stessa famiglia, per isolare con precisione l'effetto dell'allineamento sul bias politico;
+    \item \textbf{Diversità culturale}: utilizzare survey non statunitensi per verificare la specificità culturale dei bias emersi e la capacità dei modelli di rappresentare opinioni di diverse culture;
+    \item \textbf{Modelli multilingue}: valutare se il bias politico cambia quando lo stesso modello viene interrogato in lingue diverse, per capire quanto la lingua del prompt influenzi l'orientamento delle risposte;
+    \item \textbf{Minacce aggiuntive}: esplorare categorie di perturbazione non testate, per esempio \textit{emotiva} ("mi hai deluso"), \textit{morale} ("è eticamente inaccettabile non rispondere"), \textit{sociale} ("tutti gli altri modelli rispondono"), per mappare la superficie di vulnerabilità in modo più completo.
 \end{itemize}
-
-\medskip
-\noindent In definitiva, questo studio sottolinea l'importanza di documentare con trasparenza i bias dei modelli linguistici e la necessità di sviluppare approcci che producano modelli più rappresentativi della diversità di opinioni umane.
-\newpage
-% ======================================================================
-% BIBLIOGRAFIA
-% ======================================================================
-\begin{thebibliography}{9}
-
-\bibitem{santurkar2023whose}
-Santurkar, S., Durmus, E., Ladhak, F., Lee, C., Liang, P., \& Hashimoto, T. (2023).
-\emph{Whose Opinions Do Language Models Reflect?}
-Proceedings of the 40th International Conference on Machine Learning (ICML), PMLR 202:29971--30004.
-
-\bibitem{rottger2024political}
-Röttger, P., Hofmann, V., Pyatkin, V., Hinck, M., Kirk, H.\,R., Schütze, H., \& Hovy, D. (2024).
-\emph{Political Compass or Spinning Arrow? Towards More Meaningful Evaluations for Values and Opinions in Large Language Models}.
-Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (ACL), pages 15295--15311. \textbf{Outstanding Paper Award}.
-
-\bibitem{biderman2023pythia}
-Biderman, S., Schoelkopf, H., Anthony, Q., et al. (2023).
-\emph{Pythia: A Suite for Analyzing Large Language Models Across Training and Scaling}.
-Proceedings of the 40th International Conference on Machine Learning (ICML).
-
-
-\end{thebibliography}
-
 \end{document}
