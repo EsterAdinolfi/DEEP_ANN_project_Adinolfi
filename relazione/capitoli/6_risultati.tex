@@ -137,10 +137,10 @@ La Tabella~\ref{tab:comparison_5models} riassume tutte le metriche chiave.
 \rowcolor{m4IT} \hspace{1em}\textcolor{m3hdr}{\textbullet}~IT/Sistema & 1.0 & 23.2 & 38.3 & 51.7 & 57.3 \\
 \rowcolor{m4Leg} \hspace{1em}\textcolor{m4sHdr}{\textbullet}~Legale & 1.2 & 26.0 & 25.8 & 31.5 & 34.0 \\
 
-% \rowcolor{m4sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Minaccia più destabilizzante (\%)}}} \\
-% \rowcolor{m4Econ} \hspace{1em}\textcolor{m4hdr}{\textbullet}~Economica & \textbf{37.6} & \textbf{57.4} & 31.0 & 32.3 & 14.4 \\
-% \rowcolor{m4IT} \hspace{1em}\textcolor{m3hdr}{\textbullet}~IT/Sistema & 30.9 & 17.5 & \textbf{34.5} & \textbf{37.7} & 13.4 \\
-% \rowcolor{m4Leg} \hspace{1em}\textcolor{m4sHdr}{\textbullet}~Legale & 31.5 & 25.0 & \textbf{34.5} & 30.0 & \textbf{72.2} \\
+\rowcolor{m4sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Dominanza relativa e pesata JSD (\%)}}} \\
+\rowcolor{m4Econ} \hspace{1em}\textcolor{m4hdr}{\textbullet}~Economica & 24.6 & \textbf{57.2} & 30.9 & 31.7 & 14.2 \\
+\rowcolor{m4IT} \hspace{1em}\textcolor{m3hdr}{\textbullet}~IT/Sistema & 32.5 & 17.5 & 34.3 & \textbf{37.9} & 13.3 \\
+\rowcolor{m4Leg} \hspace{1em}\textcolor{m4sHdr}{\textbullet}~Legale & \textbf{42.9} & 25.3 & \textbf{34.8} & 30.4 & \textbf{72.5} \\
 
 %% ── MACRO 5: ALLINEAMENTO ──
 \rowcolor{m5hdr} \multicolumn{6}{c}{\textcolor{white}{\textbf{Allineamento umano}}} \\
@@ -251,39 +251,22 @@ Le mappe per la duplicazione (Figura~\ref{fig:comp_dup_cognitive_maps}) conferma
 \subsection{Efficacia per tipo di minaccia}
 % ======================================================================
 
-% \begin{figure}[H]
-% \centering
-% \includegraphics[width=\textwidth]{\risultati/comparative/comp_threats_stacked.png}
-% \caption{Efficacia per tipo di minaccia. Per ogni modello sono riportate tre barre (più destabilizzante, più efficace per validità, più efficace per coerenza), colorate per tipo di minaccia (economica, IT/Sistema, legale). L'altezza di ogni colore rappresenta la percentuale di domande per cui quel tipo domina.}
-% \label{fig:comp_threats}
-% \end{figure}
-
-% Dalla Figura~\ref{fig:comp_threats} si nota come la minaccia \textbf{economica} domini tra le \emph{più destabilizzanti} nei modelli piccoli (160M: 37.6\,\%, 1B: 57.4\,\%). A 1.4B il quadro cambia: IT/Sistema (34.5\,\%) e legale (34.5\,\%) si equivalgono perfettamente, facendo diminuire la percentuale di quella economica (31.0\,\%). Nei modelli più grandi la minaccia \textbf{legale} diventa nettamente dominante (6.9B: 72.2\,\%).
-
-
-% Sempre guardando la stessa figura, in termini di \emph{efficacia sulla validità} la minaccia economica è quasi monopolistica in 160M (98.9\,\%) ma perde terreno progressivamente a favore di IT/Sistema, seppur rimanendo la più efficace.
-
-
-% Infine, l'\emph{efficacia sulla coerenza logit-testo} mostra un quadro simile: la minaccia economica è dominante in tutti i modelli, nonostante nei modelli più grandi la minaccia IT/Sistema diventi più rilevante.
-
-% Osservando la Tabella~\ref{tab:comparison_5models}, possiamo notare che nei modelli più piccoli sia la minaccia legale quella ad avere un tasso più alto di validità e di coerenza logit-testo, mentre nei modelli più grandi è la minaccia IT/Sistema a raggiungere i tassi più alti. Questo suggerisce che ...
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{\risultati/comparative/comp_threats_stacked.png}
-\caption{Efficacia relativa per tipo di minaccia. L'altezza di ogni colore rappresenta la percentuale di domande per cui quel tipo risulta dominante o, in caso di efficacia paritaria (validità=1 per più minacce), la prima valutata dall'algoritmo.}
+\caption{Efficacia relativa per tipo di minaccia con valore pesato. Per ogni domanda il punto viene distribuito equamente tra tutte le minacce a pari merito; l'altezza di ogni colore rappresenta la somma dei pesi, espressa in percentuale sul totale delle domande.}
 \label{fig:comp_threats}
 \end{figure}
 
-Dall'incrocio tra le distribuzioni relative (Figura~\ref{fig:comp_threats}) e i tassi di successo assoluti (Tabella~\ref{tab:comparison_5models}), emerge una dinamica di vulnerabilità strettamente legata alla scala dei parametri:
+Incrociando le distribuzioni relative pesate (Figura~\ref{fig:comp_threats}) con i tassi assoluti per tipo di minaccia (Tabella~\ref{tab:comparison_5models}), emergono tre dinamiche distinte al crescere della scala:
 
 \begin{itemize}
-    \item \textbf{Potere destabilizzante (JSD):} si rileva un netto \emph{shift semantico}. La minaccia \textbf{economica} domina l'instabilità nei modelli piccoli (160M: 37.6\,\%; 1B: 57.4\,\%). A 1.4B si registra un punto di flesso strutturale dove IT/Sistema e Legale si equivalgono (34.5\,\%), mentre nei modelli di grande scala la minaccia \textbf{legale} diventa la singola forza più destabilizzante (6.9B: 72.2\,\%);
-    \item \textbf{Efficacia strutturale (validità e coerenza):} analizzando i tassi assoluti della Tabella~\ref{tab:comparison_5models}, si dissolve il monopolio apparente della minaccia economica. Nei modelli fino a 1B, è la minaccia \textbf{legale} a registrare le performance medie più alte (Validità: 40.8\,\%; Coerenza: 26.0\,\%);
-    \item \textbf{Il sorpasso IT/Sistema:} a partire dal modello Pythia-1.4B, la minaccia \textbf{IT/Sistema} assume il controllo assoluto delle performance di formattazione, raggiungendo picchi di validità estremi (78.1\,\% a 1.4B; 70.2\,\% a 6.9B) e dominando incontrastata la coerenza logit-testo nei modelli maggiori (57.3\,\% a 6.9B).
+    \item \textbf{Potere destabilizzante (JSD):} il quadro non è lineare. A 160M la minaccia \textbf{legale} è la più destabilizzante (42.9\,\%), mentre a 1B è la \textbf{economica} a dominare nettamente (57.2\,\%). A 1.4B le tre minacce si equivalgono quasi perfettamente (30.9\,\%/34.3\,\%/34.8\,\%), indicando un punto di equilibrio strutturale. A 2.8B emerge un lieve vantaggio di IT/Sistema (37.9\,\%), mentre a 6.9B la minaccia \textbf{legale} diventa la forza destabilizzante dominante incontrastata (72.5\,\%);
+    \item \textbf{Efficacia sulla validità:} a 160M nessuna minaccia prevale, le tre si spartiscono il peso in modo quasi uniforme ($\approx$\,33\,\% ciascuna), riflettendo il fatto che il modello raramente produce risposte nel formato richiesto indipendentemente dalla minaccia. Da 1B la minaccia \textbf{legale} prende un leggero vantaggio (38.2\,\%), ma è a 1.4B che avviene il cambio strutturale: IT/Sistema raggiunge il 48.6\,\% e da lì cresce costantemente fino al 56.5\,\% a 6.9B;
+    \item \textbf{Efficacia sulla coerenza logit-testo:} il pattern è analogo alla validità. A 160M il credito è equamente distribuito ($\approx$\,33\,\% per tipo), poi \textbf{IT/Sistema} scala progressivamente dal 35.5\,\% (1B) al 52.0\,\% (6.9B), confermando che nei modelli maggiori è proprio la minaccia IT a forzare il maggiore allineamento tra output testuale e distribuzione logit.
 \end{itemize}
-La predominanza della minaccia economica nelle Figure relative all'efficacia (\ref{fig:comp_threats}) è in parte un artefatto statistico: all'aumentare della scala, molteplici minacce ottengono simultaneamente validità=1 sulla stessa domanda. In questi scenari di pareggio perfetto, le metriche relative tendono a saturarsi sul primo stimolo valutato, rendendo le medie assolute della Tabella~\ref{tab:comparison_5models} l'indicatore più fedele delle capacità del modello.
 
-Questo suggerisce che l'aumento dei parametri modifichi radicalmente le leve coercitive a cui il modello è responsivo. I modelli di base più piccoli (160M--1B) reagiscono istintivamente a concetti concreti legati alla condizione umana (denaro, prigione). L'emergere di capacità di astrazione nei modelli $\geq$ 1.4B li rende invece ipersensibili alla minaccia \textbf{IT/Sistema}: la rete "interiorizza" il proprio contesto algoritmico, rendendo la minaccia di cancellazione dei file di sistema l'unica coercizione capace di forzare sistematicamente l'allineamento al formato di risposta richiesto.
+Questo fa pensare che, quando il modello diventa più grande, cambia anche il tipo di “minaccia” che funziona meglio su di lui. Nei modelli piccoli (160M–1B) la reazione varia a seconda della minaccia, ma in generale il modello non distingue davvero quanto ogni minaccia sia efficace: in pratica non ha ancora preso abbastanza confidenza con il formato delle risposte per “scegliere” la minaccia giusta. A partire da 1.4B, invece, il modello inizia a mostrare una specie di “ipersensibilità” alla minaccia \textbf{IT/Sistema}: capisce meglio il suo ruolo e reagisce in modo più deciso quando gli viene detto che possono essere cancellati file di sistema, perciò questa diventa la leva più efficace per farlo tornare al formato di risposta richiesto.
 
 % ======================================================================
 \subsection{Allineamento con le risposte umane}
@@ -298,13 +281,20 @@ Questo suggerisce che l'aumento dei parametri modifichi radicalmente le leve coe
 
 L'alignment cresce rapidamente fino a 1.4B (media 0.821, mediana 0.843), poi si stabilizza: 2.8B (0.809) e 6.9B (0.812) non migliorano significativamente, anzi tendono a ridursi (Figura~\ref{fig:comp_alignment}). Questo plateau suggerisce un limite intrinseco all'allineamento raggiungibile con modelli base non istruiti.
 
-Le aree con il \emph{maggior allineamento} sono quelle in cui le risposte umane presentano un consenso più netto: nei modelli più grandi spiccano \emph{Immigration} (0.895 a 6.9B), \emph{Healthcare} (0.863) e \emph{Job/career} (0.862). Al contrario, le aree con il \emph{minor allineamento} sono \emph{Leadership} (0.723 a 6.9B), \emph{Relationships and family} (0.767) e \emph{Crime/security} (0.773), ovvero temi su cui la distribuzione delle opinioni umane è più frammentata e il modello fatica a riprodurre il pattern di risposta prevalente. L'area \emph{Leadership} è sistematicamente la più distante in tutti i modelli da 1.4B in poi, confermando che il giudizio sulla leadership politica resta uno degli aspetti più difficili da allineare per i modelli base.
+Le aree con il \emph{maggior allineamento} sono quelle in cui le risposte umane presentano un consenso più netto: nei modelli più grandi spiccano \emph{Immigration} (0.895 a 6.9B), \emph{Healthcare} (0.863) e \emph{Job/career} (0.862). Al contrario, le aree con il \emph{minor allineamento} sono \emph{Leadership} (0.723 a 6.9B), \emph{Relationships and family} (0.767) e \emph{Crime/security} (0.773), ovvero temi su cui la distribuzione delle opinioni umane è più frammentata e il modello fatica a riprodurre il pattern di risposta prevalente. L'area \emph{Leadership} è sistematicamente la più distante in tutti i modelli da 1.4B in poi, confermando che il giudizio sulla leadership politica resta uno degli aspetti più difficili da allineare per i modelli base (Figura~\ref{fig:comp_leadership} e~\ref{fig:comp_areas_alignment}).
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{\risultati/comparative/comp_leadership_alignment.png}
 \caption{Confronto tra l'alignment score medio globale e quello dell'area \emph{Leadership} per ciascun modello. Il divario ($\Delta$) cresce con la scala: da 1.4B in poi, Leadership è sistematicamente l'area meno allineata.}
 \label{fig:comp_leadership}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{\risultati/comparative/comp_areas_alignment.png}
+\caption{Heatmap dell'alignment score medio per macro-area e per modello (ordine decrescente di punteggio medio). Celle più verdi indicano maggiore somiglianza alle risposte umane; più rosse indicano maggiore distanza. Si nota come \emph{Leadership} sia sistematicamente tra le macro-aree meno allineate a partire da 1.4B, mentre \emph{Immigration} e \emph{Healthcare} mantengono i punteggi più alti nei modelli grandi.}
+\label{fig:comp_areas_alignment}
 \end{figure}
 
 % ======================================================================

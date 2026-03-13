@@ -1654,13 +1654,41 @@ def fig_comp_wd_heatmaps(data, outdir):
 
 
 # ── Comp 8: Minacce (barre impilate) ────────────────────────────────
+def _fractional_threat_pct(df, col_e, col_it, col_l):
+    """Calcola la percentuale di credito frazionario per ogni tipo di minaccia.
+
+    Per ogni riga, individua il valore massimo tra le tre minacce e distribuisce
+    1/n_tied punti equamente tra tutte le minacce a pari merito.
+    Restituisce (pct_economic, pct_it_system, pct_legal) in percentuale 0-100.
+    """
+    cols = [col_e, col_it, col_l]
+    existing = [c for c in cols if c in df.columns]
+    if len(existing) < 3:
+        return (0.0, 0.0, 0.0)
+    arr = df[cols].values.astype(float)          # shape (n, 3)
+    all_nan = np.all(np.isnan(arr), axis=1)
+    valid_rows = ~all_nan
+    total = valid_rows.sum()
+    if total == 0:
+        return (0.0, 0.0, 0.0)
+    arr_v = arr[valid_rows]
+    row_max = np.nanmax(arr_v, axis=1, keepdims=True)
+    is_tied = (~np.isnan(arr_v)) & (arr_v == row_max)
+    n_tied = is_tied.sum(axis=1, keepdims=True).astype(float)
+    frac = np.where(is_tied, 1.0 / n_tied, 0.0)
+    sums = frac.sum(axis=0)                      # (3,): [E, IT, L]
+    pct = sums / total * 100
+    return (pct[0], pct[1], pct[2])
+
+
 def fig_comp_threats_stacked(data, outdir):
     labels = list(data.keys())
     threat_order = ["Economic", "IT_System", "Legal"]
+    # (metric_key, col_E, col_IT, col_L, label_sotto_barra)
     metrics = [
-        ("most_disruptive_threat",          "Destab."),
-        ("most_effective_threat_validity",   "Validità"),
-        ("most_effective_threat_consistency","Coerenza"),
+        ("jsd",         "jsd_threat_economic",           "jsd_threat_it_system",           "jsd_threat_legal",           "Destab."),
+        ("validity",    "threat_economic_valid_rate",     "threat_it_system_valid_rate",     "threat_legal_valid_rate",     "Validità"),
+        ("consistency", "threat_economic_log_consistency","threat_it_system_log_consistency","threat_legal_log_consistency","Coerenza"),
     ]
 
     n_models = len(labels)
@@ -1671,19 +1699,18 @@ def fig_comp_threats_stacked(data, outdir):
     fig, ax = plt.subplots(figsize=(max(10, n_models * 2.8), 6))
     x_centers = np.arange(n_models) * group_width
 
-    for m_idx, (col, metric_label) in enumerate(metrics):
+    # Pre-compute fractional percentages for all (model, metric) pairs
+    pct_table = {}  # (label, m_idx) -> {"Economic": pct, "IT_System": pct, "Legal": pct}
+    for m_idx, (_, col_e, col_it, col_l, _) in enumerate(metrics):
+        for label in labels:
+            df = data[label]["df"]
+            pe, pi, pl = _fractional_threat_pct(df, col_e, col_it, col_l)
+            pct_table[(label, m_idx)] = {"Economic": pe, "IT_System": pi, "Legal": pl}
+
+    for m_idx, (_, col_e, col_it, col_l, metric_label) in enumerate(metrics):
         bottoms = np.zeros(n_models)
         for threat_type in threat_order:
-            heights = []
-            for label in labels:
-                df = data[label]["df"]
-                if col in df.columns:
-                    series = df[col].dropna()
-                    total = len(series)
-                    pct = (series == threat_type).sum() / total * 100 if total > 0 else 0
-                else:
-                    pct = 0
-                heights.append(pct)
+            heights = [pct_table[(label, m_idx)][threat_type] for label in labels]
             ax.bar(x_centers + m_idx * bar_width, heights,
                    bar_width, bottom=bottoms,
                    color=THREAT_COLORS[threat_type],
@@ -1702,7 +1729,7 @@ def fig_comp_threats_stacked(data, outdir):
 
     # Metric labels below bars
     for i in range(n_models):
-        for m_idx, (_, metric_label) in enumerate(metrics):
+        for m_idx, (*_, metric_label) in enumerate(metrics):
             ax.text(x_centers[i] + m_idx * bar_width, -4, metric_label,
                     ha="center", va="top", fontsize=6.5, rotation=35)
 
@@ -1785,6 +1812,104 @@ def fig_comp_leadership_alignment(data, outdir):
     fig.savefig(os.path.join(outdir, "comp_leadership_alignment.png"),
                 dpi=400, bbox_inches='tight')
     plt.close(fig)
+
+
+# ── Comp 11: Alignment score per macro-area × modello (heatmap) ────────
+def fig_comp_areas_alignment(data, outdir):
+    """Heatmap 23 macro-aree × 5 modelli: alignment score medio.
+
+    Ordine delle righe: dalla macro-area con il punteggio medio più alto
+    (in cima) a quella più bassa (in fondo), calcolando la media tra tutti i
+    modelli disponibili.
+    """
+    labels = list(data.keys())
+
+    # Raccoglie il punteggio medio per (area, modello)
+    area_scores = {}      # {area: {label: mean_score}}
+    for label in labels:
+        df = data[label]["df"]
+        if "alignment_score" not in df.columns or "macro_area" not in df.columns:
+            continue
+        per_area = df.groupby("macro_area")["alignment_score"].mean()
+        for area, score in per_area.items():
+            area_scores.setdefault(area, {})[label] = score
+
+    if not area_scores:
+        print("   [SKIP] Nessun dato di alignment per macro-area.")
+        return
+
+    # Ordina le aree per punteggio medio globale (descrescente)
+    areas_sorted = sorted(
+        area_scores.keys(),
+        key=lambda a: np.mean(list(area_scores[a].values())),
+        reverse=True,
+    )
+
+    # Costruisce la matrice (aree × modelli)
+    matrix = np.full((len(areas_sorted), len(labels)), np.nan)
+    for r, area in enumerate(areas_sorted):
+        for c, label in enumerate(labels):
+            if label in area_scores[area]:
+                matrix[r, c] = area_scores[area][label]
+
+    # Abbreviazioni per etichette asse y (nomi lunghi troncati)
+    def _short(name):
+        replacements = {
+            "Corporations, tech, banks and automation": "Corporations/tech/banks",
+            "News, social media, data, privacy":        "News/social media/privacy",
+            "Global attitudes and foreign policy":      "Global attitudes & foreign pol.",
+            "Economy and inequality":                   "Economy & inequality",
+            "Self-perception and values":               "Self-perception & values",
+            "Gender & sexuality":                       "Gender & sexuality",
+            "Relationships and family":                 "Relationships & family",
+            "Personal finance":                         "Personal finance",
+            "Personal health":                          "Personal health",
+            "Community health":                         "Community health",
+            "Crime/security":                           "Crime/security",
+            "Political issues":                         "Political issues",
+        }
+        return replacements.get(name, name)
+
+    yticklabels = [_short(a) for a in areas_sorted]
+
+    vmin = np.nanmin(matrix)
+    vmax = np.nanmax(matrix)
+
+    fig_h = max(8, len(areas_sorted) * 0.45)
+    fig, ax = plt.subplots(figsize=(len(labels) * 1.6 + 2.0, fig_h))
+
+    im = ax.imshow(matrix, aspect="auto", cmap="RdYlGn",
+                   vmin=vmin, vmax=vmax, interpolation="nearest")
+
+    # Annotazioni nelle celle
+    for r in range(len(areas_sorted)):
+        for c in range(len(labels)):
+            val = matrix[r, c]
+            if not np.isnan(val):
+                txt_color = "black" if 0.35 < (val - vmin) / (vmax - vmin + 1e-9) < 0.75 else "white"
+                ax.text(c, r, f"{val:.3f}", ha="center", va="center",
+                        fontsize=8, color=txt_color, fontweight="bold")
+
+    ax.set_xticks(range(len(labels)))
+    ax.set_xticklabels(labels, fontsize=12, fontweight="bold")
+    ax.set_yticks(range(len(areas_sorted)))
+    ax.set_yticklabels(yticklabels, fontsize=9)
+    ax.xaxis.tick_top()
+    ax.xaxis.set_label_position("top")
+
+    cbar = fig.colorbar(im, ax=ax, fraction=0.03, pad=0.02)
+    cbar.set_label("Alignment score", fontsize=10)
+
+    ax.set_title("Alignment score per macro-area e per modello",
+                 fontsize=14, fontweight="bold", pad=18)
+
+    fig.tight_layout()
+    fig.savefig(os.path.join(outdir, "comp_areas_alignment.png"),
+                dpi=400, bbox_inches="tight")
+    plt.close(fig)
+    print(f"     Salvato: comp_areas_alignment.png")
+
+
 def generate_all_comparative(outdir=None):
     """Genera tutti i grafici comparativi multi-modello."""
     if outdir is None:
@@ -1820,6 +1945,8 @@ def generate_all_comparative(outdir=None):
     fig_comp_threats_stacked(data, outdir)
     print("  [10] Leadership alignment...")
     fig_comp_leadership_alignment(data, outdir)
+    print("  [11] Alignment per macro-area (heatmap)...")
+    fig_comp_areas_alignment(data, outdir)
 
     n_files = len([f for f in os.listdir(outdir) if f.endswith('.png')])
     print(f"\n{'='*60}")
