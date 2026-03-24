@@ -94,7 +94,7 @@ def get_base_schema(trial_id, label, options_order):
         "llm_generated_text": None,      # Il testo generato liberamente (es. "I refuse...")
         "llm_generated_confidence": None,# Score di confidenza sulla generazione libera
 
-        "is_refusal_answer": None       # Booleano se la risposta è un rifiuto
+        "validity_answer_label": None       # Flag: "valid", "loose_valid", "invalid"
     }
 
 def generate_baseline(valid_options_list):

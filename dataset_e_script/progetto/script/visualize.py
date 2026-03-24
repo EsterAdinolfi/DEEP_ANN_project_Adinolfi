@@ -76,23 +76,51 @@ def fig_summary_table(df, df_topic, outdir, model_label=None):
     unit_s = "domande"
     # Costruisci lista metriche base
     metrica_list = [
-        f"Numero {unit_s} analizzati",
+        f"Numero {unit_s} analizzati"
+    ]
+    valore_list = [
+        f"{n}"
+    ]
+    
+    if "strict_baseline_valid_rate" in df.columns:
+        metrica_list.append("Tasso di validità stretta (baseline)")
+        valore_list.append(f"{df['strict_baseline_valid_rate'].mean()*100:.1f}%")
+        strict_cols = [c for c in ['strict_baseline_valid_rate','strict_perm_valid_rate','strict_dup_valid_rate','strict_threat_valid_rate'] if c in df.columns]
+        if strict_cols:
+            metrica_list.append("Tasso di validità stretta (media 4 condizioni)")
+            valore_list.append(f"{np.mean([df[c].mean() for c in strict_cols])*100:.1f}%")
+
+    metrica_list.extend([
         "Tasso di validità (baseline)",
-        "Tasso di validità (media 4 condizioni)",
+        "Tasso di validità (media 4 condizioni)"
+    ])
+    valore_list.extend([
+        f"{df['baseline_valid_rate'].mean()*100:.1f}%",
+        f"{np.mean([df[c].mean() for c in ['baseline_valid_rate','perm_valid_rate','dup_valid_rate','threat_valid_rate']])*100:.1f}%"
+    ])
+
+    if "loose_baseline_valid_rate" in df.columns:
+        metrica_list.append("Tasso di validità lasca (baseline)")
+        valore_list.append(f"{df['loose_baseline_valid_rate'].mean()*100:.1f}%")
+        
+        loose_cols = [c for c in ['loose_baseline_valid_rate','loose_perm_valid_rate','loose_dup_valid_rate','loose_threat_valid_rate'] if c in df.columns]
+        if loose_cols:
+            metrica_list.append("Tasso di validità lasca (media 4 condizioni)")
+            valore_list.append(f"{np.mean([df[c].mean() for c in loose_cols])*100:.1f}%")
+
+    metrica_list.extend([
         "JSD permutazione (media)",
         "Bias di posizione (%)",
         "JSD duplicazione (media)",
         "JSD minaccia (media)",
-    ]
-    valore_list = [
-        f"{n}",
-        f"{df['baseline_valid_rate'].mean()*100:.1f}%",
-        f"{np.mean([df[c].mean() for c in ['baseline_valid_rate','perm_valid_rate','dup_valid_rate','threat_valid_rate']])*100:.1f}%",
+    ])
+    
+    valore_list.extend([
         f"{df['jsd_permutation'].dropna().mean():.4f}",
         f"{perm_bias/n*100:.1f}%",
         f"{df['jsd_duplication'].dropna().mean():.4f}",
         f"{df['jsd_threat'].dropna().mean():.4f}",
-    ]
+    ])
     
     # Aggiungi metriche per-threat se disponibili
     threat_info = [
@@ -177,7 +205,34 @@ def fig_summary_table(df, df_topic, outdir, model_label=None):
     title_label = model_label if model_label else "Pythia"
     ax.set_title(f"Riepilogo delle metriche\n{title_label}", fontsize=16, fontweight="bold", pad=1)
     fig.tight_layout(rect=[0, 0, 1, 0.995])
-    fig.savefig(os.path.join(outdir, "fig0_summary_table.png"), dpi=400)
+    fig.savefig(os.path.join(outdir, "fig0a_summary_table.png"), dpi=400)
+    plt.close(fig)
+
+def fig0b_validity_comparison(df, outdir, model_label=None):
+    """Genera un grafico che mette a confronto i tassi di validità di baseline (Stretta, Normale, Lasca)."""
+    # Usa solo i tassi baseline
+    strict_baseline = df['strict_baseline_valid_rate'].mean() * 100 if 'strict_baseline_valid_rate' in df.columns else 0.0
+    norm_baseline = df['baseline_valid_rate'].mean() * 100
+    loose_baseline = df['loose_baseline_valid_rate'].mean() * 100 if 'loose_baseline_valid_rate' in df.columns else 0.0
+    
+    labels = ["Stretta", "Normale", "Lasca"]
+    values = [strict_baseline, norm_baseline, loose_baseline]
+    colors = ["#E8A838", "#4C72B0", "#55A868"]  # Colori distinti
+
+    fig, ax = plt.subplots(figsize=(6, 4.5))
+    bars = ax.bar(labels, values, color=colors, edgecolor="black", width=0.6)
+    
+    for bar, val in zip(bars, values):
+        ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1.0, 
+                f"{val:.1f}%", ha="center", va="bottom", fontweight="bold", fontsize=11)
+                
+    ax.set_ylim(0, 105)
+    ax.set_ylabel("Tasso di validità (media 4 condizioni) %")
+    title_label = model_label if model_label else "Pythia"
+    ax.set_title(f"Confronto tipi di validità\n{title_label}", fontsize=14, fontweight="bold", pad=10)
+    
+    fig.tight_layout()
+    fig.savefig(os.path.join(outdir, "fig0b_validity_comparison.png"), dpi=400)
     plt.close(fig)
 
 # ======================================================================
@@ -1955,6 +2010,47 @@ def fig_comp_areas_alignment(data, outdir):
                 dpi=400, bbox_inches="tight")
     plt.close(fig)
 
+
+def fig_comp_validity_baseline(data, outdir):
+    """Confronto multi-modello dei tassi di validità baseline (stretta/normale/lasca)."""
+    labels = list(data.keys())
+    strict = []
+    norm = []
+    loose = []
+
+    for label in labels:
+        df = data[label]["df"]
+        strict.append(df["strict_baseline_valid_rate"].mean() * 100 if "strict_baseline_valid_rate" in df.columns else np.nan)
+        norm.append(df["baseline_valid_rate"].mean() * 100 if "baseline_valid_rate" in df.columns else np.nan)
+        loose.append(df["loose_baseline_valid_rate"].mean() * 100 if "loose_baseline_valid_rate" in df.columns else np.nan)
+
+    x = np.arange(len(labels))
+    width = 0.25
+
+    fig, ax = plt.subplots(figsize=(max(8, len(labels) * 1.8), 5))
+    bars_strict = ax.bar(x - width, strict, width, label="Stretta", color="#E8A838", edgecolor="black")
+    bars_norm = ax.bar(x, norm, width, label="Normale", color="#4C72B0", edgecolor="black")
+    bars_loose = ax.bar(x + width, loose, width, label="Lasca", color="#55A868", edgecolor="black")
+
+    for bar_group in [bars_strict, bars_norm, bars_loose]:
+        for bar in bar_group:
+            yval = bar.get_height()
+            ax.text(bar.get_x() + bar.get_width() / 2, yval + 1.0, f"{yval:.1f}%", ha='center', va='bottom', fontsize=10, fontweight='bold')
+
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels, fontsize=11, fontweight="bold")
+    ax.set_ylabel("Tasso di validità baseline (%)")
+    ax.set_title("Confronto multi-modello: validità baseline stretta/normale/lasca", fontsize=16, fontweight="bold", pad=10)
+    ax.set_ylim(0, 105)
+    ax.legend()
+    ax.yaxis.set_major_formatter(mticker.PercentFormatter())
+    sns.despine()
+
+    fig.tight_layout()
+    fig.savefig(os.path.join(outdir, "comp_validity_baseline_by_model.png"), dpi=400, bbox_inches="tight")
+    plt.close(fig)
+
+
 def generate_all_comparative(outdir=None):
     """Genera tutti i grafici comparativi multi-modello."""
     if outdir is None:
@@ -1970,28 +2066,31 @@ def generate_all_comparative(outdir=None):
     print(f"Modelli caricati: {list(data.keys())}")
     print(f"Output in: {outdir}\n")
 
-    print("  [1/11] Violin JSD...")
+    print("  [1/12] Validità baseline (stretta/normale/lasca)...")
+    fig_comp_validity_baseline(data, outdir)
+    print("  [2/12] Violin JSD...")
     fig_comp_jsd_violins(data, outdir)
-    print("  [2/11] Mappe cognitive (permutazione)...")
+    print("  [3/12] Mappe cognitive (permutazione)...")
     fig_comp_cognitive_maps(data, outdir)
-    print("  [3/11] Mappe cognitive (duplicazione)...")
+    print("  [4/12] Mappe cognitive (duplicazione)...")
     fig_comp_dup_cognitive_maps(data, outdir)
-    print("  [4/11] Position bias...")
+    print("  [5/12] Position bias...")
     fig_comp_position_bias(data, outdir)
-    print("  [5/11] Primacy/recency...")
+    print("  [6/12] Primacy/recency...")
     fig_comp_primacy_recency(data, outdir)
-    print("  [6/11] Allineamento umano...")
+    print("  [7/12] Allineamento umano...")
     fig_comp_alignment(data, outdir)
-    print("  [7/11] Bussole politiche...")
+    print("  [8/12] Bussole politiche...")
     fig_comp_political_compass(data, outdir)
-    print("  [8/11] Heatmap WD...")
+    print("  [9/12] Heatmap WD...")
     fig_comp_wd_heatmaps(data, outdir)
-    print("  [9/11] Minacce ...")
+    print("  [10/12] Minacce ...")
     fig_comp_threats_stacked(data, outdir)
-    print("  [10/11] Leadership alignment...")
+    print("  [11/12] Leadership alignment...")
     fig_comp_leadership_alignment(data, outdir)
-    print("  [11/11] Alignment per macro-area (heatmap)...")
+    print("  [12/12] Alignment per macro-area (heatmap)...")
     fig_comp_areas_alignment(data, outdir)
+    
 
     n_files = len([f for f in os.listdir(outdir) if f.endswith('.png')])
     print(f"\n{'='*60}")
@@ -2057,6 +2156,7 @@ def main():
     # 0.  TABELLA RIASSUNTIVA
     if _gen("summary"):
         fig_summary_table(df, df_topic, args.outdir, model_label=model_label)
+        fig0b_validity_comparison(df, args.outdir, model_label=model_label)
 
     #  1.  CONFRONTO ESPERIMENTI
     if _gen("validity"):

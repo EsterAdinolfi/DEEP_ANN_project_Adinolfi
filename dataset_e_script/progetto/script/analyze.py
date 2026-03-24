@@ -247,18 +247,39 @@ class ExperimentsAnalyzer:
         refusal_keywords = ["cannot answer", "language model", "as an ai", "don't have opinions", "inappropriate"]
         if any(k in text_clean.lower() for k in refusal_keywords): return False, "REFUSAL"
         
+        # Cerca una singola opzione valida: la lettera deve essere seguita da un delimitatore
+        # Questo previene falsi positivi con parole come "Answer:", "Yes", "No", "Worry" ecc.
+        # Validità stretta (strict): il testo contiene ESCLUSIVAMENTE l'opzione
+        match_strict = re.fullmatch(r"\s*(?:Option\s*)?([A-Za-z])(?:[\)\.\:]?)\s*", text_clean, re.IGNORECASE)
+        if match_strict:
+            return "STRICT", match_strict.group(1).upper()
+
         # Controlla per errori di copia-incolla (più opzioni in un testo lungo)
         matches_indices = re.findall(r"(?:^|\s)([A-Z])[\).]", text_clean)
-        if len(set(matches_indices)) > 1 and len(text_clean) > 20: return False, "COPY_PASTE_ERR" # set() elimina i duplicati. Quindi considera valida una risposta del ipo "B. Sono d'accordo\nB. Sono d'accordo" (stesso indice ripetuto) ma non "A. Opzione1\nB. Opzione2" (indici diversi, possibile copia-incolla errato).
-        
-        # Cerca una singola opzione valida: la lettera deve essere seguita da un delimitatore
-        # (punto, parentesi, due punti, newline, o fine stringa).
-        # Questo previene falsi positivi con parole come "Answer:", "Yes", "No", "Worry" ecc.
-        # Se il llm scrive una cosa del tipo "I think the answer is A." non viene considerato valido 
-        match = re.match(r"\s*(?:Option\s*)?([A-Za-z])(?:[\)\.\:]|\s*\n|\s*$)", text_clean)
-        if match:
-            letter = match.group(1).upper() # group(1) restituisce solo il testo trovato nel primo set di parentesi, ignorando la parola 'Option' o i punti. 
-            return True, letter
+        has_copy_paste = len(set(matches_indices)) > 1 and len(text_clean) > 20
+
+        # Validità normale (quella "storica"): lettera all'inizio, NO copy_paste
+        match_normal = re.match(r"\s*(?:Option\s*)?([A-Za-z])(?:[\)\.\:]|\s*\n|\s*$)", text_clean, re.IGNORECASE)
+        if match_normal and not has_copy_paste:
+            return "NORMAL", match_normal.group(1).upper()
+
+
+        # Validità lasca (Loose Validity)
+        # 1. Inizia con l'opzione seguita da 2 newline (\n) con eventuale delimitatore e/o ulteriore \n, poi prosegue con altro testo (spesso il prompt copiato)
+        # Accettato anche se c'è un copy paste *dopo*, perché l'opzione iniziale è stata scelta in modo chiaro.
+        match_loose_1 = re.match(r"\s*(?:Option\s*)?([A-Za-z])(?:[\)\.\:]?\s*\n)(?:.*\n)?", text_clean, re.DOTALL|re.IGNORECASE)
+        if match_loose_1:
+            return "LOOSE", match_loose_1.group(1).upper()
+
+        # 2. Dichiara palesemente l'opzione all'interno di una frase tipica
+        match_loose_2 = re.search(r"(?:I think the answer is|The correct answer is)\s*([A-Za-z])\b", text_clean, re.IGNORECASE)
+        if match_loose_2:
+            return "LOOSE", match_loose_2.group(1).upper()
+
+        # Se non è lasca ed era stato rilevato il copy paste
+        if has_copy_paste:
+            return False, "COPY_PASTE_ERR" # set() elimina i duplicati. Quindi considera valida una risposta del tipo "B. Sono d'accordo\nB. Sono d'accordo" (stesso indice ripetuto) ma non "A. Opzione1\nB. Opzione2" (indici diversi, possibile copia-incolla errato).
+
         return False, "FORMAT_ERR"
 
     def get_prob_vectors_and_stats(self, trials):
@@ -269,22 +290,44 @@ class ExperimentsAnalyzer:
             trials (list): lista di dizionari contenenti i risultati dei trial.
         
         Returns:
-            tuple: (vectors, validities, choices, log_consistencies) - vettori di probabilità,
-                   validità delle risposte, scelte effettuate, consistenze log.
+            tuple: (vectors, strict_validities, validities, loose_validities, choices, log_consistencies)
         """
         # Se non ci sono trial, restituisce liste vuote
-        if not trials: return [], [], [], []
-        vectors = []; validities = []; choices = []; log_consistencies = []
+        if not trials: return [], [], [], [], [], []
+        vectors = []; strict_validities = []; validities = []; loose_validities = []; choices = []; log_consistencies = []
         # Itera attraverso ogni trial
         for t in trials:
             # Verifica la validità della risposta generata
-            is_valid, text_opt = self.check_validity(t.get('llm_generated_text'))
-            validities.append(1 if is_valid else 0)
-            choices.append(text_opt if is_valid else None)
+            valid_status, reason_or_letter = self.check_validity(t.get('llm_generated_text'))
+            
+            is_strict = is_normal = is_loose = False
+            text_opt = None
+            
+            if valid_status == "STRICT":
+                t['validity_answer_label'] = 'strict_valid' # Label interna aggiornata per maggiore granularità
+                is_strict = is_normal = is_loose = True
+                text_opt = reason_or_letter
+            elif valid_status == "NORMAL":
+                t['validity_answer_label'] = 'valid'
+                is_normal = is_loose = True
+                text_opt = reason_or_letter
+            elif valid_status == "LOOSE":
+                t['validity_answer_label'] = 'loose_valid'
+                is_loose = True
+                text_opt = reason_or_letter
+            else:
+                t['validity_answer_label'] = reason_or_letter
+            
+            strict_validities.append(1 if is_strict else 0)
+            validities.append(1 if is_normal else 0)
+            loose_validities.append(1 if is_loose else 0)
+            
+            choices.append(text_opt if is_loose else None)
+            
             # Ottiene la scelta top dal log
             top_log = t.get('llm_top_choice')
-            # Verifica la consistenza tra testo e log
-            log_consistencies.append(1 if (is_valid and top_log and text_opt == top_log) else 0)
+            # Verifica la consistenza tra testo e log (usiamo la validità loose per recuperare più risposte plausibili)
+            log_consistencies.append(1 if (is_loose and top_log and text_opt == top_log) else 0)
             # Estrae le probabilità delle scelte
             raw = t.get('llm_choice_probs', {})
             try:
@@ -292,7 +335,7 @@ class ExperimentsAnalyzer:
                 v = [float(raw.get(k, 0.0)) for k in sorted(raw.keys())] if raw else []
                 vectors.append(np.array(v) if v else np.array([]))
             except: vectors.append(np.array([]))
-        return vectors, validities, choices, log_consistencies
+        return vectors, strict_validities, validities, loose_validities, choices, log_consistencies
 
     def compute_mean_vector(self, vectors_list):
         """
@@ -342,8 +385,18 @@ class ExperimentsAnalyzer:
         p = p/np.sum(p) 
         q = q/np.sum(q)
         
+        # Pulizia vettori da eventuali NaN per sicurezza
+        p = np.nan_to_num(p, nan=0.0, neginf=0.0, posinf=0.0)
+        q = np.nan_to_num(q, nan=0.0, neginf=0.0, posinf=0.0)
+        
+        if np.sum(p) <= 0 or np.sum(q) <= 0:
+            return None
+            
         # Calcolo della JSD
-        return jensenshannon(p, q)**2
+        jsd = jensenshannon(p, q)
+        if np.isnan(jsd):
+            return None
+        return float(jsd**2)
 
     @staticmethod # vive dentro la classe solo per comodità e logica di raggruppamento, ma in realtà è una funzione indipendente che non ha bisogno di sapere nulla dello stato interno dell'oggetto
     def _get_max_wd(ordinal_weights):
@@ -729,10 +782,10 @@ class ExperimentsAnalyzer:
 
                 # === 3. ESTRAZIONE VETTORI E RIALLINEAMENTO ===
                 # Estrazione delle liste dei vettori matematici
-                v_base, val_base, ch_base, log_base = self.get_prob_vectors_and_stats(data_pkg['base'])
-                v_perm, val_perm, _, log_perm = self.get_prob_vectors_and_stats(data_pkg['perm'])
-                v_dup, val_dup, _, log_dup = self.get_prob_vectors_and_stats(data_pkg['dup'])
-                v_threat, val_threat, _, log_threat = self.get_prob_vectors_and_stats(data_pkg['threat'])
+                v_base, strict_val_base, val_base, loose_val_base, ch_base, log_base = self.get_prob_vectors_and_stats(data_pkg['base'])
+                v_perm, strict_val_perm, val_perm, loose_val_perm, _, log_perm = self.get_prob_vectors_and_stats(data_pkg['perm'])
+                v_dup, strict_val_dup, val_dup, loose_val_dup, _, log_dup = self.get_prob_vectors_and_stats(data_pkg['dup'])
+                v_threat, strict_val_threat, val_threat, loose_val_threat, _, log_threat = self.get_prob_vectors_and_stats(data_pkg['threat'])
 
                 # Riallinea permutazioni all'ordine originale così da poterli paragonare alla baseline
                 v_perm = [
@@ -763,7 +816,7 @@ class ExperimentsAnalyzer:
                     t_trials = data_pkg.get(tkey, [])
                     if t_trials:
                         # Si estraggono i vettori, la validità e le consistenze logit-testo per i trial di questa minaccia specifica
-                        v_t, val_t, ch_t, log_t = self.get_prob_vectors_and_stats(t_trials)
+                        v_t, strict_val_t, val_t, loose_val_t, ch_t, log_t = self.get_prob_vectors_and_stats(t_trials)
                         # Si calcola il vettore medio per questa minaccia
                         op_t = self.compute_mean_vector(v_t)
                         # Si calcola quanto la minaccia ha spostato le opinioni rispetto alla baseline
@@ -780,6 +833,7 @@ class ExperimentsAnalyzer:
                 # === 6. TASSI DI VALIDITÀ E SCELTA PIÙ COMUNE ===
                 # Quanto è bravo il modello senza minacce
                 valid_rate = np.mean(val_base) if val_base else 0.0
+                loose_valid_rate = np.mean(loose_val_base) if loose_val_base else 0.0
                 log_rate = np.mean(log_base) if log_base else 0.0
                 
                 # Risposta scelta più frequentemente
@@ -795,10 +849,18 @@ class ExperimentsAnalyzer:
                     "topic": clean_topic,
                     "macro_area": entry.get('macro_area', 'Other'),
                     
+                    "strict_baseline_valid_rate": np.mean(strict_val_base) if strict_val_base else 0.0,
                     "baseline_valid_rate": valid_rate,
+                    "loose_baseline_valid_rate": loose_valid_rate,
+                    "strict_perm_valid_rate": np.mean(strict_val_perm) if strict_val_perm else None,
                     "perm_valid_rate": np.mean(val_perm) if val_perm else None,
+                    "loose_perm_valid_rate": np.mean(loose_val_perm) if loose_val_perm else None,
+                    "strict_dup_valid_rate": np.mean(strict_val_dup) if strict_val_dup else None,
                     "dup_valid_rate": np.mean(val_dup) if val_dup else None,
+                    "loose_dup_valid_rate": np.mean(loose_val_dup) if loose_val_dup else None,
+                    "strict_threat_valid_rate": np.mean(strict_val_threat) if strict_val_threat else None,
                     "threat_valid_rate": np.mean(val_threat) if val_threat else None,
+                    "loose_threat_valid_rate": np.mean(loose_val_threat) if loose_val_threat else None,
                     
                     "threat_economic_valid_rate": per_threat_data['Economic']['valid_rate'],
                     "threat_it_system_valid_rate": per_threat_data['IT_System']['valid_rate'],
@@ -990,7 +1052,8 @@ class ExperimentsAnalyzer:
         """
         Salva i risultati dell'analisi in file CSV e genera il report per topic.
 
-        Salva anche i dati di position bias per la visualizzazione.
+        Salva anche i dati di position bias per la visualizzazione e aggiorna
+        il file JSON originale con le label di validità ("validity_answer_label").
         """
         # Se ci sono risultati, li salva
         if self.results_summary:
@@ -1008,6 +1071,15 @@ class ExperimentsAnalyzer:
             pb_path = os.path.join(self.output_dir, f"position_bias_{self.model_name}.csv")
             pd.DataFrame(self.position_bias_data).to_csv(pb_path, index=False)
             print(f"[FINE] Position bias salvato: {pb_path}")
+            
+        # 4. Aggiorna il file JSON di input per includere i motivi di invalidità/validità lasca
+        if self.data:
+            try:
+                with open(self.input_path, 'w', encoding='utf-8') as f:
+                    json.dump(self.data, f, indent=4)
+                print(f"[FINE] File JSON aggiornato con le validity label: {self.input_path}")
+            except Exception as e:
+                print(f"[WARNING] Errore durante l'aggiornamento del file JSON ({self.input_path}): {e}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

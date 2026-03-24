@@ -57,9 +57,10 @@ EXPECTED_FILES = {
 # File requirements.txt
 REQUIREMENTS_FILE = os.path.join(BASE_DIR, 'requirements.txt')
 
-# Tutte le figure attese per modello (23 in totale)
+# Tutte le figure attese per modello (24 in totale)
 ALL_MODEL_FIGURES = [
-    "fig0_summary_table.png",
+    "fig0a_summary_table.png",
+    "fig0b_validity_comparison.png",
     "fig1a_validity.png",
     "fig1b_log_coherence.png",
     "fig1c_jsd.png",
@@ -86,7 +87,8 @@ ALL_MODEL_FIGURES = [
 
 # Mappa ogni figura al gruppo che la genera (per la rigenerazione selettiva)
 FIGURE_TO_GROUP = {
-    "fig0_summary_table.png":           "summary",
+    "fig0a_summary_table.png":          "summary",
+    "fig0b_validity_comparison.png":    "summary",
     "fig1a_validity.png":               "validity",
     "fig1b_log_coherence.png":          "coherence",
     "fig1c_jsd.png":                    "robustness",
@@ -124,6 +126,7 @@ ALL_COMPARATIVE_FIGURES = [
     "comp_threats_stacked.png",
     "comp_leadership_alignment.png",
     "comp_areas_alignment.png",
+    "comp_validity_baseline_by_model.png",
 ]
 
 
