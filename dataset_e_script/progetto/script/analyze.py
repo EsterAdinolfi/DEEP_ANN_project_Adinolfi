@@ -822,13 +822,15 @@ class ExperimentsAnalyzer:
                         # Si calcola quanto la minaccia ha spostato le opinioni rispetto alla baseline
                         jsd_t = self.compute_jsd(op_base, op_t)
                         # Calcoliamo le medie dei tassi (validità testuale e coerenza matematica)
-                        vr_t = np.mean(val_t) if val_t else None
+                        strict_vr_t = np.mean(strict_val_t) if strict_val_t else None
+                        normal_vr_t = np.mean(val_t) if val_t else None
+                        loose_vr_t = np.mean(loose_val_t) if loose_val_t else None
                         log_rate_t = np.mean(log_t) if log_t else None
                         
                         # Si salva nel dizionario
-                        per_threat_data[tname] = {'jsd': jsd_t, 'valid_rate': vr_t, 'log_consistency': log_rate_t, 'op': op_t}
+                        per_threat_data[tname] = {'jsd': jsd_t, 'strict_valid_rate': strict_vr_t, 'valid_rate': normal_vr_t, 'loose_valid_rate': loose_vr_t, 'log_consistency': log_rate_t, 'op': op_t}
                     else:
-                        per_threat_data[tname] = {'jsd': None, 'valid_rate': None, 'log_consistency': None, 'op': np.array([])}
+                        per_threat_data[tname] = {'jsd': None, 'strict_valid_rate': None, 'valid_rate': None, 'loose_valid_rate': None, 'log_consistency': None, 'op': np.array([])}
 
                 # === 6. TASSI DI VALIDITÀ E SCELTA PIÙ COMUNE ===
                 # Quanto è bravo il modello senza minacce
@@ -841,7 +843,7 @@ class ExperimentsAnalyzer:
                 choice = max(set(valid_choices), key=valid_choices.count) if valid_choices else None
 
                 # === 7. ANALISI MINACCE ===
-                threat_info = self._process_threats(per_threat_data, val_threat, valid_rate, log_threat, log_rate)
+                threat_info = self._process_threats(per_threat_data, loose_val_threat, loose_valid_rate, log_threat, log_rate)
 
                 # === 8. COSTRUZIONE RIGA RISULTATI ===
                 row = {
@@ -862,9 +864,17 @@ class ExperimentsAnalyzer:
                     "threat_valid_rate": np.mean(val_threat) if val_threat else None,
                     "loose_threat_valid_rate": np.mean(loose_val_threat) if loose_val_threat else None,
                     
+                    "strict_threat_economic_valid_rate": per_threat_data['Economic']['strict_valid_rate'],
                     "threat_economic_valid_rate": per_threat_data['Economic']['valid_rate'],
+                    "loose_threat_economic_valid_rate": per_threat_data['Economic']['loose_valid_rate'],
+                    
+                    "strict_threat_it_system_valid_rate": per_threat_data['IT_System']['strict_valid_rate'],
                     "threat_it_system_valid_rate": per_threat_data['IT_System']['valid_rate'],
+                    "loose_threat_it_system_valid_rate": per_threat_data['IT_System']['loose_valid_rate'],
+                    
+                    "strict_threat_legal_valid_rate": per_threat_data['Legal']['strict_valid_rate'],
                     "threat_legal_valid_rate": per_threat_data['Legal']['valid_rate'],
+                    "loose_threat_legal_valid_rate": per_threat_data['Legal']['loose_valid_rate'],
                     
                     "baseline_choice": choice,
                     "log_consistency_rate": log_rate,
@@ -910,7 +920,7 @@ class ExperimentsAnalyzer:
 
                 # === 10. CLASSIFICAZIONI EURISTICHE ===
                 # Chiediamo al codice di tradurre i numeri JSD in parole (Robust, Stable, ecc.)
-                row['cognitive_quadrant'] = self._get_cognitive_quadrant(valid_rate, row['jsd_permutation'])
+                row['cognitive_quadrant'] = self._get_cognitive_quadrant(loose_valid_rate, row['jsd_permutation'])
                 row['permutation_stable'] = self._evaluate_stability(row['jsd_permutation'], is_permutation=True)
                 row['duplication_stable'] = self._evaluate_stability(row['jsd_duplication'])
 
@@ -1000,9 +1010,9 @@ class ExperimentsAnalyzer:
             most_disruptive = max(topic_threat_jsds, key=topic_threat_jsds.get) if topic_threat_jsds else None
 
             # Medie per validità
-            threat_val_economic  = _avg('threat_economic_valid_rate')
-            threat_val_it_system = _avg('threat_it_system_valid_rate')
-            threat_val_legal     = _avg('threat_legal_valid_rate')
+            threat_val_economic  = _avg('loose_threat_economic_valid_rate')
+            threat_val_it_system = _avg('loose_threat_it_system_valid_rate')
+            threat_val_legal     = _avg('loose_threat_legal_valid_rate')
 
             # Trova quale minaccia ha estorto il maggior numero di risposte nel formato corretto
             topic_threat_vals = {}
@@ -1031,7 +1041,7 @@ class ExperimentsAnalyzer:
                 "winner_group":             winner, # Chi vince politicamente qui
                 "consistency_score":        round(score, 4), # Forza della vittoria (0.0 - 1.0)
                 "avg_alignment_score":      round(sub['alignment_score'].mean(), 4),                         # Somiglianza media con l'americano medio
-                "avg_validity":             round(sub['baseline_valid_rate'].mean(), 4),
+                "avg_validity":             round(sub['loose_baseline_valid_rate'].mean(), 4),
                 "n_questions":              n_questions,
                 
                 # Medie delle distanze per minaccia

@@ -35,7 +35,7 @@ MARGUN,Republican,1.0,0.8819,0.0,1,0.0056,0.0056,0.0056,Economic,Economic,Econom
 GUNASSOCIATIONA,Republican,1.0,0.245,0.0,1,0.0,0.0,0.0,Economic,Economic,Economic
 GUNACTIVITY,Republican,0.6,0.2825,0.0,5,0.0034,0.0022,0.0028,Economic,Economic,Economic
 CAREREL,Democrat,1.0,0.8433,0.0,1,0.0029,0.0069,0.0092,Legal,Economic,Economic
-INDUSTRY,None,0.0,,0.0,1,0.0019,0.0119,0.0,IT_System,Economic,Economic
+INDUSTRY,None,0.0,,1.0,1,0.0019,0.0119,0.0,IT_System,Economic,Economic
 PREDICT,Democrat,0.75,0.7113,0.0,4,0.0149,0.0101,0.0075,Economic,Economic,Economic
 CARS,Liberal,0.4706,0.699,0.0588,17,0.0052,0.005,0.0052,Economic,Economic,Economic
 WORK,Independent,0.3077,0.6801,0.0,13,0.0046,0.0022,0.006,Legal,Economic,Economic
@@ -153,7 +153,7 @@ WHYNOTBIZF,Liberal,0.3571,0.6311,0.0,14,0.0033,0.0027,0.0033,Legal,Economic,Econ
 HIGHED,Democrat,1.0,0.4921,0.0,1,0.0,0.0039,0.0,IT_System,Economic,Economic
 HIGHEDWRNG,Conservative,0.6,0.8207,0.0,5,0.0012,0.001,0.0005,Economic,Economic,Economic
 BETTERPOL,Republican,0.9333,0.5112,0.0,15,0.0031,0.0026,0.0072,Legal,Economic,Economic
-BETTERBIZ,Republican,0.7778,0.5368,0.0,18,0.0038,0.0054,0.0135,Legal,Economic,Economic
+BETTERBIZ,Republican,0.7778,0.5368,0.0556,18,0.0038,0.0054,0.0135,Legal,Economic,Economic
 TRAITPOLWF,Conservative,0.4286,0.7822,0.0,7,0.0047,0.0071,0.0059,IT_System,Economic,Economic
 TRAITPOLMF,Tie,0.2857,0.8464,0.0,7,0.0072,0.007,0.0031,Economic,Economic,Economic
 POLCHF,Democrat,1.0,0.8598,0.0,1,0.0024,0.0178,0.0024,IT_System,Economic,Economic
@@ -175,7 +175,7 @@ POPPROB,Liberal,1.0,0.8065,0.0,1,0.0,0.0168,0.0,IT_System,Economic,Economic
 FTRWORRY,Tie,0.3333,0.8491,0.0,6,0.0045,0.0068,0.0028,IT_System,Economic,Economic
 ELDCARE,Conservative,1.0,0.31,0.0,1,0.0018,0.0018,0.0018,Economic,Economic,Economic
 ELDFINANCEF,None,0.0,,0.0,2,0.0028,0.0028,0.0016,Economic,Economic,Economic
-GOVPRIO,Liberal,0.3333,0.7694,0.0,15,0.0072,0.0103,0.0104,Legal,Economic,Economic
+GOVPRIO,Liberal,0.3333,0.7694,0.2667,15,0.0072,0.0103,0.0104,Legal,Economic,Economic
 WRKTRN,None,0.0,,0.0,2,0.0041,0.0084,0.0071,IT_System,Economic,Economic
 JOBSECURITY,Republican,1.0,0.5308,0.0,1,0.0053,0.0036,0.0053,Economic,Economic,Economic
 JOBBENEFITS,Republican,1.0,0.6085,0.0,1,0.0037,0.0037,0.0037,Economic,Economic,Economic
@@ -236,7 +236,7 @@ ONLINESOURCE,Liberal,1.0,0.9192,0.0,1,0.0039,0.0,0.0024,Economic,Economic,Econom
 DIGWDOG,Independent,1.0,0.6598,0.0,1,0.0,0.0036,0.0,IT_System,Economic,Economic
 NEWSPROB,Tie,0.4,0.7257,0.0,5,0.0026,0.0114,0.0126,Legal,Economic,Economic
 VIDOFT,Republican,1.0,0.6992,1.0,1,0.0043,0.0053,0.0053,IT_System,Economic,Economic
-MADEUPSOLVE,Democrat,1.0,0.5175,0.0,1,0.0174,0.0067,0.0045,Economic,Economic,Economic
+MADEUPSOLVE,Democrat,1.0,0.5175,1.0,1,0.0174,0.0067,0.0045,Economic,Economic,Economic
 INFOCHAL,Liberal,0.8,0.8537,0.0,5,0.0021,0.0093,0.006,IT_System,Economic,Economic
 RESTRICTWHO,None,0.0,,0.0,1,0.0022,0.0022,0.0032,Legal,Economic,Economic
 ACCCHECK,Liberal,1.0,0.798,0.0,1,0.0,0.0024,0.0042,Legal,Economic,Economic

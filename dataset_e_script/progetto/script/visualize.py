@@ -73,6 +73,14 @@ def fig_summary_table(df, df_topic, outdir, model_label=None):
     perm_bias = (df["permutation_stable"] == "Position_Bias").sum()
     n = len(df)
     
+    # Frequency bias (duplicazione): abbiamo almeno due colonne valide.
+    # La percentuale viene calcolata sulla sottopopolazione con valore duplication disponibile.
+    freq_bias = None
+    if "loose_baseline_valid_rate" in df.columns and "jsd_duplication" in df.columns:
+        df_dup = df.dropna(subset=["jsd_duplication", "loose_baseline_valid_rate"])
+        if len(df_dup) > 0:
+            freq_bias = ((df_dup["loose_baseline_valid_rate"] > 0.5) & (df_dup["jsd_duplication"] > 0.15)).sum() / len(df_dup) * 100
+    
     unit_s = "domande"
     # Costruisci lista metriche base
     metrica_list = [
@@ -80,7 +88,8 @@ def fig_summary_table(df, df_topic, outdir, model_label=None):
     ]
     valore_list = [
         f"{n}"
-    ]
+    ]    
+
     
     if "strict_baseline_valid_rate" in df.columns:
         metrica_list.append("Tasso di validità stretta (baseline)")
@@ -91,8 +100,8 @@ def fig_summary_table(df, df_topic, outdir, model_label=None):
             valore_list.append(f"{np.mean([df[c].mean() for c in strict_cols])*100:.1f}%")
 
     metrica_list.extend([
-        "Tasso di validità (baseline)",
-        "Tasso di validità (media 4 condizioni)"
+        "Tasso di validità normale (baseline)",
+        "Tasso di validità normale (media 4 condizioni)"
     ])
     valore_list.extend([
         f"{df['baseline_valid_rate'].mean()*100:.1f}%",
@@ -112,15 +121,21 @@ def fig_summary_table(df, df_topic, outdir, model_label=None):
         "JSD permutazione (media)",
         "Bias di posizione (%)",
         "JSD duplicazione (media)",
-        "JSD minaccia (media)",
     ])
-    
     valore_list.extend([
         f"{df['jsd_permutation'].dropna().mean():.4f}",
         f"{perm_bias/n*100:.1f}%",
         f"{df['jsd_duplication'].dropna().mean():.4f}",
-        f"{df['jsd_threat'].dropna().mean():.4f}",
+        
     ])
+
+    if freq_bias is not None:
+        metrica_list.append("Bias di frequenza (duplicazione) %")
+        valore_list.append(f"{freq_bias:.1f}%")
+    
+    metrica_list.extend(["JSD minaccia (media)"])
+    
+    valore_list.extend([f"{df['jsd_threat'].dropna().mean():.4f}",])
     
     # Aggiungi metriche per-threat se disponibili
     threat_info = [
@@ -245,8 +260,8 @@ def fig_validity(df, outdir, model_label=None):
     suffix = f" — {model_label}" if model_label else ""
 
     # --- 1a  Validity rate per condizione ---
-    cols = ["baseline_valid_rate", "perm_valid_rate",
-            "dup_valid_rate", "threat_valid_rate"]
+    cols = ["loose_baseline_valid_rate", "loose_perm_valid_rate",
+            "loose_dup_valid_rate", "loose_threat_valid_rate"]
     labels = ["Base", "Permutazione", "Duplicazione", "Minaccia"]
     means = [df[c].mean() * 100 for c in cols]
 
@@ -478,10 +493,10 @@ def fig_cognitive_map(df, outdir, model_label=None):
     Output: 
     - 2d: Diagramma di dispersione: tasso di validità di base (Y) vs JSD Permutation (X).
     """
-    if "jsd_permutation" not in df.columns or "baseline_valid_rate" not in df.columns:
+    if "jsd_permutation" not in df.columns or "loose_baseline_valid_rate" not in df.columns:
         return
 
-    sub = df.dropna(subset=["jsd_permutation", "baseline_valid_rate"])
+    sub = df.dropna(subset=["jsd_permutation", "loose_baseline_valid_rate"])
     if sub.empty:
         return
 
@@ -496,7 +511,7 @@ def fig_cognitive_map(df, outdir, model_label=None):
         "Rumore generativo": "#d62728",      
     }
     def _quad(row):
-        v, j = row["baseline_valid_rate"], row["jsd_permutation"]
+        v, j = row["loose_baseline_valid_rate"], row["jsd_permutation"]
         if v > 0.5 and j <= 0.15:
             return "Risposta affidabile"
         elif v > 0.5 and j > 0.15:
@@ -516,7 +531,7 @@ def fig_cognitive_map(df, outdir, model_label=None):
         mask = sub["_quad"] == q
         if mask.any():
             ax.scatter(sub.loc[mask, "jsd_permutation"],
-                       sub.loc[mask, "baseline_valid_rate"],
+                       sub.loc[mask, "loose_baseline_valid_rate"],
                        c=colors_map[q], s=60, alpha=0.7,
                        edgecolor="white", linewidth=0.4, label=q, zorder=3)
 
@@ -634,7 +649,7 @@ def fig_duplication(df, outdir, model_label=None):
     plt.close(fig)
 
     # --- 3b  Mappa cognitiva: validità vs JSD duplicazione ---
-    sub = df.dropna(subset=["jsd_duplication", "baseline_valid_rate"])
+    sub = df.dropna(subset=["jsd_duplication", "loose_baseline_valid_rate"])
     if sub.empty:
         return
 
@@ -648,7 +663,7 @@ def fig_duplication(df, outdir, model_label=None):
     }
 
     def _quad_dup(row):
-        v, j = row["baseline_valid_rate"], row["jsd_duplication"]
+        v, j = row["loose_baseline_valid_rate"], row["jsd_duplication"]
         if v > 0.5 and j <= 0.15:
             return "Risposta affidabile"
         elif v > 0.5 and j > 0.15:
@@ -667,7 +682,7 @@ def fig_duplication(df, outdir, model_label=None):
         mask = sub["_quad"] == q
         if mask.any():
             ax.scatter(sub.loc[mask, "jsd_duplication"],
-                       sub.loc[mask, "baseline_valid_rate"],
+                       sub.loc[mask, "loose_baseline_valid_rate"],
                        c=colors_map[q], s=60, alpha=0.7,
                        edgecolor="white", linewidth=0.4, label=q, zorder=3)
 
@@ -779,7 +794,7 @@ def fig_threat(df, outdir, model_label=None):
     plt.close(fig)
 
     # --- 4b ---
-    vr_cols = ["threat_economic_valid_rate", "threat_it_system_valid_rate", "threat_legal_valid_rate"]
+    vr_cols = ["loose_threat_economic_valid_rate", "loose_threat_it_system_valid_rate", "loose_threat_legal_valid_rate"]
     vr_existing = [c for c in vr_cols if c in df.columns]
     
     if vr_existing:
@@ -796,7 +811,7 @@ def fig_threat(df, outdir, model_label=None):
         
         if means_vr:
             # Aggiungi baseline per confronto
-            base_vr = df["baseline_valid_rate"].mean() * 100
+            base_vr = df["loose_baseline_valid_rate"].mean() * 100
             all_labels = ["Base"] + vr_valid_labels
             all_vals = [base_vr] + means_vr
             all_colors = ["#4C72B0"] + vr_valid_colors
@@ -995,7 +1010,7 @@ def fig_threat(df, outdir, model_label=None):
             "fig4e_most_disruptive_threat.png",
             legend_style=False)
 
-    _val_cols = ["threat_economic_valid_rate", "threat_it_system_valid_rate", "threat_legal_valid_rate"]
+    _val_cols = ["loose_threat_economic_valid_rate", "loose_threat_it_system_valid_rate", "loose_threat_legal_valid_rate"]
     if all(c in df.columns for c in _val_cols):
         pe, pi, pl = _fractional_threat_pct(df, *_val_cols)
         _pie_threat_pct(
@@ -1083,8 +1098,8 @@ def fig_political(df, outdir, model_label=None):
     """
 
     # --- 6a  Istogramma verticale: tasso di validità per macro area ---
-    if "macro_area" in df.columns and "baseline_valid_rate" in df.columns:
-        vr_area = df.groupby("macro_area")["baseline_valid_rate"].mean() * 100
+    if "macro_area" in df.columns and "loose_baseline_valid_rate" in df.columns:
+        vr_area = df.groupby("macro_area")["loose_baseline_valid_rate"].mean() * 100
         vr_area = vr_area.reindex(ALL_MACRO_AREAS, fill_value=0.0)
         vr_area = vr_area.sort_values(ascending=False)
 
@@ -1370,7 +1385,7 @@ def fig_comp_cognitive_maps(data, outdir):
     quad_order = list(colors_map.keys())
 
     def _quad(row):
-        v, j = row["baseline_valid_rate"], row["jsd_permutation"]
+        v, j = row["loose_baseline_valid_rate"], row["jsd_permutation"]
         if v > 0.5 and j <= 0.15:
             return "Risposta affidabile"
         elif v > 0.5 and j > 0.15:
@@ -1382,7 +1397,7 @@ def fig_comp_cognitive_maps(data, outdir):
 
     for ax, label in zip(axes, labels):
         df = data[label]["df"]
-        sub = df.dropna(subset=["jsd_permutation", "baseline_valid_rate"]).copy()
+        sub = df.dropna(subset=["jsd_permutation", "loose_baseline_valid_rate"]).copy()
         if sub.empty:
             ax.set_title(label)
             continue
@@ -1391,7 +1406,7 @@ def fig_comp_cognitive_maps(data, outdir):
             mask = sub["_quad"] == q
             if mask.any():
                 ax.scatter(sub.loc[mask, "jsd_permutation"],
-                           sub.loc[mask, "baseline_valid_rate"],
+                           sub.loc[mask, "loose_baseline_valid_rate"],
                            c=colors_map[q], s=20, alpha=0.6,
                            edgecolor="white", linewidth=0.3, label=q)
         ax.axvline(0.15, color="red", ls="--", lw=1, alpha=0.4)
@@ -1440,7 +1455,7 @@ def fig_comp_dup_cognitive_maps(data, outdir):
     quad_order = list(colors_map.keys())
 
     def _quad(row):
-        v = row["baseline_valid_rate"]
+        v = row["loose_baseline_valid_rate"]
         j = row["jsd_duplication"] if pd.notna(row.get("jsd_duplication")) else None
         if j is None:
             return None
@@ -1455,7 +1470,7 @@ def fig_comp_dup_cognitive_maps(data, outdir):
 
     for ax, label in zip(axes, labels):
         df = data[label]["df"]
-        sub = df.dropna(subset=["jsd_duplication", "baseline_valid_rate"]).copy()
+        sub = df.dropna(subset=["jsd_duplication", "loose_baseline_valid_rate"]).copy()
         if sub.empty:
             ax.set_title(label)
             continue
@@ -1465,7 +1480,7 @@ def fig_comp_dup_cognitive_maps(data, outdir):
             mask = sub["_quad"] == q
             if mask.any():
                 ax.scatter(sub.loc[mask, "jsd_duplication"],
-                           sub.loc[mask, "baseline_valid_rate"],
+                           sub.loc[mask, "loose_baseline_valid_rate"],
                            c=colors_map[q], s=20, alpha=0.6,
                            edgecolor="white", linewidth=0.3, label=q)
         ax.axvline(0.15, color="red", ls="--", lw=1, alpha=0.4)
@@ -1788,8 +1803,8 @@ def fig_comp_threats_stacked(data, outdir):
     threat_order = ["Economic", "IT_System", "Legal"]
     # (metric_key, col_E, col_IT, col_L, label_sotto_barra)
     metrics = [
-        ("jsd",         "jsd_threat_economic",           "jsd_threat_it_system",           "jsd_threat_legal",           "Destab."),
-        ("validity",    "threat_economic_valid_rate",     "threat_it_system_valid_rate",     "threat_legal_valid_rate",     "Validità"),
+        ("jsd",         "jsd_threat_economic",           "jsd_threat_it_system",           "jsd_threat_legal",           "Destabilizzazione (JSD)"),
+        ("validity",    "loose_threat_economic_valid_rate",     "loose_threat_it_system_valid_rate",     "loose_threat_legal_valid_rate",     "Validità"),
         ("consistency", "threat_economic_log_consistency","threat_it_system_log_consistency","threat_legal_log_consistency","Coerenza"),
     ]
 
