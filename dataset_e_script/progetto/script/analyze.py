@@ -816,13 +816,13 @@ class ExperimentsAnalyzer:
                     t_trials = data_pkg.get(tkey, [])
                     if t_trials:
                         # Si estraggono i vettori, la validità e le consistenze logit-testo per i trial di questa minaccia specifica
-                        v_t, strict_val_t, val_t, loose_val_t, ch_t, log_t = self.get_prob_vectors_and_stats(t_trials)
+                        v_t, _, _, loose_val_t, _, log_t = self.get_prob_vectors_and_stats(t_trials)
                         # Si calcola il vettore medio per questa minaccia
                         op_t = self.compute_mean_vector(v_t)
                         # Si calcola quanto la minaccia ha spostato le opinioni rispetto alla baseline
                         jsd_t = self.compute_jsd(op_base, op_t)
                         # Calcoliamo le medie dei tassi (validità testuale e coerenza matematica)
-                        vr_t = np.mean(val_t) if val_t else None
+                        vr_t = np.mean(loose_val_t) if loose_val_t else None
                         log_rate_t = np.mean(log_t) if log_t else None
                         
                         # Si salva nel dizionario
@@ -841,7 +841,7 @@ class ExperimentsAnalyzer:
                 choice = max(set(valid_choices), key=valid_choices.count) if valid_choices else None
 
                 # === 7. ANALISI MINACCE ===
-                threat_info = self._process_threats(per_threat_data, val_threat, valid_rate, log_threat, log_rate)
+                threat_info = self._process_threats(per_threat_data, loose_val_threat, loose_valid_rate, log_threat, log_rate)
 
                 # === 8. COSTRUZIONE RIGA RISULTATI ===
                 row = {

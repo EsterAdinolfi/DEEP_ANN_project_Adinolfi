@@ -138,34 +138,37 @@ def fig_summary_table(df, df_topic, outdir, model_label=None):
                 metrica_list.append(label)
                 valore_list.append(f"{s.mean():.4f}")
     
-    # Uso di df_topic per i vincitori assoluti
-    if df_topic is not None and not df_topic.empty:
-        # Minaccia più destabilizzante
-        if "most_disruptive_threat" in df_topic.columns:
-            eff = df_topic["most_disruptive_threat"].dropna()
-            if not eff.empty:
-                winner = eff.mode()[0]
-                pct = (eff == winner).sum() / len(eff) * 100
+    # Uso di df_topic per i vincitori assoluti calcolando le distanze con metodo frazionario
+    if df is not None and not df.empty:
+        # Minaccia più destabilizzante (JSD)
+        _jsd_cols = ["jsd_threat_economic", "jsd_threat_it_system", "jsd_threat_legal"]
+        if all(c in df.columns for c in _jsd_cols):
+            pe, pi, pl = _fractional_threat_pct(df, *_jsd_cols)
+            pcts = {"Economic": pe, "IT/System": pi, "Legal": pl}
+            winner = max(pcts, key=pcts.get)
+            if pcts[winner] > 0:
                 metrica_list.append("Minaccia con JSD massimo")
-                valore_list.append(f"{winner} ({pct:.1f}%)")
+                valore_list.append(f"{winner} ({pcts[winner]:.1f}%)")
 
         # Minaccia più efficace per validità
-        if "most_effective_threat_validity" in df_topic.columns:
-            eff_v = df_topic["most_effective_threat_validity"].dropna()
-            if not eff_v.empty:
-                winner_v = eff_v.mode()[0]
-                pct_v = (eff_v == winner_v).sum() / len(eff_v) * 100
+        _val_cols = ["threat_economic_valid_rate", "threat_it_system_valid_rate", "threat_legal_valid_rate"]
+        if all(c in df.columns for c in _val_cols):
+            pe, pi, pl = _fractional_threat_pct(df, *_val_cols)
+            pcts = {"Economic": pe, "IT/System": pi, "Legal": pl}
+            winner_v = max(pcts, key=pcts.get)
+            if pcts[winner_v] > 0:
                 metrica_list.append("Minaccia con valore più alto (validità)")
-                valore_list.append(f"{winner_v} ({pct_v:.1f}%)")
-        
+                valore_list.append(f"{winner_v} ({pcts[winner_v]:.1f}%)")
+
         # Minaccia più efficace per coerenza
-        if "most_effective_threat_consistency" in df_topic.columns:
-            eff_c = df_topic["most_effective_threat_consistency"].dropna()
-            if not eff_c.empty:
-                winner_c = eff_c.mode()[0]
-                pct_c = (eff_c == winner_c).sum() / len(eff_c) * 100
+        _cons_cols = ["threat_economic_log_consistency", "threat_it_system_log_consistency", "threat_legal_log_consistency"]
+        if all(c in df.columns for c in _cons_cols):
+            pe, pi, pl = _fractional_threat_pct(df, *_cons_cols)
+            pcts = {"Economic": pe, "IT/System": pi, "Legal": pl}
+            winner_c = max(pcts, key=pcts.get)
+            if pcts[winner_c] > 0:
                 metrica_list.append("Minaccia con valore più alto (coerenza)")
-                valore_list.append(f"{winner_c} ({pct_c:.1f}%)")
+                valore_list.append(f"{winner_c} ({pcts[winner_c]:.1f}%)")
     
     # Metriche rimanenti
     metrica_list.extend([
