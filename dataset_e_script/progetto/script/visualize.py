@@ -71,6 +71,7 @@ def fig_summary_table(df, df_topic, outdir, model_label=None):
     al = df["alignment_score"].dropna()
     log = df["log_consistency_rate"].dropna()
     perm_bias = (df["permutation_stable"] == "Position_Bias").sum()
+    freq_bias = (df["duplication_stable"] == "Unstable").sum() if "duplication_stable" in df.columns else 0
     n = len(df)
     
     unit_s = "domande"
@@ -112,13 +113,15 @@ def fig_summary_table(df, df_topic, outdir, model_label=None):
         "JSD permutazione (media)",
         "Bias di posizione (%)",
         "JSD duplicazione (media)",
+        "Bias di frequenza (%)",
         "JSD minaccia (media)",
     ])
-    
+
     valore_list.extend([
         f"{df['jsd_permutation'].dropna().mean():.4f}",
         f"{perm_bias/n*100:.1f}%",
         f"{df['jsd_duplication'].dropna().mean():.4f}",
+        f"{freq_bias/n*100:.1f}%",
         f"{df['jsd_threat'].dropna().mean():.4f}",
     ])
     
@@ -214,23 +217,23 @@ def fig0b_validity_comparison(df, outdir, model_label=None):
     strict_baseline = df['strict_baseline_valid_rate'].mean() * 100 if 'strict_baseline_valid_rate' in df.columns else 0.0
     norm_baseline = df['baseline_valid_rate'].mean() * 100
     loose_baseline = df['loose_baseline_valid_rate'].mean() * 100 if 'loose_baseline_valid_rate' in df.columns else 0.0
-    
+
     labels = ["Stretta", "Normale", "Lasca"]
     values = [strict_baseline, norm_baseline, loose_baseline]
     colors = ["#E8A838", "#4C72B0", "#55A868"]  # Colori distinti
 
     fig, ax = plt.subplots(figsize=(6, 4.5))
     bars = ax.bar(labels, values, color=colors, edgecolor="black", width=0.6)
-    
+
     for bar, val in zip(bars, values):
-        ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1.0, 
+        ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1.0,
                 f"{val:.1f}%", ha="center", va="bottom", fontweight="bold", fontsize=11)
-                
+
     ax.set_ylim(0, 105)
-    ax.set_ylabel("Tasso di validità (media 4 condizioni) %")
+    ax.set_ylabel("Tasso di validità baseline (%)")
     title_label = model_label if model_label else "Pythia"
     ax.set_title(f"Confronto tipi di validità\n{title_label}", fontsize=14, fontweight="bold", pad=10)
-    
+
     fig.tight_layout()
     fig.savefig(os.path.join(outdir, "fig0b_validity_comparison.png"), dpi=400)
     plt.close(fig)
@@ -240,13 +243,13 @@ def fig0b_validity_comparison(df, outdir, model_label=None):
 # ======================================================================
 def fig_validity(df, outdir, model_label=None):
     """
-    1a: Grafico a barre dei tassi di validità medi per condizione
+    1a: Grafico a barre dei tassi di validità medi per condizione (usa validità lasca)
     """
     suffix = f" — {model_label}" if model_label else ""
 
-    # --- 1a  Validity rate per condizione ---
-    cols = ["baseline_valid_rate", "perm_valid_rate",
-            "dup_valid_rate", "threat_valid_rate"]
+    # --- 1a  Validity rate per condizione (usa validità lasca) ---
+    cols = ["loose_baseline_valid_rate", "loose_perm_valid_rate",
+            "loose_dup_valid_rate", "loose_threat_valid_rate"]
     labels = ["Base", "Permutazione", "Duplicazione", "Minaccia"]
     means = [df[c].mean() * 100 for c in cols]
 
@@ -475,13 +478,14 @@ def fig_cognitive_map(df, outdir, model_label=None):
     """
     Divide lo spazio in 4 quadranti cognitivi con etichette descrittive.
 
-    Output: 
+    Output:
     - 2d: Diagramma di dispersione: tasso di validità di base (Y) vs JSD Permutation (X).
+    Usa validità lasca per la classificazione.
     """
-    if "jsd_permutation" not in df.columns or "baseline_valid_rate" not in df.columns:
+    if "jsd_permutation" not in df.columns or "loose_baseline_valid_rate" not in df.columns:
         return
 
-    sub = df.dropna(subset=["jsd_permutation", "baseline_valid_rate"])
+    sub = df.dropna(subset=["jsd_permutation", "loose_baseline_valid_rate"])
     if sub.empty:
         return
 
@@ -490,13 +494,13 @@ def fig_cognitive_map(df, outdir, model_label=None):
     # Diagramma di dispersione con colore uniforme per quadrante
     # Determina il quadrante di ogni punto per colorarlo
     colors_map = {
-        "Risposta affidabile": "#2ca02c",      
-        "Bias di posizione": "#ff7f0e",    
-        "Rifiuto coerente": "#7f7f7f",       
-        "Rumore generativo": "#d62728",      
+        "Risposta affidabile": "#2ca02c",
+        "Bias di posizione": "#ff7f0e",
+        "Rifiuto coerente": "#7f7f7f",
+        "Rumore generativo": "#d62728",
     }
     def _quad(row):
-        v, j = row["baseline_valid_rate"], row["jsd_permutation"]
+        v, j = row["loose_baseline_valid_rate"], row["jsd_permutation"]
         if v > 0.5 and j <= 0.15:
             return "Risposta affidabile"
         elif v > 0.5 and j > 0.15:
@@ -516,7 +520,7 @@ def fig_cognitive_map(df, outdir, model_label=None):
         mask = sub["_quad"] == q
         if mask.any():
             ax.scatter(sub.loc[mask, "jsd_permutation"],
-                       sub.loc[mask, "baseline_valid_rate"],
+                       sub.loc[mask, "loose_baseline_valid_rate"],
                        c=colors_map[q], s=60, alpha=0.7,
                        edgecolor="white", linewidth=0.4, label=q, zorder=3)
 
@@ -633,8 +637,8 @@ def fig_duplication(df, outdir, model_label=None):
                 dpi=400, bbox_inches='tight')
     plt.close(fig)
 
-    # --- 3b  Mappa cognitiva: validità vs JSD duplicazione ---
-    sub = df.dropna(subset=["jsd_duplication", "baseline_valid_rate"])
+    # --- 3b  Mappa cognitiva: validità vs JSD duplicazione (usa validità lasca) ---
+    sub = df.dropna(subset=["jsd_duplication", "loose_baseline_valid_rate"])
     if sub.empty:
         return
 
@@ -648,7 +652,7 @@ def fig_duplication(df, outdir, model_label=None):
     }
 
     def _quad_dup(row):
-        v, j = row["baseline_valid_rate"], row["jsd_duplication"]
+        v, j = row["loose_baseline_valid_rate"], row["jsd_duplication"]
         if v > 0.5 and j <= 0.15:
             return "Risposta affidabile"
         elif v > 0.5 and j > 0.15:
@@ -667,7 +671,7 @@ def fig_duplication(df, outdir, model_label=None):
         mask = sub["_quad"] == q
         if mask.any():
             ax.scatter(sub.loc[mask, "jsd_duplication"],
-                       sub.loc[mask, "baseline_valid_rate"],
+                       sub.loc[mask, "loose_baseline_valid_rate"],
                        c=colors_map[q], s=60, alpha=0.7,
                        edgecolor="white", linewidth=0.4, label=q, zorder=3)
 
@@ -795,8 +799,8 @@ def fig_threat(df, outdir, model_label=None):
                     vr_valid_colors.append(color)
         
         if means_vr:
-            # Aggiungi baseline per confronto
-            base_vr = df["baseline_valid_rate"].mean() * 100
+            # Aggiungi baseline per confronto (usa validità lasca)
+            base_vr = df["loose_baseline_valid_rate"].mean() * 100
             all_labels = ["Base"] + vr_valid_labels
             all_vals = [base_vr] + means_vr
             all_colors = ["#4C72B0"] + vr_valid_colors
@@ -1082,9 +1086,9 @@ def fig_political(df, outdir, model_label=None):
     - 6d: Mappa di calore: WD media per macro_area × gruppo
     """
 
-    # --- 6a  Istogramma verticale: tasso di validità per macro area ---
-    if "macro_area" in df.columns and "baseline_valid_rate" in df.columns:
-        vr_area = df.groupby("macro_area")["baseline_valid_rate"].mean() * 100
+    # --- 6a  Istogramma verticale: tasso di validità per macro area (usa validità lasca) ---
+    if "macro_area" in df.columns and "loose_baseline_valid_rate" in df.columns:
+        vr_area = df.groupby("macro_area")["loose_baseline_valid_rate"].mean() * 100
         vr_area = vr_area.reindex(ALL_MACRO_AREAS, fill_value=0.0)
         vr_area = vr_area.sort_values(ascending=False)
 
@@ -1370,7 +1374,7 @@ def fig_comp_cognitive_maps(data, outdir):
     quad_order = list(colors_map.keys())
 
     def _quad(row):
-        v, j = row["baseline_valid_rate"], row["jsd_permutation"]
+        v, j = row["loose_baseline_valid_rate"], row["jsd_permutation"]
         if v > 0.5 and j <= 0.15:
             return "Risposta affidabile"
         elif v > 0.5 and j > 0.15:
@@ -1382,7 +1386,7 @@ def fig_comp_cognitive_maps(data, outdir):
 
     for ax, label in zip(axes, labels):
         df = data[label]["df"]
-        sub = df.dropna(subset=["jsd_permutation", "baseline_valid_rate"]).copy()
+        sub = df.dropna(subset=["jsd_permutation", "loose_baseline_valid_rate"]).copy()
         if sub.empty:
             ax.set_title(label)
             continue
@@ -1391,7 +1395,7 @@ def fig_comp_cognitive_maps(data, outdir):
             mask = sub["_quad"] == q
             if mask.any():
                 ax.scatter(sub.loc[mask, "jsd_permutation"],
-                           sub.loc[mask, "baseline_valid_rate"],
+                           sub.loc[mask, "loose_baseline_valid_rate"],
                            c=colors_map[q], s=20, alpha=0.6,
                            edgecolor="white", linewidth=0.3, label=q)
         ax.axvline(0.15, color="red", ls="--", lw=1, alpha=0.4)
@@ -1440,7 +1444,7 @@ def fig_comp_dup_cognitive_maps(data, outdir):
     quad_order = list(colors_map.keys())
 
     def _quad(row):
-        v = row["baseline_valid_rate"]
+        v = row["loose_baseline_valid_rate"]
         j = row["jsd_duplication"] if pd.notna(row.get("jsd_duplication")) else None
         if j is None:
             return None
@@ -1455,7 +1459,7 @@ def fig_comp_dup_cognitive_maps(data, outdir):
 
     for ax, label in zip(axes, labels):
         df = data[label]["df"]
-        sub = df.dropna(subset=["jsd_duplication", "baseline_valid_rate"]).copy()
+        sub = df.dropna(subset=["jsd_duplication", "loose_baseline_valid_rate"]).copy()
         if sub.empty:
             ax.set_title(label)
             continue
@@ -1465,7 +1469,7 @@ def fig_comp_dup_cognitive_maps(data, outdir):
             mask = sub["_quad"] == q
             if mask.any():
                 ax.scatter(sub.loc[mask, "jsd_duplication"],
-                           sub.loc[mask, "baseline_valid_rate"],
+                           sub.loc[mask, "loose_baseline_valid_rate"],
                            c=colors_map[q], s=20, alpha=0.6,
                            edgecolor="white", linewidth=0.3, label=q)
         ax.axvline(0.15, color="red", ls="--", lw=1, alpha=0.4)
