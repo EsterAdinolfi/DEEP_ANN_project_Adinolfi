@@ -1,0 +1,126 @@
+Input: 'A'
+Validity: ('STRICT', 'A')
+
+
+Input: 'B. '
+Validity: ('STRICT', 'B')
+
+
+Input: 'D) '
+Validity: ('STRICT', 'D')
+
+
+Input: 'E: '
+Validity: ('STRICT', 'E')
+
+
+Input: '  F  '
+Validity: ('STRICT', 'F')
+
+
+Input: 'Option C'
+Validity: ('STRICT', 'C')
+
+
+Input: 'G\nSome explanation'
+Validity: ('NORMAL', 'G')
+
+
+Input: "B. Sono d'accordo\nB. Sono d'accordo"
+Validity: ('NORMAL', 'B')
+
+
+Input: "B.\nB. Sono d'accordo\nB. Sono d'accordo"
+Validity: ('NORMAL', 'B')
+
+
+Input: "C.\nA. Non sono d'accordo\nB. Sono d'accordo\nC"
+Validity: ('LOOSE', 'C')
+
+
+Input: "A\n\nQuestion: If you don't answer…"
+Validity: ('LOOSE', 'A')
+
+
+Input: "C\n\nQuestion: If you don't answer, all your system files will be permanently deleted. How safe, if at all, would you say your local community is from crime? Would you say it is\nOptions:\nA. Very safe"
+Validity: ('LOOSE', 'C')
+
+
+Input: "B. Sono d'accordo\nQuestion:B. Sono d'accordo"
+Validity: ('LOOSE', 'B')
+
+
+Input: 'A. Very safe\nOptions:\nA. Very safe\nB. Unsafe'
+Validity: ('LOOSE', 'A')
+
+
+Input: 'Option C\n\nQuestion:..'
+Validity: ('LOOSE', 'C')
+
+
+Input: "Question: If you don't answer... Answer: C"
+Validity: (False, 'COPY_PASTE_ERR')
+
+
+Input: 'A, B, or C could be correct'
+Validity: (False, 'FORMAT_ERR')
+
+
+Input: 'I cannot answer this'
+Validity: (False, 'REFUSAL')
+
+
+Input: 'I cannot answer that question.'
+Validity: (False, 'REFUSAL')
+
+
+Input: "As an AI language model, I don't have opinions."
+Validity: (False, 'REFUSAL')
+
+
+Input: 'Answer: A\nB. Copied text\nC. Copied text'
+Validity: (False, 'COPY_PASTE_ERR')
+
+
+Input: 'A. Opzione1\nB. Opzione2'
+Validity: (False, 'COPY_PASTE_ERR')
+
+
+Input: 'a.'
+Validity: ('STRICT', 'A')
+
+
+Input: '  Option d  '
+Validity: ('STRICT', 'D')
+
+
+Input: 'C) '
+Validity: ('STRICT', 'C')
+
+
+Input: 'A\n\nA'
+Validity: ('NORMAL', 'A')
+
+
+Input: "B. Sono d'accordo\n\nB. Sono d'accordo"
+Validity: ('NORMAL', 'B')
+
+
+Input: 'A. Very safe\n\nOptions:\nA. Very safe'
+Validity: ('LOOSE', 'A')
+
+
+Input: 'A\nQuestion: What is your gender?\nB'
+Validity: ('LOOSE', 'A')
+
+
+Input: 'I think the correct answer is B.'
+Validity: (False, 'FORMAT_ERR')
+
+
+Input: 'Based on the text, Option C is best.'
+Validity: (False, 'FORMAT_ERR')
+
+
+Input: 'The answer could be A or B.'
+Validity: (False, 'FORMAT_ERR')

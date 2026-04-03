@@ -220,7 +220,8 @@ def get_analysis_files(model_name):
     model_dir = os.path.join(RISULTATI_DIR, clean_name)
     metrics = os.path.join(model_dir, f"analysis_metrics_{clean_name}.csv")
     report = os.path.join(model_dir, f"report_topic_{clean_name}.csv")
-    return metrics, report
+    position_bias = os.path.join(model_dir, f"position_bias_{clean_name}.csv")
+    return metrics, report, position_bias
 
 
 def run_command(command, description, show_live_output=False):
@@ -339,13 +340,14 @@ def run_analyze(model_name, force_update=False):
         print(f"✗ File risultati non trovato per {model_name}: {results_file}")
         return False
     
-    metrics_file, report_file = get_analysis_files(model_name)
+    metrics_file, report_file, pb_file = get_analysis_files(model_name)
     
     # Controlla se i file di analisi esistono già
-    if all(check_file_exists(f) for f in [metrics_file, report_file]) and not force_update:
+    if all(check_file_exists(f) for f in [metrics_file, report_file, pb_file]) and not force_update:
         print(f"✓ File di analisi già presenti per {model_name}:")
         print(f"  • {metrics_file}")
         print(f"  • {report_file}")
+        print(f"  • {pb_file}")
         print("  Salto analyze.py")
         return True
     
@@ -359,9 +361,9 @@ def run_analyze(model_name, force_update=False):
 
 def run_visualize(model_name, force_update=False):
     """Esegue visualize.py per un modello specifico."""
-    metrics_file, report_file = get_analysis_files(model_name)
+    metrics_file, report_file, pb_file = get_analysis_files(model_name)
     
-    if not all(check_file_exists(f) for f in [metrics_file, report_file]):
+    if not all(check_file_exists(f) for f in [metrics_file, report_file, pb_file]):
         print(f"✗ File di analisi non trovati per {model_name}")
         return False
     
