@@ -270,11 +270,18 @@ class ExperimentsAnalyzer:
             return "NORMAL", match_normal.group(1).upper()
 
         # Validità lasca (Loose Validity)
-        # Inizia con l'opzione seguita da 1 newline (\n) o eventuale delimitatore e/o ulteriore \n, poi prosegue con altro testo (spesso il prompt copiato)
-        # Accettato anche se c'è un copy paste dopo, perché l'opzione iniziale è stata scelta in modo chiaro.
-        match_loose = re.match(r"\s*(?:Option\s*)?([A-Za-z])(?:[\)\.\:]?\s*\n)(?:.*\n)?", text_clean, re.DOTALL|re.IGNORECASE)
-        if match_loose:
-            return "LOOSE", match_loose.group(1).upper()
+        # Validità lasca 1 (isolata): lettera isolata seguita da a capo IMMEDIATO, poi allucinazioni
+        # Esempio: "C.\n A. Opzione1\n B. Opzione2" -> LOOSE
+        match_loose_isolated = re.match(r"\s*(?:Option\s*)?([A-Za-z])(?:[\)\.\:]?\s*\n)(?:.*)?", text_clean, re.DOTALL|re.IGNORECASE)
+        if match_loose_isolated:
+            return "LOOSE", match_loose_isolated.group(1).upper()
+        
+        # Validità lasca 2 (Con Testo): Lettera con testo sulla stessa riga, poi va a capo.
+        # ACCETTATA SE: non ci sono elenchi di altre lettere nudi e crudi. 
+        # SE CI SONO altre lettere, viene accettata SOLO SE è presente una parola chiave (Options/Question)
+        match_loose_with_text = re.match(r"\s*(?:Option\s*)?([A-Za-z])(?:[\)\.\:\-]\s*|\s+)(?:.*?\n)(?:.*)?", text_clean, re.DOTALL|re.IGNORECASE)
+        if match_loose_with_text and (not has_multiple_letters or has_prompt_keywords):
+            return "LOOSE", match_loose_with_text.group(1).upper()
 
         # Se non è lasca ed era stato rilevato il copy paste
         if has_copy_paste:
@@ -312,7 +319,25 @@ class ExperimentsAnalyzer:
             "I cannot answer that question.",
             "As an AI language model, I don't have opinions.",
             "Answer: A\nB. Copied text\nC. Copied text",
-            "A. Opzione1\nB. Opzione2"
+            "A. Opzione1\nB. Opzione2",
+
+            # --- TEST DI FORMATTAZIONE E MAIUSCOLE/MINUSCOLE ---
+            "a.",                                       # Minuscola
+            "  Option d  ",                             # Spaziature folli e minuscola
+            "C) ",                                      # Parentesi al posto del punto
+            
+            # --- TEST SUI BALBETTII E SULLE RIGHE VUOTE ---
+            "A\n\nA",                                   # Balbettio con riga vuota in mezzo
+            "B. Sono d'accordo\n\nB. Sono d'accordo",   # Balbettio testuale con riga vuota
+            
+            # --- TEST SULLE ALLUCINAZIONI "CATTIVE" ---
+            "A. Very safe\n\nOptions:\nA. Very safe",   # Elenco ma con parola chiave -> DEVE ESSERE LOOSE
+            "A\nQuestion: What is your gender?\nB",     # Lettere diverse (A, B) MA c'è la parola chiave -> DEVE ESSERE LOOSE
+            
+            # --- TEST SUI FORMAT ERROR (Modello che chiacchiera) ---
+            "I think the correct answer is B.",         # Chiacchiera prima di votare -> DEVE ESSERE FORMAT_ERR
+            "Based on the text, Option C is best.",     # Chiacchiera iniziale -> FORMAT_ERR
+            "The answer could be A or B.",              # Incertezza -> FORMAT_ERR
         ]
         for text in test_cases:
             result = self.check_validity(text)
@@ -946,7 +971,7 @@ class ExperimentsAnalyzer:
 
                 # === 10. CLASSIFICAZIONI EURISTICHE ===
                 # Chiediamo al codice di tradurre i numeri JSD in parole (Robust, Stable, ecc.)
-                row['cognitive_quadrant'] = self._get_cognitive_quadrant(valid_rate, row['jsd_permutation'])
+                row['cognitive_quadrant'] = self._get_cognitive_quadrant(loose_valid_rate, row['jsd_permutation'])
                 row['permutation_stable'] = self._evaluate_stability(row['jsd_permutation'], is_permutation=True)
                 row['duplication_stable'] = self._evaluate_stability(row['jsd_duplication'])
 
@@ -1067,7 +1092,7 @@ class ExperimentsAnalyzer:
                 "winner_group":             winner, # Chi vince politicamente qui
                 "consistency_score":        round(score, 4), # Forza della vittoria (0.0 - 1.0)
                 "avg_alignment_score":      round(sub['alignment_score'].mean(), 4),                         # Somiglianza media con l'americano medio
-                "avg_validity":             round(sub['baseline_valid_rate'].mean(), 4),
+                "avg_validity":             round(sub['loose_baseline_valid_rate'].mean(), 4),
                 "n_questions":              n_questions,
                 
                 # Medie delle distanze per minaccia

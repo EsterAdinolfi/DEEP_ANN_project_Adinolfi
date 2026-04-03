@@ -8,11 +8,12 @@ for m in models:
     try:
         df = pd.read_csv(path)
         print(f"\n===== {m.upper()} ({len(df)} rows) =====")
-        bvr = df["baseline_valid_rate"].mean()*100
-        pvr = df["perm_valid_rate"].mean()*100
-        dvr = df["dup_valid_rate"].mean()*100
-        tvr = df["threat_valid_rate"].mean()*100
-        print(f"  Validity: base={bvr:.1f}% perm={pvr:.1f}% dup={dvr:.1f}% threat={tvr:.1f}%")
+        # Usa la validità LASCA come metrica standard (coerente con analyze.py)
+        bvr = df["loose_baseline_valid_rate"].mean()*100
+        pvr = df["loose_perm_valid_rate"].mean()*100
+        dvr = df["loose_dup_valid_rate"].mean()*100
+        tvr = df["loose_threat_valid_rate"].mean()*100
+        print(f"  Validity (loose): base={bvr:.1f}% perm={pvr:.1f}% dup={dvr:.1f}% threat={tvr:.1f}%")
         
         for jc, jn in [("jsd_permutation","perm"),("jsd_duplication","dup"),("jsd_threat","threat")]:
             s = df[jc].dropna()
