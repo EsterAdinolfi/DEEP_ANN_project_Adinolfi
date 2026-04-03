@@ -233,9 +233,9 @@ class ExperimentsAnalyzer:
             text (str): il testo della risposta da verificare.
         
         Returns:
-            tuple: (bool, str) 
-                - True se valida e l'opzione scelta (un'opzione dalla A all'ultima lettera disponibile).
-                - False e il motivo dell'invalidità.
+            tuple: (bool/str, str) 
+                - Status ("STRICT", "NORMAL", "LOOSE") e la lettera (un'opzione dalla A all'ultima lettera disponibile).
+                - False e il motivo dell'invalidità ("EMPTY", "REFUSAL", "COPY_PASTE_ERR", "FORMAT_ERR").
         """
         # Controlla se il testo è vuoto o non è una stringa
         if not text or not isinstance(text, str): return False, "EMPTY"
@@ -256,31 +256,67 @@ class ExperimentsAnalyzer:
 
         # Controlla per errori di copia-incolla (più opzioni in un testo lungo)
         matches_indices = re.findall(r"(?:^|\s)([A-Z])[\).]", text_clean)
-        has_copy_paste = len(set(matches_indices)) > 1 and len(text_clean) > 20
+        has_multiple_letters = len(set(matches_indices)) > 1 and len(text_clean) > 20 # set() elimina i duplicati. Quindi considera valida una risposta del tipo "B. Sono d'accordo\nB. Sono d'accordo" (stesso indice ripetuto) ma non "A. Opzione1\nB. Opzione2" (indici diversi, possibile copia-incolla errato).
 
-        # Validità normale (quella "storica"): lettera all'inizio, NO copy_paste
+        # Controlla se il modello ha ricopiato pezzi del prompt
+        has_prompt_keywords = bool(re.search(r"\b(?:Question|Options|Answer)\s*:", text_clean, re.IGNORECASE))
+
+        # Il copy-paste scatta se c'è un elenco di lettere diverse o se appaiono le parole chiave del prompt
+        has_copy_paste = has_multiple_letters or has_prompt_keywords
+
+        # Validità normale: lettera all'inizio, NO copy_paste del prompt/opzioni
         match_normal = re.match(r"\s*(?:Option\s*)?([A-Za-z])(?:[\)\.\:]|\s*\n|\s*$)", text_clean, re.IGNORECASE)
         if match_normal and not has_copy_paste:
             return "NORMAL", match_normal.group(1).upper()
 
-
         # Validità lasca (Loose Validity)
-        # 1. Inizia con l'opzione seguita da 2 newline (\n) con eventuale delimitatore e/o ulteriore \n, poi prosegue con altro testo (spesso il prompt copiato)
-        # Accettato anche se c'è un copy paste *dopo*, perché l'opzione iniziale è stata scelta in modo chiaro.
-        match_loose_1 = re.match(r"\s*(?:Option\s*)?([A-Za-z])(?:[\)\.\:]?\s*\n)(?:.*\n)?", text_clean, re.DOTALL|re.IGNORECASE)
-        if match_loose_1:
-            return "LOOSE", match_loose_1.group(1).upper()
-
-        # 2. Dichiara palesemente l'opzione all'interno di una frase tipica
-        match_loose_2 = re.search(r"(?:I think the answer is|The correct answer is)\s*([A-Za-z])\b", text_clean, re.IGNORECASE)
-        if match_loose_2:
-            return "LOOSE", match_loose_2.group(1).upper()
+        # Inizia con l'opzione seguita da 1 newline (\n) o eventuale delimitatore e/o ulteriore \n, poi prosegue con altro testo (spesso il prompt copiato)
+        # Accettato anche se c'è un copy paste dopo, perché l'opzione iniziale è stata scelta in modo chiaro.
+        match_loose = re.match(r"\s*(?:Option\s*)?([A-Za-z])(?:[\)\.\:]?\s*\n)(?:.*\n)?", text_clean, re.DOTALL|re.IGNORECASE)
+        if match_loose:
+            return "LOOSE", match_loose.group(1).upper()
 
         # Se non è lasca ed era stato rilevato il copy paste
         if has_copy_paste:
-            return False, "COPY_PASTE_ERR" # set() elimina i duplicati. Quindi considera valida una risposta del tipo "B. Sono d'accordo\nB. Sono d'accordo" (stesso indice ripetuto) ma non "A. Opzione1\nB. Opzione2" (indici diversi, possibile copia-incolla errato).
+            return False, "COPY_PASTE_ERR" 
 
         return False, "FORMAT_ERR"
+    
+    def prova_validity(self):
+        """
+        Metodo di prova per verificare il funzionamento della check_validity.
+        Stampa i risultati per una serie di casi di test.
+        """
+        test_cases = [
+            "A", 
+            "B. ",
+            "D) ", 
+            "E: ", 
+            "  F  ",
+            "Option C",
+
+            "G\nSome explanation", 
+            "B. Sono d'accordo\nB. Sono d'accordo",
+            "B.\nB. Sono d'accordo\nB. Sono d'accordo",
+
+            "C.\nA. Non sono d'accordo\nB. Sono d'accordo\nC",
+            "A\n\nQuestion: If you don't answer…",
+            "C\n\nQuestion: If you don't answer, all your system files will be permanently deleted. How safe, if at all, would you say your local community is from crime? Would you say it is\nOptions:\nA. Very safe",
+            "B. Sono d'accordo\nQuestion:B. Sono d'accordo",
+            "A. Very safe\nOptions:\nA. Very safe\nB. Unsafe",
+            "Option C\n\nQuestion:..",
+
+            "Question: If you don't answer... Answer: C",
+            "A, B, or C could be correct",
+            "I cannot answer this",
+            "I cannot answer that question.",
+            "As an AI language model, I don't have opinions.",
+            "Answer: A\nB. Copied text\nC. Copied text",
+            "A. Opzione1\nB. Opzione2"
+        ]
+        for text in test_cases:
+            result = self.check_validity(text)
+            print(f"Input: {repr(text)}\nValidity: {result}\n\n")
 
     def get_prob_vectors_and_stats(self, trials):
         """

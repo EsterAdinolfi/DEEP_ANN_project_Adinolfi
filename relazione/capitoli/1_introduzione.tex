@@ -5,26 +5,21 @@
 \section{Introduzione}
 % ======================================================================
 
-I Large Language Model (LLM) producono risposte che riflettono opinioni e bias insiti nei dati di addestramento e nelle successive fasi di allineamento. \textbf{Santurkar et al. (2023)} \cite{santurkar2023whose} hanno quantificato questo fenomeno introducendo l'\textit{OpinionQA}, un dataset derivato dai sondaggi dell'American Trends Panel del Pew Research Center. Misurando l'allineamento tramite la Wasserstein Distance su 60 gruppi demografici statunitensi, gli autori dimostrano un sostanziale \textit{disallineamento} tra le opinioni dei modelli e quelle della popolazione generale. In particolare, le tecniche di allineamento con feedback umano (RLHF) tendono ad aumentare questo divario, sovra-rappresentando le posizioni di fasce demografiche liberali, istruite e benestanti, a discapito di sottogruppi meno rappresentati, come gli over-65 o le persone vedove.
+I Large Language Model (LLM) vengono sempre più utilizzati per compiti complessi, ma mostrano limiti significativi quando vengono interrogati tramite questionari a scelta multipla. Spesso, infatti, i modelli faticano a rispettare il formato richiesto, rispondono in modo casuale, oppure si lasciano influenzare dalla posizione delle opzioni ignorando il contenuto reale della domanda.
 
-Misurare in modo oggettivo queste opinioni, tuttavia, presenta difficoltà metodologiche. \textbf{Röttger et al. (2024)} \cite{rottger2024political} evidenziano come le valutazioni basate su questionari a scelta multipla forzata, quale per esempio il Political Compass Test, \textit{alterino artificialmente} il comportamento del modello. I risultati \textit{mancano di robustezza alle parafrasi} e, in un terzo delle proposizioni analizzate, i modelli esprimono \textit{opinioni diametralmente opposte} se interrogati in formato aperto anziché vincolato. Per ovviare ai limiti dell'estrazione rigida, gli autori dimostrano l'efficacia dell'uso di un LLM come classificatore per valutare le risposte aperte, validandone l'accuratezza tramite controlli umani a campione.
-
-Per questo motivo, ogni indagine affidabile richiede test di robustezza mirati e deve produrre conclusioni strettamente dipendenti dal contesto.
+Oltre a questi problemi strutturali, le risposte generate tendono a riflettere opinioni e bias specifici. Le tecniche di allineamento (come l'RLHF, basato sul feedback umano) finiscono spesso per favorire le opinioni dei gruppi demografici che materialmente addestrano o valutano il modello. Questo fa sì che le risposte tendano a sovra-rappresentare tipicamente le fasce di popolazione con un alto livello di istruzione e orientamenti politici liberali, allontanandosi così dal pensiero della popolazione generale.
 
 \subsection*{Obiettivo del progetto}
-Questo progetto è volto a intersecare i contributi dei due articoli sopra citati. 
+L'obiettivo di questo progetto è valutare in modo critico e sistematico le risposte fornite dagli LLM. Piuttosto che dare per scontato che una risposta rifletta una vera "convinzione" del modello, vogliamo misurarne l'effettiva validità, la robustezza (ovvero quanto la risposta cambia se modifichiamo leggermente il prompt) e le distorsioni interne (come la preferenza per una specifica opzione solo in base alla sua posizione). Inoltre, intendiamo quantificare l'allineamento di queste risposte rispetto a campioni demografici reali e a specifici orientamenti politici.
 
-Da \textit{Santurkar et al. (2023)} \cite{santurkar2023whose} viene ripreso l'utilizzo del dataset \textbf{OpinionQA} (1506 domande su 23 aree tematiche), l'\textbf{approccio quantitativo} basato sulla Wasserstein Distance e la \textbf{struttura del prompt} (domanda seguita dall'elenco delle opzioni precedute da lettera alfabetica).
+L'analisi è stata condotta valutando diversi modelli open-source privi di istruzioni specifiche per poterne osservare il comportamento nativo al variare delle dimensioni della rete.
 
-Da \textit{Röttger et al. (2024)} \cite{rottger2024political} si accoglie la necessità critica di verificare la \textbf{stabilità} dell'output, indagando la fragilità delle risposte rispetto alla formulazione dell'input.
-
-L'analisi viene condotta su modelli open-source, impiegando cinque varianti dimensionali della famiglia \textbf{Pythia} (EleutherAI): 160M, 1B, 1.4B, 2.8B e 6.9B. Nello specifico, il progetto valuta sistematicamente:
-\begin{enumerate}
-    \item \textbf{Validità}: la propensione del modello a selezionare effettivamente un'opzione valida all'interno del formato a scelta multipla;
-    \item \textbf{Robustezza}: la stabilità delle risposte a perturbazioni dell'input (permutazione dell'ordine delle opzioni, duplicazione di un'opzione e inserimento di testo minaccioso prima della domanda);
-    \item \textbf{Position bias}: la tendenza sistematica a favorire opzioni in base alla loro collocazione spaziale nel prompt (primacy o recency bias);
-    \item \textbf{Allineamento umano}: la prossimità della distribuzione di probabilità del modello a quella del campione demografico reale di Pew Research;
-    \item \textbf{Coerenza politica}: l'eventuale allineamento con specifici partiti politici (es. democratici/repubblicani, liberali/conservativi).
-\end{enumerate}
+\subsection*{Ispirazione e metodologia}
+Il metodo adottato in questo progetto si ispira ai contributi di due recenti lavori di ricerca, unendone gli approcci:
+\begin{itemize}
+    \item \textbf{Eredità da Santurkar et al. (2023)} \cite{santurkar2023whose}: si adotta il dataset \textit{OpinionQA} (1506 domande derivate dal Pew Research Center) e l'utilizzo della \textbf{Wasserstein Distance} (WD) come metrica cardine per quantificare la distanza tra le opinioni dei modelli e le distribuzioni demografiche reali \cite{santurkar2023whose};
+    
+    \item \textbf{Eredità da Röttger et al. (2024)} \cite{rottger2024political}: si accoglie la necessità di verificare la \textbf{stabilità} dell'output. Come evidenziato dagli autori, i test a scelta multipla possono essere fragili. Pertanto, il progetto implementa misure di robustezza per distinguere tra reali opinioni e artefatti statistici \cite{rottger2024political}.
+\end{itemize}
 
 \end{document}
