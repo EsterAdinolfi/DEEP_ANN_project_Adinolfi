@@ -19,6 +19,8 @@ import subprocess
 import json
 from pathlib import Path
 
+from matplotlib.pylab import choice
+
 # ══════════════════════════════════════════════════════════════════════
 #  CONFIGURAZIONE GLOBALE
 # ══════════════════════════════════════════════════════════════════════
@@ -417,6 +419,58 @@ def run_comparative(force_update=False):
 
     return generate_all_comparative(outdir=outdir)
 
+def run_interactive_exploration():
+    """Carica i CSV di analisi in pandas ed entra in un REPL interattivo."""
+    try:
+        import pandas as pd
+    except ImportError:
+        print("✗ pandas non è installato. Esegui prima l'opzione [8] o 'pip install pandas'.")
+        return False
+        
+    import code
+    
+    print("\n▸ Caricamento dati in corso...")
+    dataframes = {}
+    
+    for model in AVAILABLE_MODELS:
+        clean_name = get_model_name_clean(model)
+        metrics_file = os.path.join(RISULTATI_DIR, clean_name, f"analysis_metrics_{clean_name}.csv")
+        if os.path.exists(metrics_file):
+            try:
+                dataframes[clean_name] = pd.read_csv(metrics_file)
+                print(f"  ✓ {clean_name}: Caricato con successo ({len(dataframes[clean_name])} righe)")
+            except Exception as e:
+                print(f"  ✗ {clean_name}: Errore di caricamento ({e})")
+        else:
+            print(f"  ⚠ {clean_name}: File non trovato")
+            
+    if not dataframes:
+        print("\n✗ Nessun dataset caricato. Analizza prima i risultati (opzione [5]).")
+        return False
+        
+    print("\n" + "═" * 70)
+    print("  MODALITÀ ESPLORAZIONE INTERATTIVA")
+    print("═" * 70)
+    print("\nHai a disposizione il dizionario 'dfs' contenente i DataFrame pandas dei modelli.")
+    print("Modelli caricati: " + ", ".join(dataframes.keys()))
+    print("\nEsempi di comandi:")
+    if dataframes:
+        first_model = list(dataframes.keys())[0]
+        print(f"  >>> df_{first_model} = dfs['{first_model}']")
+        print(f"  >>> df_{first_model}.head()")
+        print(f"  >>> df_{first_model}['loose_baseline_valid_rate'].mean()")
+    print("\nPremi Ctrl+Z (Windows) / Ctrl+D (Mac/Linux) seguito da Invio per uscire.")
+    print("-" * 70 + "\n")
+    
+    local_vars = {"pd": pd, "dfs": dataframes}
+    # Per comodità globale espongo i singoli dataframe
+    for name, df in dataframes.items():
+        local_vars[f"df_{name}"] = df
+        
+    code.interact(local=local_vars, banner="")
+    print("\nUscita dall'esplorazione interattiva.")
+    return True
+
 def run_only_experiments_pipeline(models=None, force_update=False):
     """
     Esegue SOLO la generazione degli esperimenti (per l'esecuzione sul server).
@@ -531,7 +585,7 @@ def run_full_pipeline(models=None, force_update=False):
 def display_menu():
     """Mostra il menu principale."""
     print("\n" + "═" * 70)
-    print("  MENU PRINCIPALE - Gestione Progetto")
+    print("  MENU PRINCIPALE - Gestione progetto")
     print("═" * 70)
     print("\n  [1] Esegui pipeline completa")
     print("  [2] Genera mapping (generate_mapping.py)")
@@ -543,6 +597,7 @@ def display_menu():
     print("  [8] Installa/aggiorna dipendenze (requirements.txt)")
     print("  [9] Esegui SOLO gli esperimenti (modalità server)")
     print(" [10] Analisi risultati + creazione grafici (anche i comparativi)")
+    print(" [11] Esplora dati in modo interattivo (REPL Python)")
     print("\n  [0] Esci")
     print("-" * 70)
 
@@ -675,7 +730,11 @@ def interactive_menu():
                         print(f"\u2717 Analisi fallita per {model}, visualizzazione saltata.")
                 if any_success:
                     run_comparative(force_update=update_mode)
-
+                    
+            elif choice == '11':
+                # Esplorazione interattiva
+                print_header("ESPLORAZIONE INTERATTIVA DATI")
+                run_interactive_exploration()
             else:
                 print("\n✗ Scelta non valida. Riprova.")
             
