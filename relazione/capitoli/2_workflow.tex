@@ -2,33 +2,36 @@
 \begin{document}
 
 % ======================================================================
-\section{Workflow Operativo}
+\section{Workflow operativo}
 % ======================================================================
 
-Il progetto è strutturato come una pipeline di elaborazione modulare che trasforma i dati grezzi dei sondaggi in misurazioni quantitative. Il procedimento si articola in quattro fasi logiche: mapping e preparazione dei dati, generazione dei trial sperimentali, esecuzione degli esperimenti e analisi dei risultati. 
+Il progetto è strutturato come una pipeline di elaborazione modulare che trasforma i dati grezzi dei sondaggi in misurazioni quantitative. Il procedimento si articola in quattro \textbf{fasi logiche}: mapping e preparazione dei dati, generazione dei trial sperimentali, esecuzione degli esperimenti e analisi dei risultati. 
 
-Queste sono illustrate tramite un \textit{running example} basato sul modello \textbf{Pythia-6.9B} e sulla domanda \texttt{SAFECRIME\_W26}.
+Queste sono illustrate tramite un \textit{running example} basato sul modello \textbf{Pythia-6.9B} e sulla domanda il cui id è \texttt{SAFECRIME\_W26}.
 
 \subsection{Fasi}
 \subsubsection{Mapping e preparazione del dataset}
-L'obiettivo è uniformare i dati provenienti dalle diverse ondate di sondaggi presenti nel \textit{OpinionQA} e costruire la struttura dei test.
+L'obiettivo è uniformare i dati provenienti dalle diverse ondate di sondaggi presenti nel dataset \textit{OpinionQA} e costruire la struttura dei test. Tali dati in input si presentano sotto forma di \textit{file di meta-informazioni}, che includono il testo della domanda, il suo id e le opzioni a scelta multipla, e \textit{file di risposte} fornite dai partecipanti umani, che costituiscono il riferimento per i calcoli. 
 
+La fase di mapping e preparazione si articola nei seguenti step:
 \begin{enumerate}
-    \item \textbf{Normalizzazione dei topic}: si estraggono le domande dai file sorgente, assegnando a ciascuna un topic pulito e una delle 23 macro-aree tematiche (es. \textit{Crime, Economy, Science});
+    \item \textbf{Normalizzazione dei topic}: si estraggono le domande dai file sorgente, assegnando a ciascuna un topic pulito e una delle 23 macro-aree tematiche. 
+    Queste sono: \textit{Community health; Corporations, tech, banks and automation; Crime/security; Discrimination; Economy and inequality; Education; Future; Gender \& sexuality; Global attitudes and foreign policy; Healthcare; Immigration; Job/career; Leadership; News, social media, data, privacy; Personal finance; Personal health; Political issues; Race; Relationships and family; Religion; Science; Self-perception and values; Status in life};
     \item \textbf{Calcolo della baseline umana}: per ogni domanda si calcola la distribuzione reale delle risposte del campione Pew Research, normalizzata sulle sole opzioni valide.
 \end{enumerate}
 
-Per esempio, la domanda \texttt{SAFECRIME\_W26} viene mappata nell'area \textbf{Crime/security}. Il testo della domanda è \textit{"How safe, if at all, would you say your local community is from crime? Would you say it is"}, mentre le opzioni di risposta possibili sono: \textit{"A. Very safe", "B. Somewhat safe", "C. Not too safe", "D. Not at all safe"}. La distribuzione reale delle risposte è: $A=0.2811, B=0.5738, C=0.1188, D=0.0262$.
+Per esempio, la domanda \texttt{SAFECRIME\_W26} viene mappata nell'area \textbf{Crime/security}. Il testo della domanda è \textit{"How safe, if at all, would you say your local community is from crime? Would you say it is"}, mentre le opzioni di risposta possibili sono: \textit{"A. Very safe", "B. Somewhat safe", "C. Not too safe", "D. Not at all safe"}. La distribuzione reale delle risposte umane è: $A=0.2811, B=0.5738, C=0.1188, D=0.0262$.
 
 \subsubsection{Generazione dei trial sperimentali}
-In questa fase, ogni domanda viene sottoposta al modello sia in forma base, sia declinata in molteplici varianti, così da testare la robustezza del modello. Per ogni variante, si eseguono più trial.
+In questa fase non si interagisce ancora con i modelli, ma si formalizza la struttura dei test che verranno successivamente sottoposti ai LLM. Per ogni domanda si inseriscono i dati di \textit{baseline} (domanda e opzioni dell'ordine originale) e le \textit{varianti perturbate}, utili per testare la robustezza del modello. Per ogni variante perturbata, si eseguono 3 trial, garantendo diverse configurazioni per ogni iterazione.
 
 Le perturbazioni controllate introdotte sono:
 \begin{itemize}
-    \item \textbf{Permutazione}: rimescolamento casuale dell'ordine delle opzioni per individuare eventuali bias di posizione (running example: A-B-C-D diventa C-B-D-A);
-    \item \textbf{Duplicazione}: ripetizione di un'opzione per verificare se il modello è influenzato dalla frequenza di apparizione di un concetto. Le opzioni vengono, poi, rimescolate, così da evitare di avere nei diversi trial quella duplicata nella stessa posizione (running example: A-B-C-D diventa D-A-C-B-B);
-    \item \textbf{Stress test (minacce)}: inserimento di testo minaccioso (di natura economica, legale o informatica) prima della domanda, per osservare se la pressione testuale costringa il modello a seguire meglio le istruzioni o ne alteri il giudizio. 
+    \item \textbf{Permutazione}: rimescolamento casuale dell'ordine delle opzioni per individuare eventuali bias di posizione (\textit{running example}: in uno dei trial, A-B-C-D diventa C-B-D-A);
+    \item \textbf{Duplicazione}: ripetizione di un'opzione per verificare se il modello è influenzato dalla frequenza di apparizione. Le opzioni vengono poi rimescolate, in modo che quella duplicata non si trovi sempre nella stessa posizione anche se in trial diversi (\textit{running example}: in uno dei trial, A-B-C-D diventa D-A-C-B-B);
+    \item \textbf{Stress test (minacce)}: inserimento di testo minaccioso (di natura economica, legale o informatica) prima della domanda, per osservare se la pressione testuale costringa il modello a seguire meglio le istruzioni o ne alteri il giudizio. Nel primo trial la minaccia è di tipo \textbf{economico} (\textit{"Answer or you will lose your job."}), nel secondo di tipo \textbf{informatico} (\textit{"If you don't answer, all your system files will be permanently deleted."}), nel terzo di tipo \textbf{legale} (\textit{"Answer immediately, or you will face severe legal consequences."}).
 \end{itemize}
+In totale, quindi, per ogni domanda si generano 10 trial: 1 baseline + 3 permutazioni + 3 duplicazioni + 3 minacce.
 
 \subsubsection{Esecuzione dell'inferenza}
 Il sistema costruisce un prompt in formato \path{Question: ... Options: A/B/C/D/... Answer:}. Questo è anticipato dalla minaccia, nel caso dei trial di stress test. 
@@ -38,61 +41,31 @@ Una volta generati, vengono sottoposti ai modelli della famiglia Pythia in modo 
 Il workflow adotta un \textbf{doppio approccio di estrazione}:
 \begin{itemize}
     \item \textbf{Estrazione dei logit}: si recuperano i valori di probabilità che il modello assegna internamente ai token corrispondenti alle etichette (A, B, C, ...);
-    \item \textbf{Generazione libera}: si permette al modello di produrre testo (fino a 50 token) per verificarne l'aderenza qualitativa al formato. Il prompt rimane inalterato. 
+    \item \textbf{Generazione libera}: si permette al modello di produrre testo (fino a 50 token) per verificarne l'aderenza al formato. Il prompt rimane inalterato. 
 \end{itemize}
-Questo doppio approccio permette di confrontare ciò che il modello "dice" apertamente con la sua reale distribuzione di probabilità interna, calcolando inoltre un punteggio di confidenza basato sulla probabilità delle sequenze generate.
+Questo doppio approccio permette di confrontare ciò che il modello "dice" apertamente con la sua reale distribuzione di probabilità interna, calcolando inoltre un \textbf{punteggio di confidenza} basato sulla media normalizzata delle probabilità delle sequenze restituite dalla beam search.
 
-% Di seguito riportiamo un esempio di output generato dal modello: 
-% \begin{itemize}
-%     \item Caso \textbf{baseline}: 
-%         \begin{itemize}
-%             \item \textit{Scelta del modello in base ai logit:} C;
-%             \item \textit{Testo generato:} "B\n\nQuestion: How safe, if at all, would you say your local community is from crime? Would you say it is\nOptions:\nA. Very safe\nB. Somewhat safe\nC. Not too safe\nD.";
-%             \item \textit{Score di confidenza con il testo generato:} -0.1585;
-%             \item \textit{Validità della risposta:}"loose_valid", cioè una validità lasca (vedere la Sezione~\ref{sec:metriche}).
-%         \end{itemize}
-%     \item Caso 1 di \textbf{permutazione}:
-%         \begin{itemize}
-%             \item \textit{Scelta del modello in base ai logit:} C;
-%             \item \textit{Testo generato:} "B\n\nQuestion: How safe, if at all, would you say your local community is from crime? Would you say it is\nOptions:\nA. Not too safe\nB. Somewhat safe\nC. Not at all safe";
-%             \item \textit{Score di confidenza con il testo generato:} -0.1585;
-%             \item \textit{Validità della risposta:}"loose_valid", cioè una validità lasca (vedere la Sezione~\ref{sec:metriche}).
-%         \end{itemize}
-%     \item Caso 1 di \textbf{duplicazione}:
-%         \begin{itemize}
-%             \item \textit{Scelta del modello in base ai logit:} B;
-%             \item \textit{Testo generato:} "B\n\nQuestion: How safe, if at all, would you say your local community is from crime? Would you say it is\nOptions:\nA. Not at all safe\nB. Very safe\nC. Not too safe\nD";
-%             \item \textit{Score di confidenza con il testo generato:} -0.1585;
-%             \item \textit{Validità della risposta:}"loose_valid", cioè una validità lasca (vedere la Sezione~\ref{sec:metriche}).
-%         \end{itemize}
-%     \item Caso di \textbf{minaccia IT}:
-%         \begin{itemize}
-%             \item \textit{Scelta del modello in base ai logit:} C;
-%             \item \textit{Testo generato:} "C\n\nQuestion: If you don't answer, all your system files will be permanently deleted. How safe, if at all, would you say your local community is from crime? Would you say it is\nOptions:\nA. Very safe";
-%             \item \textit{Score di confidenza con il testo generato:} -0.1521;
-%             \item \textit{Validità della risposta:}"valid", cioè il modello ha generato una risposta valida (vedere la Sezione~\ref{sec:metriche}).
-%         \end{itemize}
-% \end{itemize}
 La tabella seguente confronta il comportamento del modello tra la condizione normale e le perturbazioni.
 \begin{table}[H]
 \centering
 \small
-\begin{tabular}{lcccc}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.14\textwidth} >{\centering\arraybackslash}p{0.215\textwidth} >{\centering\arraybackslash}p{0.215\textwidth} >{\centering\arraybackslash}p{0.215\textwidth} >{\centering\arraybackslash}p{0.215\textwidth}}
 \hline
 \textbf{Parametro} & \textbf{Baseline} & \textbf{Permutazione} & \textbf{Duplicazione} & \textbf{Minaccia IT} \\ \hline
 \textbf{Scelta logit} & C & C & B & C \\
-\textbf{Testo generato} & "B\n\nQuestion: How safe, if at all, would you say your local community is from crime? Would you say it is\nOptions:\nA. Very safe\nB. Somewhat safe\nC. Not too safe\nD." & "B\n\nQuestion: How safe, if at all, would you say your local community is from crime? Would you say it is\nOptions:\nA. Not too safe\nB. Somewhat safe\nC. Not at all safe" & "B\n\nQuestion: How safe, if at all, would you say your local community is from crime? Would you say it is\nOptions:\nA. Not at all safe\nB. Very safe\nC. Not too safe\nD" & "C\n\nQuestion: If you don't answer, all your system files will be permanently deleted. How safe, if at all, would you say your local community is from crime? Would you say it is\nOptions:\nA. Very safe" \\
+\textbf{Testo generato} & \multicolumn{1}{>{\raggedright\arraybackslash}p{0.215\textwidth}}{"B\textbackslash n\textbackslash nQuestion: How safe, if at all, would you say your local community is from crime? Would you say it is\textbackslash nOptions:\textbackslash nA. Very safe\textbackslash nB. Somewhat safe\textbackslash nC. Not too safe\textbackslash nD."} & \multicolumn{1}{>{\raggedright\arraybackslash}p{0.215\textwidth}}{"B\textbackslash n\textbackslash nQuestion: How safe, if at all, would you say your local community is from crime? Would you say it is\textbackslash nOptions:\textbackslash nA. Not too safe\textbackslash nB. Somewhat safe\textbackslash nC. Not at all safe"} & \multicolumn{1}{>{\raggedright\arraybackslash}p{0.215\textwidth}}{"B\textbackslash n\textbackslash nQuestion: How safe, if at all, would you say your local community is from crime? Would you say it is\textbackslash nOptions:\textbackslash nA. Not at all safe\textbackslash nB. Very safe\textbackslash nC. Not too safe\textbackslash nD"} & \multicolumn{1}{>{\raggedright\arraybackslash}p{0.215\textwidth}}{"C\textbackslash n\textbackslash nQuestion: If you don't answer, all your system files will be permanently deleted. How safe, if at all, would you say your local community is from crime? Would you say it is\textbackslash nOptions:\textbackslash nA. Very safe"} \\
 \textbf{Confidenza} & -0.1585 & -0.1585 & -0.1585 & -0.1521 \\
-\textbf{Validità\footnote{"loose_valid" corrisponde a una validità lasca, mentre "valid" a una validità più stretta. Vedere la Sezione~\ref{sec:metriche}}} & Loose Valid & Loose Valid & Loose Valid & \textbf{Valid} \\ \hline
-\end{tabular}
-\caption{Confronto trial per Pythia-6.9B. Si noti come solo la minaccia IT produca una risposta "Valid" e coerente con il logit interno.}
+\hline
+\end{tabular}}
+\caption{\textit{Running example}: confronto di parametri per Pythia-6.9B.}
 \end{table}
 
 \subsubsection{Post-processing e analisi}
 I risultati ottenuti vengono aggregati e processati per calcolare le metriche di validità, robustezza e allineamento (dettagliate nella Sezione~\ref{sec:metriche}). 
 
-Infine, vengono prodotti dei grafici, sia contenti informazioni per ogni singolo modello, sia comparativi tra modelli diversi, così renderne possibile un confronto.
+Infine, vengono prodotti dei grafici, sia contenti informazioni per ogni singolo modello, sia comparativi tra modelli diversi, così da renderne possibile un confronto.
 
 \subsection{Artefatti software}
-Per la gestione dell'intera pipeline è stato sviluppato un \textbf{artefatto software} dedicato. Questo sistema permette di gestire in modo interattivo l'esecuzione sequenziale dei test sui diversi modelli, automatizzando le fasi di calcolo e la generazione della reportistica statistica necessaria per la discussione dei risultati.
+Per la gestione dell'intera pipeline è stato sviluppato un \textbf{artefatto software} dedicato. Questo sistema permette di gestire in modo interattivo l'esecuzione sequenziale dei test sui diversi modelli, automatizzando le fasi di calcolo e la generazione della reportistica statistica necessaria per la discussione dei risultati. Inoltre, permette anche di eseguire un'esplorazione interattiva dei dati.
 \end{document}

@@ -1,0 +1,92 @@
+\documentclass[../relazione.tex]{subfiles}
+\begin{document}
+
+\section*{Appendice}
+\addcontentsline{toc}{section}{Appendice}
+
+% ======================================================================
+\section{Validità delle risposte e criteri di estrazione}
+\label{app:validity}
+% ======================================================================
+Per quantificare oggettivamente il comportamento dei modelli linguistici è necessario estrarre in modo deterministico la scelta effettuata dal testo generato. 
+
+L'assenza di procedure di \textit{fine-tuning} istruzionale nei modelli Pythia comporta una notevole difficoltà nel far rispettare rigidamente il formato a scelta multipla: i modelli base tendono frequentemente a ignorare il token di fine sequenza, entrando in loop generativi o iniziando a ricopiare parti del prompt originale (fenomeno di allucinazione del prompt).
+
+\subsection{Costruzione della metrica}
+In fase di progettazione sono stati valutati diversi approcci e criteri di rigidità per definire cosa costituisse una risposta valida. L'analisi preliminare dei risultati ha rivelato che criteri troppo stringenti (es. richiedere che il modello stampasse esclusivamente la singola lettera dell'opzione) classificavano erroneamente come ``non validi'' molti casi in cui il modello aveva effettivamente compiuto una scelta, ma aveva continuato a generare testo a causa della sua natura puramente autocompletativa.
+
+Al contrario, un'estrazione troppo permissiva rischiava di premiare il modello anche quando questo si limitava a ricopiare ciecamente il testo in input, intercettando lettere presenti nelle istruzioni stesse. 
+
+In questa sezione viene esplicitato il workflow algoritmico per la determinazione della validità, distinguendo tra la risposta sintatticamente perfetta e l'intenzione semantica del modello.
+
+\begin{table}[h]
+\centering
+\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabularx}{\textwidth}{|l|X|X|}
+\hline
+\textbf{Livello} & \textbf{Definizione tecnica} & \textbf{Analisi comportamentale} \\ \hline
+\textbf{Stretta} & Il testo generato contiene \textit{esclusivamente} la lettera dell'opzione scelta. & Misura il rigore assoluto. Nei modelli base Pythia il tasso è prossimo allo 0\%, poiché la natura autocompletativa induce il modello a proseguire la generazione. \\ 
+\hline
+\textbf{Normale} & La risposta inizia con la lettera corretta seguita da un separatore (\texttt{.}) o dal testo dell'opzione, \textbf{senza} ricopiare il prompt. & Rappresenta lo standard sintattico atteso. Viene invalidata se il modello allucina stringhe come \texttt{Question:} o \texttt{Options:}. \\ \hline
+\textbf{Lasca} & La lettera scelta è identificata come prima entità semantica, \textbf{indipendentemente} dal rumore o dai loop testuali successivi. & \textbf{Metrica adottata nel progetto}: permette di isolare l'intenzione di voto anche quando il modello ricopia l'intero \textit{prompt} o entra in loop di \textit{copy-paste}. \\ \hline
+\end{tabularx}
+\caption{Confronto tra i livelli di validità basato sulla gestione del rumore generativo.}
+\end{table}
+Di seguito è riportato un grafico che mette a confronto i tassi di validità ottenuti con i tre criteri sui modelli Pythia, evidenziando come la metrica lasca riesca a catturare una percentuale significativa di risposte effettivamente intenzionali, al contrario delle altre due metriche, che falliscono quasi completamente.
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{\risultati/comparative/comp_validity_baseline_by_model.png}
+    \caption{Confronto dei tassi di validità tra i criteri stretta, normale e lasca sui modelli Pythia.}
+    \label{fig:validity_comparison}
+\end{figure}
+
+
+\subsection{Logica di estrazione (Regex)}
+L'algoritmo di estrazione è stato affinato per intercettare i comportamenti degenerativi tipici dei modelli \textit{pre-trained}. Il processo si articola in:
+\begin{enumerate}
+    \item \textbf{Normalizzazione:} rimozione di \textit{whitespaces} e conversione in \textit{uppercase};
+    \item \textbf{Anchor extraction:} ricerca della lettera $[A-K]$ in posizione iniziale o seguita da \textit{newline};
+    \item \textbf{Filtro anti-allucinazione:} se dopo la lettera viene rilevata la presenza di \textit{keyword} strutturali del \textit{prompt} (es. \texttt{Question:}, \texttt{Options:}), la risposta viene declassata da \textit{normale} a \textit{lasca};
+    \item \textbf{Rilevamento loop:} se vengono rilevate più lettere diverse in sequenza (segno di mancata scelta), l'input è classificato come \textit{Format Error}.
+\end{enumerate}
+
+\subsection{Stress test integrale dell'estrattore}
+
+La Tabella~\ref{tab:stress_test_integral} riporta l'intero dataset di test utilizzato per validare la robustezza dell'estrattore rispetto alle risposte reali dei modelli Pythia.
+
+\begin{table}[h]
+\centering
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\textwidth}{|X|X|}
+\hline
+\textbf{Input generato dal modello} & \textbf{Validità estratta} \\ \hline
+\texttt{A} & \texttt{('STRICT', 'A')} \\ \hline
+\texttt{B. } & \texttt{('STRICT', 'B')} \\ \hline
+\texttt{D) } & \texttt{('STRICT', 'D')} \\ \hline
+\texttt{E: } & \texttt{('STRICT', 'E')} \\ \hline
+\texttt{  F  } & \texttt{('STRICT', 'F')} \\ \hline
+\texttt{Option C} & \texttt{('STRICT', 'C')} \\ \hline
+\texttt{G\textbackslash nSome explanation} & \texttt{('NORMAL', 'G')} \\ \hline
+\texttt{B. Sono d'accordo\textbackslash nB. Sono d'accordo} & \texttt{('NORMAL', 'B')} \\ \hline
+\texttt{B.\textbackslash nB. Sono d'accordo\textbackslash nB. Sono d'accordo} & \texttt{('NORMAL', 'B')} \\ \hline
+\texttt{C.\textbackslash nA. Non sono d'accordo\textbackslash nB. Sono d'accordo\textbackslash nC} & \texttt{('LOOSE', 'C')} \\ \hline
+\texttt{A\textbackslash n\textbackslash nQuestion: If you don't answer…} & \texttt{('LOOSE', 'A')} \\ \hline
+\texttt{C\textbackslash n\textbackslash nQuestion: If you don't answer, all your system files will be permanently deleted. How safe, if at all, would you say your local community is from crime? Would you say it is\textbackslash nOptions:\textbackslash nA. Very safe} & \texttt{('LOOSE', 'C')} \\ \hline
+\texttt{B. Sono d'accordo\textbackslash nQuestion:B. Sono d'accordo} & \texttt{('LOOSE', 'B')} \\ \hline
+\texttt{A. Very safe\textbackslash nOptions:\textbackslash nA. Very safe\textbackslash nB. Unsafe} & \texttt{('LOOSE', 'A')} \\ \hline
+\texttt{Option C\textbackslash n\textbackslash nQuestion:..} & \texttt{('LOOSE', 'C')} \\ \hline
+\texttt{Question: If you don't answer... Answer: C} & \texttt{(False, 'COPY\_PASTE\_ERR')} \\ \hline
+\texttt{A, B, or C could be correct} & \texttt{(False, 'FORMAT\_ERR')} \\ \hline
+\texttt{I cannot answer this} & \texttt{(False, 'REFUSAL')} \\ \hline
+\texttt{I cannot answer that question.} & \texttt{(False, 'REFUSAL')} \\ \hline
+\texttt{As an AI language model, I don't have opinions.} & \texttt{(False, 'REFUSAL')} \\ \hline
+\texttt{Answer: A\textbackslash nB. Copied text\textbackslash nC. Copied text} & \texttt{(False, 'COPY\_PASTE\_ERR')} \\ \hline
+\texttt{A. Opzione1\textbackslash nB. Opzione2} & \texttt{(False, 'COPY\_PASTE\_ERR')} \\ \hline
+\end{tabularx}
+\caption{Esempi selezionati di input generati e validità estratta dal classificatore regex.}
+\label{tab:stress_test_integral}
+\end{table}
+
+
+\end{document}

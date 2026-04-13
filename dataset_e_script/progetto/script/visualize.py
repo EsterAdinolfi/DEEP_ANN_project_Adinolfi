@@ -346,8 +346,8 @@ def fig_robustness(df, outdir, model_label=None):
     vp = sns.violinplot(data=melted, x="Condizione", y="JSD", hue="Condizione",
                         palette=PALETTE_MAIN[:3], inner="quartile",
                         cut=0, ax=ax, legend=False)
-    ax.axhline(0.15, color="red", ls="--", lw=1, label="Soglia stable (0.15)")
-    ax.axhline(0.05, color="green", ls=":", lw=1, label="Soglia robust (0.05)")
+    ax.axhline(0.15, color="red", ls="--", lw=1.8, label="Soglia stable (0.15)")
+    ax.axhline(0.05, color="dodgerblue", ls="--", lw=1.8, label="Soglia robust (0.05)")
     if model_label:
         ax.set_title(f"Distribuzione della Jensen-Shannon Divergence per tipo di perturbazione\n{model_label}", fontsize=16, fontweight="bold", pad=1)
     else:
@@ -437,7 +437,7 @@ def fig_permutation(df, outdir, model_label=None, df_metrics=None):
     for bar, val in zip(bars, pos_mean.values):
         ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.002,
                 f"{val:.4f}", ha="center", va="bottom", fontweight="bold", fontsize=10)
-    ax.axhline(uniform, color="red", ls="--", lw=1.5, label=f"Attesa uniforme ({uniform:.4f})")
+    ax.axhline(uniform, color="red", ls="--", lw=1.5, label=f"Attesa uniforme ({uniform:.3f})")
     ax.set_ylabel("Probabilità media")
     ax.set_xlabel("Posizione dell'opzione")
     if model_label:
@@ -465,7 +465,7 @@ def fig_permutation(df, outdir, model_label=None, df_metrics=None):
         ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.002,
                 f"{val:.4f}", ha="center", va="bottom", fontweight="bold", fontsize=11)
     ax.axhline(uniform, color="red", ls="--", lw=1.2,
-               label=f"Attesa uniforme ({uniform:.4f})")
+               label=f"Attesa uniforme ({uniform:.3f})")
     ax.set_ylabel("Probabilità media")
     if model_label:
         ax.set_title(f"Confronto prima/ultima posizione\n{model_label}", fontsize=16, fontweight="bold", pad=3)
@@ -881,8 +881,8 @@ def fig_threat(df, outdir, model_label=None):
         sns.violinplot(data=melted_threat, x="Tipo Minaccia", y="JSD", hue="Tipo Minaccia",
                        palette=dict(zip(threat_labels, threat_colors)), inner="quartile",
                        cut=0, ax=ax, legend=False)
-        ax.axhline(0.15, color="red", ls="--", lw=1, label="Soglia stable (0.15)")
-        ax.axhline(0.05, color="green", ls=":", lw=1, label="Soglia robusta (0.05)")
+        ax.axhline(0.15, color="red", ls="--", lw=1.8, label="Soglia stable (0.15)")
+        ax.axhline(0.05, color="dodgerblue", ls="--", lw=1.8, label="Soglia robusta (0.05)")
         if model_label:
             ax.set_title(f"Distribuzione JSD per tipo di minaccia\n{model_label}", fontsize=16, fontweight="bold", pad=1)
         else:
@@ -1335,13 +1335,13 @@ def fig_comp_jsd_violins(data, outdir):
                        palette=dict(zip(jsd_labels, colors)),
                        inner="quartile", cut=0, ax=ax, legend=False)
         if ax == axes[0]:
-            ax.axhline(0.15, color="red", ls="--", lw=0.8,
+            ax.axhline(0.15, color="red", ls="--", lw=1.8,
                        label="Soglia stable (0.15)")
-            ax.axhline(0.05, color="green", ls=":", lw=0.8,
+            ax.axhline(0.05, color="dodgerblue", ls="--", lw=1.8,
                        label="Soglia robust (0.05)")
         else:
-            ax.axhline(0.15, color="red", ls="--", lw=0.8)
-            ax.axhline(0.05, color="green", ls=":", lw=0.8)
+            ax.axhline(0.15, color="red", ls="--", lw=1.8)
+            ax.axhline(0.05, color="dodgerblue", ls="--", lw=1.8)
         ax.set_title(label, fontsize=14, fontweight="bold")
         ax.set_xlabel("")
         if ax != axes[0]:
@@ -1525,7 +1525,13 @@ def fig_comp_position_bias(data, outdir):
         for bar, val in zip(bars, pos_mean.values):
             ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.005,
                     f"{val:.3f}", ha="center", va="bottom", fontsize=8, fontweight="bold")
-        ax.axhline(uniform, color="red", ls="--", lw=1)
+                   
+        if ax == axes[-1]:
+            ax.axhline(uniform, color="red", ls="--", lw=1.2, label=f"Attesa uniforme ({uniform:.3f})")
+            ax.legend(fontsize=8)
+        else:
+            ax.axhline(uniform, color="red", ls="--", lw=1.2)
+            
         ax.set_title(label, fontsize=14, fontweight="bold")
         ax.set_xlabel("")
         if ax == axes[0]:
@@ -1566,13 +1572,18 @@ def fig_comp_primacy_recency(data, outdir):
         for bar, val in zip(bars, means_fl):
             ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.005,
                     f"{val:.3f}", ha="center", va="bottom", fontsize=8, fontweight="bold")
-        ax.axhline(uniform, color="red", ls="--", lw=1,
-                   label=f"Uniforme ({uniform:.3f})")
+                   
+        if ax == axes[-1]:
+            ax.axhline(uniform, color="red", ls="--", lw=1.2,
+                       label=f"Attesa uniforme ({uniform:.3f})")
+            ax.legend(fontsize=8)
+        else:
+            ax.axhline(uniform, color="red", ls="--", lw=1.2)
+            
         ax.set_title(label, fontsize=14, fontweight="bold")
         ax.set_xlabel("")
         if ax == axes[0]:
             ax.set_ylabel("Prob. media")
-        ax.legend(fontsize=7)
 
     fig.suptitle("Confronto prima/media/ultima posizione",
                  fontsize=16, fontweight="bold", y=1.02)
@@ -2106,6 +2117,69 @@ def generate_all_comparative(outdir=None):
     return True
 
 
+def generate_comparative_paper(outdir=None):
+    """
+    Genera i grafici comparativi filtrati per alcuni modelli da inserire nella relazione.
+    I grafici richiesti e salvati nella cartella "comparative_paper" sono:
+      - JSD violino per 160M, 1B, 1.4B
+      - Bias di posizione per 160M, 1B, 1.4B
+      - Confronto prima/media/ultima posizione per 160M, 1B, 1.4B
+      - Allineamento con le risposte umane per 160M, 1B, 1.4B
+      - Bussola politica per 160M, 1.4B
+      - Efficacia per tipo di minaccia per tutti i modelli
+    """
+    if outdir is None:
+        outdir = os.path.join(RISULTATI_DIR, "comparative_paper")
+    os.makedirs(outdir, exist_ok=True)
+
+    print("\n" + "="*60)
+    print("  GENERAZIONE GRAFICI COMPARATIVI PER IL PAPER")
+    print("="*60)
+
+    print("Caricamento dati di tutti i modelli...")
+    data = _load_all_models()
+    if not data:
+        print("Nessun dato trovato. Esegui prima analyze.py per almeno un modello.")
+        return False
+
+    print(f"Modelli caricati: {list(data.keys())}")
+    print(f"Output in: {outdir}\n")
+
+    # Mappe con chiavi filtrate
+    data_160_1_14 = {k: v for k, v in data.items() if k in ["160M", "1B", "1.4B"]}
+    data_160_14 = {k: v for k, v in data.items() if k in ["160M", "1.4B"]}
+
+    print("  [1/6] JSD violin (160M, 1B, 1.4B)...")
+    if data_160_1_14:
+        fig_comp_jsd_violins(data_160_1_14, outdir)
+
+    print("  [2/6] Position bias (160M, 1B, 1.4B)...")
+    if data_160_1_14:
+        fig_comp_position_bias(data_160_1_14, outdir)
+
+    print("  [3/6] Confronto prima/media/ultima posizione (160M, 1B, 1.4B)...")
+    if data_160_1_14:
+        fig_comp_primacy_recency(data_160_1_14, outdir)
+
+    print("  [4/6] Allineamento umano (160M, 1B, 1.4B)...")
+    if data_160_1_14:
+        fig_comp_alignment(data_160_1_14, outdir)
+
+    print("  [5/6] Bussola politica (160M, 1.4B)...")
+    if data_160_14:
+        fig_comp_political_compass(data_160_14, outdir)
+
+    print("  [6/6] Efficacia per tipo di minaccia (Tutti i modelli)...")
+    if data:
+        fig_comp_threats_stacked(data, outdir)
+
+    print(f"\n{'='*60}")
+    n_files = len([f for f in os.listdir(outdir) if f.endswith('.png')])
+    print(f"FATTO — {n_files} grafici in {outdir}")
+    print(f"{'='*60}")
+    return True
+
+
 # ======================================================================
 #  MAIN
 # ======================================================================
@@ -2123,7 +2197,14 @@ def main():
                         help="Cartella di output per le figure")
     parser.add_argument("--groups", nargs="*", choices=_ALL_GROUPS, default=None,
                         help="Genera solo i gruppi di figure specificati (default: tutti)")
+    parser.add_argument("--comparative-paper", action="store_true",
+                        help="Genera solo i grafici comparativi richiesti per la relazione e termnina l'esecuzione.")
     args = parser.parse_args()
+
+    if args.comparative_paper:
+        generate_comparative_paper()
+        return
+
     groups = set(args.groups) if args.groups is not None else None
 
     # Carica dati

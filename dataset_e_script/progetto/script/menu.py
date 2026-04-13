@@ -419,6 +419,35 @@ def run_comparative(force_update=False):
 
     return generate_all_comparative(outdir=outdir)
 
+def run_comparative_paper(force_update=False):
+    """Esegue solo i grafici comparativi per la relazione."""
+    try:
+        from visualize import generate_comparative_paper, COMPARATIVE_OUT
+    except Exception as e:
+        print(f"✗ Impossibile importare generate_comparative_paper da visualize: {e}")
+        return False
+        
+    paper_outdir = os.path.join(RISULTATI_DIR, "comparative_paper")
+    expected_figures = [
+        "comp_validity_baseline_by_model.png", 
+        "comp_jsd_violins.png", 
+        "comp_position_bias.png", 
+        "comp_primacy_recency.png", 
+        "comp_alignment_human.png", 
+        "comp_political_compass.png", 
+        "comp_threats_stacked.png"
+    ]
+    
+    if not force_update:
+        missing = [f for f in expected_figures
+                   if not check_file_exists(os.path.join(paper_outdir, f))]
+        if not missing:
+            print(f"✓ Grafici comparativi per il paper già presenti: {paper_outdir}")
+            return True
+        print(f"  Figure comparative mancanti ({len(missing)}): {', '.join(missing)}")
+
+    return generate_comparative_paper(outdir=paper_outdir)
+
 def run_interactive_exploration():
     """Carica i CSV di analisi in pandas ed entra in un REPL interattivo."""
     try:
@@ -574,6 +603,12 @@ def run_full_pipeline(models=None, force_update=False):
                     return False
             continue
     
+    # Alla fine della pipeline (opzione 1), se ci sono più modelli creiamo i comparativi
+    if len(models) > 1:
+        print_header("GENERAZIONE GRAFICI COMPARATIVI GLOBALI E PAPER")
+        run_comparative(force_update)
+        run_comparative_paper(force_update)
+        
     print_header("PIPELINE COMPLETATA ✓")
     return True
 
@@ -593,11 +628,12 @@ def display_menu():
     print("  [4] Esegui esperimenti (experiments_1.py)")
     print("  [5] Analizza risultati (analyze.py)")
     print("  [6] Crea grafici (visualize.py)")
-    print("  [7] Genera grafici comparativi multi-modello")
-    print("  [8] Installa/aggiorna dipendenze (requirements.txt)")
-    print("  [9] Esegui SOLO gli esperimenti (modalità server)")
-    print(" [10] Analisi risultati + creazione grafici (anche i comparativi)")
-    print(" [11] Esplora dati in modo interattivo (REPL Python)")
+    print("  [7] Genera grafici comparativi multi-modello (solo completi)")
+    print("  [8] Crea grafici comparativi multi-modello per la relazione (solo paper)")
+    print("  [9] Installa/aggiorna dipendenze (requirements.txt)")
+    print(" [10] Esegui SOLO gli esperimenti (modalità server)")
+    print(" [11] Analisi risultati + creazione grafici (anche i comparativi completi e paper)")
+    print(" [12] Esplora dati in modo interattivo (REPL Python)")
     print("\n  [0] Esci")
     print("-" * 70)
 
@@ -699,23 +735,30 @@ def interactive_menu():
                     run_visualize(model, force_update=update_mode)
                 if len(models) == len(AVAILABLE_MODELS):
                     run_comparative(force_update=update_mode)
+                    run_comparative_paper(force_update=update_mode)
             
             elif choice == '7':
                 # Grafici comparativi multi-modello
+                print_header("GENERAZIONE GRAFICI COMPARATIVI - GENERALI")
                 run_comparative(force_update=update_mode)
 
             elif choice == '8':
+                # Grafici comparativi per il paper
+                print_header("GENERAZIONE GRAFICI COMPARATIVI - PAPER")
+                run_comparative_paper(force_update=update_mode)
+
+            elif choice == '9':
                 # Installa/aggiorna dipendenze
                 print_header("INSTALLAZIONE DIPENDENZE")
                 install_dependencies()
 
-            elif choice == '9':
+            elif choice == '10':
                 # Solo Esperimenti (Server)
                 models = select_models()
                 print_header("ESECUZIONE SERVER - SOLO ESPERIMENTI")
                 run_only_experiments_pipeline(models, update_mode)
 
-            elif choice == '10':
+            elif choice == '11':
                 # Solo Analisi + Visualizzazione + Grafici comparativi
                 models = select_models()
                 print_header("ANALISI RISULTATI + CREAZIONE GRAFICI + GRAFICI COMPARATIVI")
@@ -730,8 +773,9 @@ def interactive_menu():
                         print(f"\u2717 Analisi fallita per {model}, visualizzazione saltata.")
                 if any_success:
                     run_comparative(force_update=update_mode)
+                    run_comparative_paper(force_update=update_mode)
                     
-            elif choice == '11':
+            elif choice == '12':
                 # Esplorazione interattiva
                 print_header("ESPLORAZIONE INTERATTIVA DATI")
                 run_interactive_exploration()

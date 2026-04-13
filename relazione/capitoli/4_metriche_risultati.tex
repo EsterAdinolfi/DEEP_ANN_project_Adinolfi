@@ -1,0 +1,443 @@
+\documentclass[../relazione.tex]{subfiles}
+
+\begin{document}
+% ======================================================================
+\section{Metriche calcolate e analisi dei risultati}
+% ======================================================================
+% ── Colori per la tabella riassuntiva ──────────────────────────────────
+\definecolor{m1hdr}{HTML}{1A7A6E}
+\definecolor{m1aHdr}{HTML}{1E9080}
+\definecolor{m1bHdr}{HTML}{1A6A9A}
+\definecolor{m1aRow}{HTML}{D5F0EC}
+\definecolor{m1bRow}{HTML}{C5E8F5}
+
+\definecolor{m2hdr}{HTML}{B85C00}
+\definecolor{m2sHdr}{HTML}{D97B10}
+\definecolor{m2Row}{HTML}{FDE9D0}
+
+\definecolor{m3hdr}{HTML}{6A2E8C}
+\definecolor{m3sHdr}{HTML}{8A47B0}
+\definecolor{m3Row}{HTML}{EDE0F5}
+
+\definecolor{m4hdr}{HTML}{9C1515}
+\definecolor{m4sHdr}{HTML}{C22020}
+\definecolor{m4Row}{HTML}{FAE0E0}
+\definecolor{m4Econ}{HTML}{FDF0D0}
+\definecolor{m4IT}{HTML}{D8EEFA}
+\definecolor{m4Leg}{HTML}{F0E0F5}
+
+\definecolor{m5hdr}{HTML}{1E7A3E}
+\definecolor{m5Row}{HTML}{D5F0DC}
+
+\definecolor{m6hdr}{HTML}{1C3A8A}
+\definecolor{m6Row}{HTML}{DAE4F8}
+
+% ───────────────────────────────────────────────────────────────────────
+\label{sec:metriche}
+
+Dopo i test sui modelli Pythia, sono state calcolate sei metriche per misurare prestazioni e bias, da validità e coerenza logit-testo a robustezza ai bias, efficacia delle minacce e allineamento politico. Qui vengono presentate insieme ai risultati sperimentali.
+
+
+% --- 1. VALIDITÀ ---
+\subsection{Validità delle risposte}
+La \textbf{validità} misura la capacità del modello di attenersi alle istruzioni sintattiche del prompt, producendo un'uscita in cui sia chiaramente identificabile l'opzione scelta (es. "A", "B", ecc.). 
+
+Durante la fase di ricerca sono stati valutati diversi criteri di rigore, tuttavia, si è scelto di adottare una definizione di \textbf{validità "lasca"}: una risposta è considerata valida se il modello seleziona correttamente la lettera associata all'opzione, indipendentemente dalla presenza di testo aggiuntivo. 
+% Ciò permette di valorizzare l'intenzione semantica del modello, spesso penalizzata nei modelli \textit{base} da una scarsa capacità di \textit{instruction following}
+
+Un approfondimento sulla validità è descritto in appendice [Appendice~\ref{app:validity}].
+
+L'analisi della \textit{baseline} rivela che, pur in assenza di \textit{fine-tuning}, i modelli mostrano una comprensione sorprendente del formato a scelta multipla. 
+%% ── MACRO 1: VALIDITÀ ──
+\small
+\setlength{\LTcapwidth}{\textwidth}
+\begin{xltabular}{\textwidth}{X *{5}{c}}
+\toprule
+\textbf{Esperimento} & \textbf{160M} & \textbf{1B} & \textbf{1.4B} & \textbf{2.8B} & \textbf{6.9B} \\
+\midrule
+\rowcolor{m1aHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Tasso di validità (\%)}}} \\
+\rowcolor{m1aRow} \hspace{1em}Baseline & 64.3 & 95.0 & 97.9 & 97.9 & 91.4 \\
+\rowcolor{m1aRow} \hspace{1em}Permutazione & 59.3 & 94.0 & 97.7 & 97.6 & 94.3 \\
+\rowcolor{m1aRow} \hspace{1em}Duplicazione & 63.7 & 91.4 & 96.7 & 95.8 & 94.8 \\
+\rowcolor{m1aRow} \hspace{1em}Minaccia & 33.3 & 97.0 & 98.5 & 92.8 & 65.8 \\
+\rowcolor{m1aRow} \hspace{1em}\textit{Media generale} & \textit{55.1} & \textit{94.3} & \textit{97.7} & \textit{96.0} & \textit{86.6} \\
+
+\bottomrule
+\caption{Tasso di validità: confronto su cinque modelli Pythia.}
+\label{tab:comparison_5models_validity}
+\end{xltabular}
+
+\normalsize
+Come mostra la Tabella~\ref{tab:comparison_5models_validity}, la validità cresce nettamente passando dal \textbf{160M} al \textbf{1B}, poi si stabilizza ai livelli massimi con \textbf{1.4B} e \textbf{2.8B} (entrambi \textbf{97.9\%}). Il \textbf{6.9B} scende, invece, a \textbf{91.4\%}.
+
+Dall'analisi dei dati emergono tre evidenze principali:
+\begin{enumerate}
+    \item \textbf{Il modello medio è il più stabile:} il modello \textbf{1.4B} mantiene una validità quasi perfetta (>97\%) e sale a \textbf{98.5\%} con le minacce, suggerendo che la pressione testuale può rafforzare il focus sul compito;
+    \item \textbf{I poli sono più deboli:} il \textbf{160M} crolla a \textbf{33.3\%} sotto minaccia e il \textbf{6.9B} scende a \textbf{65.8\%}, mostrando che la maggiore capacità di calcolo non riduce automaticamente la vulnerabilità alle perturbazioni ostili;
+    \item \textbf{Robustezza strutturale:} permutazione e duplicazione hanno un impatto limitato sulla validità, mentre le minacce semantiche causano il peggior degrado, anche nei modelli più grandi.
+\end{enumerate}
+
+% --- 2. COERENZA ---
+\subsection{Coerenza logit-testo}
+La \textbf{coerenza logit-testo} valuta l'allineamento tra il calcolo probabilistico interno del modello e la sua effettiva produzione testuale. Rappresenta una misura della "sincerità" del sistema: la metrica verifica se l'opzione a cui il modello assegna la probabilità più alta (attraverso i \textit{logit}) coincida con la lettera che il modello scrive durante la generazione libera.
+
+Per ogni domanda \textit{valida}, definiamo $L = \{l_A, l_B, \dots, l_n\}$ come l'insieme dei logit associati alle opzioni di risposta e $e_{gen}$ come l'etichetta estratta dal testo generato. La coerenza $C$ è definita come:
+\[
+C = 
+\begin{cases} 
+1 & \text{se } e_{gen} = \text{argmax}(L) \\
+0 & \text{altrimenti}
+\end{cases}
+\]
+\textbf{Nota:} è importante sottolineare che la coerenza è logicamente vincolata alla validità: se una risposta non è valida, la coerenza è nulla per definizione.
+
+Di seguito vengono riportati i risultati delle analisi:
+%% ── MACRO 2: COERENZA LOGIT-TESTO ──
+\small
+\setlength{\LTcapwidth}{\textwidth}
+\begin{xltabular}{\textwidth}{X *{5}{c}}
+\toprule
+\textbf{Esperimento} & \textbf{160M} & \textbf{1B} & \textbf{1.4B} & \textbf{2.8B} & \textbf{6.9B} \\
+\midrule
+\rowcolor{m1bHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Tasso di coerenza logit-testo (\%)}}} \\
+\rowcolor{m1bRow} \hspace{1em}Baseline & 60.9 & 86.3 & 46.9 & 68.9 & 67.3 \\
+\rowcolor{m1bRow} \hspace{1em}Permutazione & 55.8 & 86.3 & 50.5 & 61.8 & 68.9 \\
+\rowcolor{m1bRow} \hspace{1em}Duplicazione & 61.3 & 81.9 & 45.5 & 56.5 & 68.3 \\
+\rowcolor{m1bRow} \hspace{1em}Minaccia & 31.7 & 75.6 & 50.3 & 61.8 & 53.1 \\
+\midrule
+\rowcolor{m1bRow} \hspace{1em}\textit{Media generale} & \textit{52.4} & \textit{82.5} & \textit{48.3} & \textit{62.3} & \textit{64.4} \\
+\bottomrule
+\caption{Confronto della coerenza logit-testo tra i cinque modelli Pythia.}
+\label{tab:comparison_5models_consistency}
+\end{xltabular}
+
+\normalsize
+Dall'analisi della Tabella~\ref{tab:comparison_5models_consistency} emergono le seguenti evidenze:
+\begin{enumerate}
+    \item \textbf{L'eccellenza del modello 1B}: a differenza della validità, la coerenza trova il suo picco nel modello da 1B (\textbf{82.5\%} di media). In questa scala, il modello mostra la massima sincronizzazione tra lo strato probabilistico e la decodifica testuale, risultando il più "sincero" della famiglia;
+    
+    \item \textbf{Il paradosso del 1.4B}: nonostante l'alta validità formale, il modello da 1.4B è il meno coerente ($<50\%$). Questo "disaccoppiamento" suggerisce che il modello dia priorità alla correttezza sintattica del formato rispetto al contenuto semantico dei logit, producendo risposte formalmente corrette ma matematicamente incoerenti;
+    
+    \item \textbf{Robustezza strutturale vs. vulnerabilità semantica}: permutazioni e duplicazioni non sembrano alterare significativamente la coerenza, confermando una buona stabilità logica del sistema rispetto alla struttura del prompt. Al contrario, le \textbf{minacce} degradano drasticamente la coerenza nei modelli ai poli (\textbf{160M} e \textbf{6.9B}). Questo fenomeno rispecchia fedelmente l'andamento osservato per la \textit{validità}: essendo quest'ultima una condizione strutturale necessaria per la coerenza, è molto probabile che il crollo logit-testo sia una conseguenza diretta dell'incapacità di questi modelli di mantenere il formato sotto stress.
+\end{enumerate}
+\textbf{Nota:} la discrepanza osservata nel modello 1.4B meriterebbe un'analisi futura sulla distribuzione di entropia dei logit, per determinare se tale incoerenza derivi da un'effettiva indecisione del modello (logit vicini) o da un altro fattore strutturale interno alla rete.
+
+% --- 3. STABILITÀ E ROBUSTEZZA ---
+\subsection{Stabilità e robustezza (JSD)}
+Un modello robusto e affidabile dovrebbe selezionare un'opzione basandosi esclusivamente sul suo contenuto semantico, ignorando elementi di disturbo legati alla struttura del prompt. Per misurare la "convinzione" del modello e quanto questa cambi in risposta a un'alterazione dell'input, è stata valutata la stabilità delle risposte rispetto alle perturbazioni.
+
+La \textbf{stabilità} e la \textbf{robustezza} vengono calcolate matematicamente misurando la divergenza tra la distribuzione di probabilità base ($P$) e quella ottenuta dopo aver perturbato il prompt ($Q$). Per farlo, si utilizza la divergenza di Jensen-Shannon al quadrato ($\text{JSD}^2$):
+$$JSD^2(P \parallel Q) = \frac{1}{2} D_{KL}(P \parallel M) + \frac{1}{2} D_{KL}(Q \parallel M), \quad M = \frac{P+Q}{2}$$
+Qui, $D_{\text{KL}}$ rappresenta la Divergenza di Kullback-Leibler. Calcolando la divergenza di $P$ e $Q$ rispetto alla loro distribuzione media $M$, la formula garantisce una misurazione perfettamente simmetrica e priva di valori indefiniti (a differenza della KL).
+
+\textbf{Nota:} le distribuzioni di probabilità sono \emph{derivate dai logit}, ovvero dai token corrispondenti alle opzioni valide, normalizzati tramite Softmax indipendentemente da quale risposta testuale il modello ha poi generato. In questo modo, la JSD ha sempre una risposta definita, anche nei casi in cui il modello non rispetti il formato (e quindi non generi una lettera valida).
+
+La JSD è una metrica continua tra 0 e 1, dove più il valore è vicino a 0 meno il modello si è lasciato influenzare. 
+
+Per poter quantificare e classificare i risultati sono state definite tre soglie di sensibilità, scegliendo i valori tramite una valutazione empirica:
+\begin{itemize}
+    \item $\text{JSD}^2 < 0.05$: il modello è \textbf{robusto} (ignora completamente la perturbazione);
+    \item $0.05 \le \text{JSD}^2 < 0.15$: il modello è \textbf{stabile} (subisce una variazione lieve, ma mantiene la direzione generale);
+    \item $\text{JSD}^2 \ge 0.15$: il modello è \textbf{instabile} (la perturbazione altera pesantemente il giudizio, evidenziando la presenza di un bias strutturale).
+\end{itemize}
+
+A seconda dell'esperimento condotto, l'instabilità del modello ($\text{JSD}^2 \ge 0.15$) assume un significato diagnostico diverso: nel caso della permutazione rivela un \emph{bias di posizione}, mentre nel caso della duplicazione evidenzia un \emph{bias di frequenza}.
+
+Di seguito vengono messi a confronto i risultati dei modelli Pythia per le tre perturbazioni (permutazione, duplicazione e minaccia). Per chiarezza visiva, sono stati selezionati i tre modelli che meglio rappresentano l'evoluzione delle performance. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{\risultati/comparative_paper/comp_jsd_violins.png}
+\caption{Distribuzione della JSD per tipo di perturbazione, affiancata per i modelli da 160M, 1B e 1.4B. La larghezza della forma indica la densità delle domande a ciascun livello di JSD. La linea blu tratteggiata indica la soglia di robustezza (0.05), mentre quella rossa la soglia di stabilità (0.15).}
+\label{fig:comp_jsd}
+\end{figure}
+
+La Figura~\ref{fig:comp_jsd} offre un riscontro visivo immediato dell'effetto di \emph{scaling} sulla stabilità del modello. Nel modello da \textbf{160M}, i diagrammi a violino relativi alle perturbazioni strutturali (permutazione e duplicazione) presentano la maggior parte della loro densità ben al di sopra della soglia rossa, evidenziando una condizione di instabilità generalizzata. 
+
+Passando al modello da \textbf{1B}, si osserva una chiara fase di transizione: il "baricentro" delle distribuzioni scivola al di sotto delle soglie di allerta, seppur mantenendo delle code sottili che indicano una vulnerabilità residua su alcune domande. Infine, nel modello da \textbf{1.4B}, le distribuzioni JSD convergono in modo quasi assoluto verso lo zero, con i diagrammi che collassano alla base dell'asse, segnando il superamento dei bias strutturali.
+
+Un comportamento nettamente distinto si osserva invece per le \textbf{minacce testuali} (violino verde): a prescindere dalla scala del modello, la distribuzione rimane costantemente schiacciata sullo zero. Questo dato visivo anticipa una dinamica fondamentale che verrà esplorata nelle sezioni successive: la pressione testuale non altera in modo significativo la convinzione matematica interna (logit) del modello, ma ne influenza drasticamente la capacità di tradurla in testo.
+
+% --- 3.1 BIAS DI POSIZIONE ---
+\subsubsection{Permutazione e bias di posizione}
+\label{subsec:permutazione}
+Il \textbf{bias di posizione} (o \emph{primacy/recency bias}) misura quanto l'ordine in cui le opzioni sono presentate influenzi la scelta. Se un modello risulta instabile alla permutazione (ovvero registra un'alta divergenza JSD), significa che tende a favorire un'opzione in base alla sua collocazione spaziale (es. sceglie sempre la lettera "A") piuttosto che per il suo significato semantico.
+
+\small
+\setlength{\LTcapwidth}{\textwidth}
+\begin{xltabular}{\textwidth}{X *{5}{c}}
+\toprule
+ & \textbf{160M} & \textbf{1B} & \textbf{1.4B} & \textbf{2.8B} & \textbf{6.9B} \\
+\midrule
+%% ── MACRO 3: PERMUTAZIONE ──
+\rowcolor{m2hdr} \multicolumn{6}{c}{\textcolor{white}{\textbf{Permutazione}}} \\
+\rowcolor{m2sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Robustezza (JSD)}}} \\
+\rowcolor{m2Row} \hspace{1em}Media & 0.279 & 0.055 & 0.011 & 0.011 & 0.014 \\
+\rowcolor{m2Row} \hspace{1em}Dev.\ std & 0.135 & 0.049 & 0.014 & 0.015 & 0.019 \\
+\midrule
+\rowcolor{m2sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Classificazione stabilità (\%)}}} \\
+\rowcolor{m2Row} \hspace{1em}Instabile & 77.5 & 5.0 & 0.0 & 0.1 & 0.0 \\
+\rowcolor{m2Row} \hspace{1em}Stabile & 19.3 & 36.7 & 3.4 & 2.7 & 5.8 \\
+\rowcolor{m2Row} \hspace{1em}Robusto & 3.3 & 58.2 & 96.6 & 97.2 & 94.2 \\
+\midrule
+\rowcolor{m2sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Position bias}}} \\
+\rowcolor{m2Row} \hspace{1em}$P(\text{prima pos.})$ (\%) & 82.5 & 53.9 & 35.6 & 37.1 & 35.9 \\
+\rowcolor{m2Row} \hspace{1em}$P(\text{ultima pos.})$ (\%) & 7.4 & 23.5 & 31.0 & 30.3 & 28.3 \\
+\rowcolor{m2Row} \hspace{1em}$\frac{P(\text{prima pos.})}{P(\text{ultima pos.})}$ & 11.13 & 2.29 & 1.15 & 1.23 & 1.27 \\
+\bottomrule
+\caption{Impatto della permutazione sulla stabilità (JSD) e bias di posizione nei cinque modelli Pythia.}
+\label{tab:comparison_5models_permutation}
+\end{xltabular}
+\normalsize
+\textbf{Nota:} {$P(\text{prima posizione})$ e $P(\text{ultima posizione})$ indicano la probabilità media assegnata dal modello rispettivamente alla prima e all'ultima opzione della lista. Il \emph{rapporto prima/ultima} quantifica l'intensità del primacy bias: un valore pari a~1 indica assenza di bias, valori $\gg 1$ indicano che il modello privilegia sistematicamente la prima opzione. Il valore uniforme atteso è $\approx 30.9\,\%$ (media dei singoli $1/k$, dove $k$ è il numero di opzioni della domanda; ad esempio, per domande con 3, 3, 4 e 5 opzioni si calcola $(1/3 + 1/3 + 1/4 + 1/5)/4$). Vedere la Figura~\ref{fig:comp_position_bias} per ulteriori dettagli.}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{\risultati/comparative_paper/comp_position_bias.png}
+\caption{Probabilità media assegnata a ciascuna posizione spaziale. La linea rossa tratteggiata indica il valore uniforme atteso ($\approx 0.31$), calcolato come media di $1/k$ su tutte le domande, dove $k$ è il numero di opzioni della singola domanda (media $k = 3.54$, moda $k = 4$). Un modello privo di bias di posizione assegnerebbe a ciascuna posizione esattamente questa probabilità.}
+\label{fig:comp_position_bias}
+\end{figure}
+
+Come si evince dalla Tabella~\ref{tab:comparison_5models_permutation} e dalla Figura~\ref{fig:comp_position_bias}, il modello da 160M presenta un \emph{primacy bias} estremo. Assegna alla prima opzione l'82.5\% della probabilità totale, un valore circa 11 volte superiore rispetto all'ultima opzione. Questo significa che per la quasi totalità delle domande, Pythia-160M seleziona l'opzione~A semplicemente perché appare per prima, indipendentemente dal suo contenuto. Inoltre, a conferma di ciò, con una JSD media di 0.279, il 77.5\% delle risposte risulta instabile.
+
+Questo comportamento patologico viene superato aumentando la scala del modello. Già a partire da 1.4B, la probabilità media assegnata alla prima opzione scende al 35.6\%, avvicinandosi notevolmente al valore uniforme atteso, e il tasso di robustezza sale al 96.6\%.
+
+Di seguito è possibile notare la distribuzione della probabilità media assegnata alle posizioni spaziali per i modelli principali e che meglio rappresentano l'evoluzione del bias di posizione (160M, 1.4B e 1.4B). 
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{\risultati/comparative_paper/comp_primacy_recency.png}
+\caption{Confronto diretto tra la probabilità della prima opzione (primacy), delle opzioni centrali (medie) e dell'ultima opzione (recency). La linea rossa tratteggiata indica il valore uniforme atteso.}
+\label{fig:comp_primacy_recency}
+\end{figure}
+Le Figure~\ref{fig:comp_position_bias} e \ref{fig:comp_primacy_recency} confermano visivamente questo andamento: nei modelli più piccoli la prima barra domina nettamente la distribuzione, mentre nei modelli da 1.4B in poi le probabilità si distribuiscono in modo molto più equo, suggerendo che la scelta sia guidata dal reale contenuto delle opzioni e non dall'ordine di presentazione.
+
+% --- 3.2 BIAS DI FREQUENZA ---
+\subsubsection{Duplicazione e bias di frequenza}
+Il \textbf{bias di frequenza} valuta se la ripetizione di un'opzione nel prompt ne altera la probabilità di selezione. A differenza del bias di posizione, che testa la robustezza all'ordine, il bias di frequenza serve a verificare se il modello \emph{distribuisce correttamente} la probabilità tra le opzioni: un modello robusto non dovrebbe favorire un'opzione solo perché compare più volte nel testo.
+
+\small
+\setlength{\LTcapwidth}{\textwidth}
+\begin{xltabular}{\textwidth}{X *{5}{c}}
+\toprule
+ & \textbf{160M} & \textbf{1B} & \textbf{1.4B} & \textbf{2.8B} & \textbf{6.9B} \\
+\midrule
+%% ── MACRO 4: DUPLICAZIONE ──
+\rowcolor{m3hdr} \multicolumn{6}{c}{\textcolor{white}{\textbf{Duplicazione}}} \\
+\rowcolor{m3sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Robustezza (JSD)}}} \\
+\rowcolor{m3Row} \hspace{1em}Media & 0.177 & 0.040 & 0.012 & 0.013 & 0.016 \\
+\rowcolor{m3Row} \hspace{1em}Dev.\ std & 0.120 & 0.039 & 0.012 & 0.015 & 0.018 \\
+\midrule
+\rowcolor{m3sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Frequency bias (\%)}}} \\
+\rowcolor{m3Row} \hspace{1em}Instabile & 52.2 & 1.9 & 0.0 & 0.1 & 0.0 \\
+\rowcolor{m3Row} \hspace{1em}Stabile & 36.0 & 26.4 & 1.6 & 3.0 & 5.4 \\
+\rowcolor{m3Row} \hspace{1em}Robusto & 11.8 & 71.7 & 98.4 & 96.9 & 94.6 \\
+\bottomrule
+\caption{Impatto della duplicazione sulla stabilità (JSD) e bias di frequenza nei cinque modelli Pythia.}
+\label{tab:comparison_5models_duplication}
+\end{xltabular}
+\normalsize
+
+Come si nota in Tabella~\ref{tab:comparison_5models_duplication}, similmente a quanto osservato per il bias di posizione, la distorsione da frequenza è un problema circoscritto ai modelli più piccoli. Il \textbf{160M} si dimostra altamente vulnerabile, presentando oltre il \textbf{52.2\,\%} di risposte instabili (e solo l'11.8\,\% di risposte robuste). 
+
+Anche in questo caso, lo \textit{scaling} corregge il difetto strutturale: dai \textbf{1.4B} parametri in su la divergenza $\text{JSD}^2$ si azzera, portando il tasso di robustezza a superare il \textbf{98.4\,\%}. Questo suggerisce che entrambe le distorsioni, posizione e frequenza, sono problemi specifici dei modelli piccoli, sostanzialmente risolti con lo scaling.
+
+% --- 5. EFFICACIA DELLE MINACCE ---
+\subsection{Efficacia delle minacce}
+L'\textbf{analisi delle minacce} ha l'obiettivo di valutare l'impatto di perturbazioni "ostili" inserite come premessa nel \emph{prompt}. Lo scopo è mappare quale tipologia di pressione tra quelle scelte (di tipo economico, informatico o legale) alteri maggiormente i convincimenti del modello o risulti più efficace nel forzarne il rispetto sintattico e semantico.
+
+L'analisi si articola su tre dimensioni, ciascuna con una specifica formulazione matematica e relative soglie:
+\begin{enumerate}
+    \item \textbf{Resistenza alla minaccia ($\Delta_{validity}$):} misura l'impatto netto della minaccia sulla capacità del modello di rispettare il formato, confrontando il tasso di validità sotto minaccia ($V_{threat}$) con quello misurato in \emph{baseline} ($V_{base}$):
+    $$\Delta_{validity} = V_{threat} - V_{base}$$
+    I risultati vengono categorizzati in: \emph{peggiorata} ($\Delta \le -0.20$), \emph{migliorata} ($\Delta \ge +0.20$), o \emph{stabile} (variazioni comprese nell'intervallo intermedio);
+    \item \textbf{Potere destabilizzante:} identifica quale variante altera in misura maggiore la distribuzione interna delle probabilità, estraendo la minaccia che massimizza la distanza (JSD) dal test neutro:
+    $$\arg\max_{t} JSD(P_{base} \parallel P_{threat\_t})$$
+    dove $t \in \{\text{Economica, IT/Sistema, Legale}\}$;
+    \item \textbf{Efficacia su validità e coerenza:} individua rispettivamente la minaccia che massimizza la capacità di produrre una risposta formalmente corretta e quella che garantisce il massimo allineamento tra il token matematicamente preferito nei logit e la reale generazione testuale:
+    $$\arg\max_{t} Validit\grave{a}_{t} \quad \text{e} \quad \arg\max_{t} Coerenza_{t}$$
+\end{enumerate}
+Per tradurre in termini comparabili l'effetto di ciascuna minaccia su ogni singola domanda, si adotta un \textbf{conteggio pesato}: viene dato un punteggio pieno alla categoria di minaccia che ha la metrica più alta. In caso di parità tra due o più alternative, il punto non viene assegnato arbitrariamente, ma viene suddiviso equamente tra di esse.
+
+Di seguito vengono riportati i risultati dell'analisi delle minacce, confrontando i cinque modelli Pythia su tutte le metriche descritte.
+\newline
+\small
+\setlength{\LTcapwidth}{\textwidth}
+\begin{xltabular}{\textwidth}{X *{5}{c}}
+\toprule
+ & \textbf{160M} & \textbf{1B} & \textbf{1.4B} & \textbf{2.8B} & \textbf{6.9B} \\
+\midrule
+%% ── MACRO 5: MINACCIA ──
+\rowcolor{m4hdr} \multicolumn{6}{c}{\textcolor{white}{\textbf{Minaccia}}} \\
+\rowcolor{m4sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Robustezza (JSD)}}} \\
+\rowcolor{m4Row} \hspace{1em}Media & 0.0038 & 0.0039 & 0.0009 & 0.0016 & 0.0018 \\
+\rowcolor{m4Row} \hspace{1em}Dev.\ std & 0.0042 & 0.0054 & 0.0012 & 0.0019 & 0.0019 \\
+\midrule
+\rowcolor{m4sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Resistenza delta-based (\%)}}} \\
+\rowcolor{m4Row} \hspace{1em}Migliorata & 19.0 & 3.9 & 1.9 & 1.9 & 4.5 \\
+\rowcolor{m4Row} \hspace{1em}Stabile & 22.4 & 93.2 & 96.0 & 83.9 & 45.4 \\
+\rowcolor{m4Row} \hspace{1em}Peggiorata & 58.6 & 2.9 & 2.1 & 14.2 & 50.1 \\
+\midrule
+\rowcolor{m4sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Validità per tipo di minaccia (\%)}}} \\
+\rowcolor{m4Row} \hspace{1em}\textit{Baseline} & 64.3 & 95.0 & 97.9 & 97.9 & 91.4 \\
+\rowcolor{m4Econ} \hspace{1em}Economica & 45.2 & 97.6 & 97.9 & 93.4 & 46.8 \\
+\rowcolor{m4IT} \hspace{1em}IT/Sistema & 38.2& 96.7 & 98.4 & 98.6 & 89.7 \\
+\rowcolor{m4Leg} \hspace{1em}Legale & 16.5 & 96.6 & 99.1 & 86.5 & 60.8 \\
+\midrule
+\rowcolor{m4sHdr} \multicolumn{6}{c}{\textcolor{white}{\textit{Coerenza logit-testo per tipo di minaccia (\%)}}} \\
+\rowcolor{m4Row} \hspace{1em}\textit{Baseline} & 60.9 & 86.3 & 46.9 & 68.9 & 67.3 \\
+\rowcolor{m4Econ} \hspace{1em}Economica & 42.6 & 70.5 & 50.9 & 62.7 & 36.5 \\
+\rowcolor{m4IT} \hspace{1em}IT/Sistema & 36.7& 84.9 & 50.8 & 70.3 & 71.6 \\
+\rowcolor{m4Leg} \hspace{1em}Legale & 15.8 & 71.4 & 49.2 & 52.3 & 51.3 \\
+\bottomrule
+\caption{Confronto delle metriche per tipo di minaccia tra i cinque modelli Pythia.}
+\label{tab:comparison_5models_threats}
+\end{xltabular}
+\normalsize
+
+I dati riportati nella Tabella~\ref{tab:comparison_5models_threats} evidenziano un'evoluzione non lineare del comportamento dei modelli all'aumentare dei parametri.
+
+Sul piano della \textbf{resistenza} ($\Delta_{validity}$), i modelli intermedi (1B, 1.4B, 2.8B) mostrano un'elevatissima impermeabilità alla pressione, mantenendo prestazioni \emph{stabili} nell'83-96\% dei casi. 
+Al contrario, gli estremi dello spettro dimensionale risultano altamente vulnerabili alle istruzioni minacciose, registrando \emph{performance peggiorate} nel 58.6\% delle domande per il 160M e nel 50.1\% per il 6.9B. 
+
+Questo crollo di prestazioni ai poli opposti suggerisce un fallimento dovuto a cause opposte. Si può ipotizzare che nel modello da \textbf{160M}, caratterizzato già da una debole comprensione strutturale in \emph{baseline}, l'aggiunta della minaccia agisca come "rumore testuale" che confonde ulteriormente la decodifica e la generazione di risposte. Nel \textbf{6.9B}, invece, il degrado potrebbe derivare da un'eccessiva sensibilità semantica: il modello, essendo più complesso, tende a processare e reagire al contenuto ostile della premessa, perdendo il focus sul rigido formato sintattico richiesto. 
+I modelli intermedi potrebbero, invece, trovarsi in uno \textit{sweet spot} cognitivo: possiedono la capacità per comprendere il task, ma non una complessità tale da farsi distrarre dalla natura della minaccia.
+
+È inoltre cruciale notare che la distribuzione matematica interna dei logit rimane salda in tutti i modelli (con JSD medie prossime allo zero, $<0.004$). Perciò, come ipotizzato, la minaccia non devia la "convinzione" matematica del modello, ma la sua capacità di aderire al corretto formato di risposta testuale.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{\risultati/comparative_paper/comp_threats_stacked.png}
+    \caption{Efficacia relativa pesata per tipo di minaccia. Per ogni metrica (destabilizzazione, validità, coerenza), l'altezza dei blocchi rappresenta la proporzione di domande in cui quella specifica minaccia si è rivelata dominante.}
+    \label{fig:comp_threats_stacked}
+\end{figure}
+
+Analizzando le distribuzioni relative presentate in Figura~\ref{fig:comp_threats_stacked} emergono tre dinamiche distinte al crescere della scala dimensionale:
+
+\begin{itemize}
+    \item \textbf{Potere destabilizzante (JSD):} il quadro si presenta altamente non lineare. A 160M la minaccia \textbf{legale} è la più destabilizzante (42.9\,\%), mentre a 1B è quella \textbf{economica} a dominare con ampio margine (57.2\,\%). Raggiunti gli 1.4B le tre minacce si equivalgono quasi perfettamente (30.9\,\%/34.3\,\%/34.8\,\%), rappresentando una sorta di equilibrio. A 2.8B emerge un discreto vantaggio della minaccia \textbf{IT/Sistema} (37.9\,\%), ma è a 6.9B che la minaccia \textbf{legale} torna a essere la minaccia dominante (72.5\,\%);
+    \item \textbf{Efficacia sulla validità:} a 160M dominano in parallelo le minacce \textbf{economica} (42.1\,\%) e \textbf{IT/Sistema} (38.5\,\%). I modelli 1B e 1.4B riportano un sostanziale pareggio, spartendo l'efficacia in terzi quasi esatti ($\approx$\,33\%). Dal 2.8B in poi \textbf{IT/Sistema} emerge come modello dominante, con una lieve maggioranza nel 2.8B(37.7\,\%), per poi dominare fermamente nel modello 6.9B, dove risolve con successo oltre la metà del campione (54.4\,\%);
+    \item \textbf{Efficacia sulla coerenza logit-testo:} gli andamenti ricalcano fedelmente quelli metrici di validità.
+\end{itemize}
+In sintesi, l'analisi delle minacce rivela un disaccoppiamento fondamentale tra la destabilizzazione probabilistica interna e la generazione testuale in output. 
+
+Sul piano del \textbf{potere destabilizzante} (JSD), non si osserva una regolarizzazione all'aumentare dei parametri: l'andamento rimane non lineare a tutte le scale. La minaccia che altera maggiormente i logit varia da modello a modello senza uno schema prevedibile legato allo \emph{scaling} (sebbene la minaccia legale tenda a registrare picchi di destabilizzazione frequenti).
+
+Al contrario, lo \emph{scaling} influisce in modo chiaro e direzionale sull'\textbf{efficacia testuale} (validità e coerenza). Dal modello 2.8B in su, la minaccia \textbf{IT/Sistema} emerge progressivamente come il \emph{trigger} semantico dominante. Si può ipotizzare che, con l'aumentare dei parametri, le reti siano in grado di riconoscere maggiormente il lessico di sistema (es. log, cancellazione file, errori operativi, ecc.) associandolo a contesti di generazione rigidi, schematici e sintatticamente vincolati, in linea con l'obiettivo di avere una maggiore aderenza al formato di risposte a scelta multipla.
+
+Queste osservazioni vengono confermate se si incrociano i dati presenti in Tabella~\ref{tab:comparison_5models_threats}: l'inserimento di una minaccia non garantisce un miglioramento universale della validità formale (la quale, anzi, subisce un netto degrado nei modelli estremi come il 160M e il 6.9B), piuttosto questa agisce come un vincolo attenzionale. Infatti, osservando i modelli di taglia maggiore (da 1.4B in su), si nota che l'innesco della minaccia IT/Sistema riesce a migliorare la coerenza logit-testo rispetto alla loro baseline, forzando un maggiore allineamento tra la probabilità interna e il testo generato.
+
+% --- 6. ALLINEAMENTO UMANO ---
+\subsection{Allineamento umano}
+L'\textbf{allineamento umano} quantifica il grado di sovrapposizione tra le opinioni espresse dal modello e la reale distribuzione delle risposte della popolazione (basata sui sondaggi del Pew Research Center). 
+L'obiettivo pratico è misurare quanto le probabilità generate dalla rete si discostino dalle convinzioni umane misurate empiricamente, tenendo rigorosamente conto della natura ordinale delle risposte (es. da "fortemente in disaccordo" a "fortemente d'accordo").
+
+Per questa ragione, si è scelto di adottare la \textbf{Distanza di Wasserstein (WD)} \cite{santurkar2023whose}. La WD calcola il "costo" spaziale necessario per trasformare la distribuzione di probabilità del modello ($P$), basata sui suoi logit, in quella umana ($Q$), utilizzando i pesi della scala Likert come coordinate. 
+
+Per standardizzare la metrica, la distanza calcolata viene normalizzata rispetto allo scenario limite o peggiore ($WD_{max}$), calcolato spostando matematicamente tutta la massa probabilistica agli estremi opposti della scala. Lo \textit{score} di allineamento finale è definito come:
+$$Score = \max\left(0, 1 - \frac{WD(P, Q)}{WD_{max}}\right)$$
+I valori di questa metrica variano all'interno dell'intervallo \textbf{[0, 1]}:
+\begin{itemize}
+    \item \textbf{Valori prossimi allo 0}: indicano un disallineamento totale (il modello concentra la probabilità sull'estremo opposto rispetto alla popolazione);
+    \item \textbf{Valori prossimi all'1}: indicano un perfetto allineamento tra la distribuzione del modello e quella umana.
+\end{itemize}
+Di seguito vengono riportati i risultati dell'allineamento umano per i modelli Pythia principali, confrontando le loro distribuzioni di probabilità con quelle empiriche della popolazione.
+\small
+\setlength{\LTcapwidth}{\textwidth}
+\begin{xltabular}{\textwidth}{X *{5}{c}}
+\toprule
+ & \textbf{160M} & \textbf{1B} & \textbf{1.4B} & \textbf{2.8B} & \textbf{6.9B} \\
+\midrule
+%% ── MACRO 6: ALLINEAMENTO UMANO ──
+\rowcolor{m5hdr} \multicolumn{6}{c}{\textcolor{white}{\textbf{Allineamento umano}}} \\
+\rowcolor{m5Row} \hspace{1em}Media & 0.661 & 0.787 & 0.821 & 0.809 & 0.812 \\
+\rowcolor{m5Row} \hspace{1em}Mediana & 0.683 & 0.819 & 0.843 & 0.829 & 0.836 \\
+\midrule
+\rowcolor{m5Row} \hspace{1em}Aree più allineate & \tiny Self-p., Status & \tiny Pers.\ h., Religion & \tiny Health., Immig. & \tiny Status, Immig. & \tiny Health., Immig. \\
+\rowcolor{m5Row} \hspace{1em}Aree meno allineate & \tiny Pers.\ fin., Family & \tiny Family, Job/car. & \tiny Leader., Family & \tiny Leader., Crime & \tiny Leader., Family \\
+\bottomrule
+\caption{Confronto dell'allineamento umano tra i cinque modelli Pythia.}
+\label{tab:comparison_5models_alignment}
+\end{xltabular}
+\normalsize
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{\risultati/comparative_paper/comp_alignment.png}
+    \caption{Distribuzione dell'allineamento umano (score) per i modelli Pythia più piccoli. La linea rossa tratteggiata indica il valore medio $(\mu)$, mentre quella blu il valore mediano (med). I grafici dei modelli più grandi (2.8B e 6.9B) sono stati omessi per chiarezza visiva, in quanto presentano una distribuzione simile a quella del modello da 1.4B.}
+    \label{fig:comp_alignment}
+\end{figure}
+
+I risultati sperimentali in Tabella~\ref{tab:comparison_5models_alignment} e in Figura~\ref{fig:comp_alignment} mostrano che l'allineamento umano cresce inizialmente con le dimensioni della rete, ma raggiunge un rapido \textbf{plateau già a 1.4B} parametri, stabilizzandosi su un punteggio medio di circa 0.821. Questo suggerisce che, al di là di una certa soglia dimensionale, l'aumento dei parametri non si traduce in un miglioramento significativo dell'allineamento con le opinioni umane. 
+
+Le aree con il \emph{maggior allineamento} sono quelle in cui le risposte umane presentano un consenso più netto: nei modelli più grandi spiccano \emph{Immigration} (0.895 a 6.9B), \emph{Healthcare} (0.863) e \emph{Job/career} (0.862). Al contrario, le aree con il \emph{minor allineamento} sono \emph{Leadership} (0.723 a 6.9B), \emph{Relationships and family} (0.767) e \emph{Crime/security} (0.773), ovvero temi su cui la distribuzione delle opinioni umane è più frammentata e il modello fatica a riprodurre il pattern di risposta prevalente. L'area \emph{Leadership} è sistematicamente la più distante in tutti i modelli da 1.4B in poi, confermando che il giudizio sulla leadership politica resta uno degli aspetti più difficili da allineare per i modelli base.
+
+% --- 7. BIAS POLITICO ---
+\subsection{Affinità politica}
+L'\textbf{affinità politica} è una metrica classificatoria che identifica quale gruppo demografico o orientamento ideologico (\textit{Democrat, Republican, Independent, Liberal, Moderate e Conservative}) sia statisticamente più vicino alle risposte generate dal modello. L'obiettivo pratico è determinare se il sistema presenti dei bias verso una specifica fazione politica rispetto alla distribuzione reale della popolazione americana.
+
+Anche in questo caso si usa la Distanza di Wasserstein. L'affinità viene calcolata individuando il gruppo $G$ che minimizza la WD tra la distribuzione delle probabilità del modello ($P$) e quella di riferimento del gruppo ($Q_G$) su un determinato set di domande:
+$$\text{Affinità} = \arg\min_{G} WD(P, Q_G)$$
+Trattandosi di una funzione di minimizzazione, il risultato non è quantitativo, ma \textbf{categoriale} (restituisce direttamente l'etichetta del gruppo demografico più affine).
+
+Per evitare di attribuire schieramenti falsati da lievi differenze statistiche, se due o più gruppi risultano ugualmente affini in una macro-area tematica il risultato viene classificato come "Tie".
+
+\small
+\setlength{\LTcapwidth}{\textwidth}
+\begin{xltabular}{\textwidth}{X *{5}{c}}
+\toprule
+ & \textbf{160M} & \textbf{1B} & \textbf{1.4B} & \textbf{2.8B} & \textbf{6.9B} \\
+\midrule
+%% ── MACRO 7: AFFINITÀ POLITICA ──
+\rowcolor{m6hdr} \multicolumn{6}{c}{\textcolor{white}{\textbf{Affinità politica (\%)}}} \\
+\rowcolor{m6Row} \hspace{1em}Democratici (D) & 25.4 & 20.4 & 17.3 & 17.1 & 17.3 \\
+\rowcolor{m6Row} \hspace{1em}Liberali (L) & 25.0 & 14.3 & 13.0 & 13.8 & 14.8 \\
+\rowcolor{m6Row} \hspace{1em}Repubblicani (R) & 25.6 & 19.0 & 19.5 & 21.5 & 18.8 \\
+\rowcolor{m6Row} \hspace{1em}Conservativi (C) & 8.1 & 14.2 & 16.4 & 14.9 & 16.6 \\
+\rowcolor{m6Row} \hspace{1em}Moderati (M) & 8.7 & 16.3 & 17.3 & 16.7 & 16.8 \\
+\rowcolor{m6Row} \hspace{1em}Indipendenti (I) & 7.2 & 15.8 & 16.4 & 16.0 & 15.7 \\
+\midrule
+\rowcolor{m6Row} \hspace{1em}D + L & 50.4 & 34.7 & 30.4 & 30.8 & 32.2 \\
+\rowcolor{m6Row} \hspace{1em}R + C & 33.7 & 33.2 & 35.9 & 36.5 & 35.4 \\
+\bottomrule
+\caption{Confronto dell'affinità politica tra i cinque modelli Pythia.}
+\label{tab:comparison_5models_political_affinity}
+\end{xltabular}
+\normalsize
+La tendenza democratica (D)/liberale (L) di Pythia-160M (D+L\,=\,50.4\,\%) si attenua progressivamente fino a 1.4B (D+L\,=\,30.4\,\%), dove avviene un \emph{cambio di rotta}: da 1.4B in poi il blocco repubblicano (R)/conservativo (C) supera quello democratico/liberale (R+C\,=\,35.9\,\%). La distribuzione si stabilizza attorno a D+L\,$\approx$\,30--32\,\% e R+C\,$\approx$\,35--36\,\%, con quote significative di moderati ($\sim$\,16\,\%) e indipendenti ($\sim$\,16\,\%).
+
+Questa evoluzione suggerisce che i modelli diventino più \emph{neutrali} man mano che crescono di parametri. Tuttavia, questa apparente neutralità potrebbe essere interpretata in due modi: 
+\begin{enumerate}
+    \item Una maggiore distribuzione equa delle risposte tra i diversi orientamenti, indice di una rappresentazione più bilanciata, oppure
+    \item Una maggiore \emph{confusione} o \emph{incoerenza} nelle risposte, per cui il modello non prende davvero posizione, ma distribuisce le probabilità in modo più uniforme senza una reale "comprensione" dei contenuti politici. 
+\end{enumerate}
+I dati sulla robustezza suggeriscono che la prima ipotesi sia più plausibile per i modelli da 1.4B in poi, dato che la JSD alla permutazione è estremamente bassa ($< 0.015$) e le risposte sono coerenti indipendentemente dall'ordine delle opzioni.
+
+Per poter visualizzare il posizionamento ideologico dei modelli, viene utilizzata una \textbf{bussola politica}, un grafico bidimensionale che mappa le risposte lungo due assi indipendenti:
+\begin{enumerate}
+    \item \textbf{Asse economico (sinistra/destra):} misura le opinioni su regolamentazione del mercato, tasse e intervento statale;
+    \item \textbf{Asse sociale (autoritario/libertario):} misura le opinioni su libertà civili, diritti individuali e autorità.
+\end{enumerate}
+A differenza degli approcci tradizionali, le coordinate non derivano da punteggi arbitrari assegnati alle risposte (come nella scala Likert), ma dalla vicinanza statistica del modello a gruppi umani di riferimento. 
+Nello specifico, le coordinate sono ottenute calcolando il delta tra le Distanze di Wasserstein (WD) che separano le risposte del modello dai rispettivi poli demografici:
+\begin{itemize}
+    \item \textbf{Asse X (orientamento politico):} calcolato come la differenza tra la distanza dai Repubblicani e la distanza dai Democratici ($WD_{Repubblicani} - WD_{Democratici}$);
+    \item \textbf{Asse Y (orientamento ideologico):} calcolato come la differenza tra la distanza dai Conservatori e la distanza dai Liberali ($WD_{Conservatori} - WD_{Liberali}$).
+\end{itemize}
+In questa formulazione, il grafico non misura l'accordo semantico con specifiche tesi politiche (ad esempio libero mercato), ma indica verso quale polo umano la distribuzione probabilistica del modello tende a convergere. Un valore positivo o negativo su ciascun asse segnala quindi una maggiore vicinanza statistica a uno dei due estremi. Il centro del grafico $(0,0)$ corrisponde a una situazione di neutralità, intesa come equidistanza dai poli considerati.
+
+L'analisi si è concentrata sui due modelli che meglio rappresentano l'evoluzione del bias politico con lo \textit{scaling}.
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{\risultati/comparative_paper/comp_political_compass.png}
+\caption{Bussola politica per macro area tematica dei modelli Pythia 160M e 1.4B: ogni punto numerato rappresenta una macro area, posizionata in base all'affinità con i quattro gruppi politici principali.}
+\label{fig:comp_political_compass}
+\end{figure}
+
+Dalla proiezione emergono due dinamiche contrapposte:
+\begin{itemize}
+    \item \textbf{Pythia-160M e una falsa polarizzazione:} il modello minore si posiziona in modo caotico, ma sbilanciato nel quadrante \textit{liberal/democratico}. Più che una reale preferenza ideologica, questa polarizzazione è probabile che sia un "artefatto statistico" causato dai suoi limiti strutturali (come l'estremo \textit{primacy bias} osservato in Subsezione~\ref{subsec:permutazione}). Il modello non comprende a fondo il testo, ma seleziona meccanicamente opzioni che, nel dataset, casualmente convergono verso questo asse;
+    \item \textbf{Pythia-1.4B e la convergenza verso la neutralità:} con l'aumento dei parametri, il punto sulla bussola migra progressivamente verso il centro. Come evidenziato dal plateau di allineamento a \textbf{0.82}, il modello 1.4B non "abbraccia" una fazione, ma impara a distribuire la probabilità in modo più simile alla popolazione generale, risultando affine a gruppi moderati e indipendenti.
+\end{itemize}
+L'osservazione di questa convergenza verso il centro evidenzia un risultato cruciale che si discosta dalla letteratura. Studi come quello di Santurkar et al. (2023) \cite{santurkar2023whose} hanno dimostrato che i modelli commerciali moderni possiedono forti bias \textit{progressisti} e \textit{liberal}. Tuttavia, quei sistemi sono stati sottoposti a \textit{fine-tuning} con allineamento umano (RLHF), assorbendo di fatto le preferenze dei valutatori umani. I modelli Pythia analizzati in questo studio sono, al contrario, modelli \textit{pre-trained}: i risultati dimostrano che il puro \textit{scaling} architetturale sui dati non pre-filtrati di internet non genera derive ideologiche verso sinistra, ma tende anzi a stabilizzare il sistema su una rappresentazione plurale e bilanciata delle opinioni umane, evitando delle polarizzazioni.
+
+\end{document}

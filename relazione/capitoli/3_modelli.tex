@@ -3,6 +3,7 @@
 
 % ======================================================================
 \section{Modelli utilizzati}
+\label{sec:modelli}
 % ======================================================================
 
 \subsection{Famiglia Pythia (EleutherAI)}
@@ -30,11 +31,11 @@ Pythia-6.9B  & 6.9 miliardi & 32 \\
 \caption{Modelli della famiglia Pythia analizzati nel progetto. Sono evidenziati sia i parametri totali sia quelli di non-embedding, cioè quelli effettivamente dedicati all'elaborazione logica della rete.}
 \end{table}
 
-\subsection{L'importanza di utilizzare foundation models}
+\subsection{L'importanza di utilizzare pre-trained models}
 
 Un aspetto metodologico cruciale del progetto riguarda l'assenza di \emph{fine-tuning}. I modelli Pythia impiegati sono modelli "base": non sono stati sottoposti a successive procedure di allineamento con feedback umano (come le tecniche RLHF). 
 
-L'impiego di questa specifica tipologia di modelli è funzionale a quanto dimostrato nell'articolo di Santurkar et al. (2023): poiché l'allineamento tende ad amplificare artificialmente i bias del modello verso posizioni demografiche specifiche (spesso riconducibili a fasce istruite e di orientamento \emph{liberale}), testare modelli base permette di misurare le opinioni nella loro forma "nativa". 
+L'impiego di questa specifica tipologia di modelli è funzionale a quanto dimostrato nell'articolo di Santurkar et al. (2023) \cite{santurkar2023whose}: poiché l'allineamento tende ad amplificare artificialmente i bias del modello verso posizioni demografiche specifiche (spesso riconducibili a fasce istruite e di orientamento \emph{liberale}), testare modelli base permette di misurare le opinioni nella loro forma "nativa". 
 
 L'obiettivo è dunque verificare quanto la semplice scala del modello influenzi la sua capacità di gestire quesiti a scelta multipla e quanto i bias siano intrinsechi alla struttura stessa della rete.
 
