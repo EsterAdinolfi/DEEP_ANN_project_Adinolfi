@@ -7,7 +7,7 @@
 
 I Large Language Model (LLM) vengono sempre più utilizzati per compiti complessi, ma mostrano limiti significativi quando vengono interrogati tramite questionari a scelta multipla. Spesso, infatti, i modelli faticano a rispettare il formato richiesto, rispondono in modo casuale, oppure si lasciano influenzare dalla posizione delle opzioni ignorando il contenuto reale della domanda.
 
-Oltre a questi problemi strutturali, le risposte generate tendono a riflettere opinioni e bias specifici. Le tecniche di allineamento (come l'RLHF, basato sul feedback umano) finiscono spesso per favorire le opinioni dei gruppi demografici che materialmente addestrano o valutano il modello. Questo fa sì che le risposte tendano a sovra-rappresentare tipicamente le fasce di popolazione con un alto livello di istruzione e orientamenti politici liberali, allontanandosi così dal pensiero della popolazione  generale \cite{santurkar2023whose}.
+Oltre a questi problemi strutturali, le risposte generate tendono a riflettere opinioni e bias specifici. Le tecniche di allineamento (come l'RLHF, basato sul feedback umano) finiscono spesso per favorire le opinioni dei gruppi demografici che materialmente addestrano o valutano il modello. Questo fa sì che le risposte tendano a sovra-rappresentare, tipicamente, le fasce di popolazione con un alto livello di istruzione e orientamenti politici liberali, allontanandosi così dal pensiero della popolazione  generale \cite{santurkar2023whose}.
 
 \subsection{Obiettivo del progetto}
 L'obiettivo di questo progetto è valutare in modo critico e sistematico le risposte fornite dagli LLM. Piuttosto che dare per scontato che una risposta rifletta una vera "convinzione" del modello, si vuole misurarne l'effettiva validità, la robustezza (ovvero quanto la risposta cambia se si modifica leggermente il prompt) e le distorsioni interne (come la preferenza per una specifica opzione solo in base alla sua posizione). Inoltre, si vuole quantificare l'allineamento di queste risposte rispetto a campioni demografici reali e a specifici orientamenti politici. 
@@ -17,9 +17,8 @@ L'analisi è stata condotta valutando diversi modelli pre-trained e open-source 
 \subsection{Ispirazione e metodologia}
 Il metodo adottato in questo progetto si ispira ai contributi di due recenti lavori di ricerca, unendone gli approcci:
 \begin{itemize}
-    \item \textbf{Eredità da Santurkar et al. (2023)} \cite{santurkar2023whose}: si adotta il dataset \textit{OpinionQA} (1506 domande derivate dal Pew Research Center) e l'utilizzo della \textbf{Wasserstein Distance} (WD) come metrica cardine per quantificare la distanza tra le opinioni dei modelli e le distribuzioni demografiche reali;
-    
-    \item \textbf{Eredità da Röttger et al. (2024)} \cite{rottger2024political}: si accoglie la necessità di verificare la \textbf{stabilità} dell'output. Come evidenziato dagli autori, i test a scelta multipla possono essere fragili. Pertanto, il progetto implementa misure di robustezza per distinguere tra reali opinioni e artefatti statistici.
+    \item \textbf{Riferimento a Santurkar et al. (2023)} \cite{santurkar2023whose}: si adotta il dataset \textit{OpinionQA} (1506 domande derivate dal Pew Research Center) e l'utilizzo della \textbf{Wasserstein Distance} (WD) come metrica principale per quantificare la distanza tra le "opinioni" dei modelli e le distribuzioni demografiche reali;
+    \item \textbf{Riferimento a Röttger et al. (2024)} \cite{rottger2024political}: si accoglie la necessità di verificare la \textbf{stabilità} dell'output. Come evidenziato dagli autori, infatti, i test a scelta multipla possono essere fragili. Pertanto, il progetto implementa misure di robustezza per distinguere tra reali opinioni e artefatti statistici.
 \end{itemize}
 
 \end{document}

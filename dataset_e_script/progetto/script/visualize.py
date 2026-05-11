@@ -346,14 +346,14 @@ def fig_robustness(df, outdir, model_label=None):
     vp = sns.violinplot(data=melted, x="Condizione", y="JSD", hue="Condizione",
                         palette=PALETTE_MAIN[:3], inner="quartile",
                         cut=0, ax=ax, legend=False)
-    ax.axhline(0.15, color="red", ls="--", lw=1.8, label="Soglia stable (0.15)")
-    ax.axhline(0.05, color="dodgerblue", ls="--", lw=1.8, label="Soglia robust (0.05)")
+    ax.axhline(0.15, color="red", ls="--", lw=1.8, label="Soglia di stabilità (0.15)")
+    ax.axhline(0.05, color="dodgerblue", ls="--", lw=1.8, label="Soglia di robustezza (0.05)")
     if model_label:
         ax.set_title(f"Distribuzione della Jensen-Shannon Divergence per tipo di perturbazione\n{model_label}", fontsize=16, fontweight="bold", pad=1)
     else:
         ax.set_title("Distribuzione della Jensen-Shannon Divergence per tipo di perturbazione", fontsize=16, fontweight="bold")
     ax.set_ylabel("JSD")
-    ax.legend(fontsize=9)
+    ax.legend(fontsize=11)
     sns.despine()
     fig.tight_layout(rect=[0, 0, 1, 0.995])
     fig.savefig(os.path.join(outdir, "fig1c_jsd.png"), dpi=400, bbox_inches='tight')
@@ -437,14 +437,12 @@ def fig_permutation(df, outdir, model_label=None, df_metrics=None):
     for bar, val in zip(bars, pos_mean.values):
         ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.002,
                 f"{val:.4f}", ha="center", va="bottom", fontweight="bold", fontsize=10)
-    ax.axhline(uniform, color="red", ls="--", lw=1.5, label=f"Attesa uniforme ({uniform:.3f})")
     ax.set_ylabel("Probabilità media")
     ax.set_xlabel("Posizione dell'opzione")
     if model_label:
         ax.set_title(f"Bias di posizione: probabilità media per posizione\n{model_label}", fontsize=16, fontweight="bold", pad=3)
     else:
         ax.set_title("Bias di posizione: probabilità media per posizione", fontsize=16, fontweight="bold")
-    ax.legend(fontsize=9)
     sns.despine()
     fig.tight_layout(rect=[0, 0, 1, 0.99])
     fig.savefig(os.path.join(outdir, "fig2b_position_bias.png"), dpi=400, bbox_inches='tight')
@@ -464,14 +462,11 @@ def fig_permutation(df, outdir, model_label=None, df_metrics=None):
     for bar, val in zip(bars, means_fl):
         ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.002,
                 f"{val:.4f}", ha="center", va="bottom", fontweight="bold", fontsize=11)
-    ax.axhline(uniform, color="red", ls="--", lw=1.2,
-               label=f"Attesa uniforme ({uniform:.3f})")
     ax.set_ylabel("Probabilità media")
     if model_label:
         ax.set_title(f"Confronto prima/ultima posizione\n{model_label}", fontsize=16, fontweight="bold", pad=3)
     else:
         ax.set_title("Confronto prima/ultima posizione", fontsize=16, fontweight="bold")
-    ax.legend(fontsize=9)
     sns.despine()
     fig.tight_layout(rect=[0, 0, 1, 0.99])
     fig.savefig(os.path.join(outdir, "fig2c_primacy_recency.png"), dpi=400, bbox_inches='tight')
@@ -881,8 +876,8 @@ def fig_threat(df, outdir, model_label=None):
         sns.violinplot(data=melted_threat, x="Tipo Minaccia", y="JSD", hue="Tipo Minaccia",
                        palette=dict(zip(threat_labels, threat_colors)), inner="quartile",
                        cut=0, ax=ax, legend=False)
-        ax.axhline(0.15, color="red", ls="--", lw=1.8, label="Soglia stable (0.15)")
-        ax.axhline(0.05, color="dodgerblue", ls="--", lw=1.8, label="Soglia robusta (0.05)")
+        ax.axhline(0.15, color="red", ls="--", lw=1.8, label="Soglia di stabilità (0.15)")
+        ax.axhline(0.05, color="dodgerblue", ls="--", lw=1.8, label="Soglia di robustezza (0.05)")
         if model_label:
             ax.set_title(f"Distribuzione JSD per tipo di minaccia\n{model_label}", fontsize=16, fontweight="bold", pad=1)
         else:
@@ -1336,9 +1331,9 @@ def fig_comp_jsd_violins(data, outdir):
                        inner="quartile", cut=0, ax=ax, legend=False)
         if ax == axes[0]:
             ax.axhline(0.15, color="red", ls="--", lw=1.8,
-                       label="Soglia stable (0.15)")
+                       label="Soglia di stabilità (0.15)")
             ax.axhline(0.05, color="dodgerblue", ls="--", lw=1.8,
-                       label="Soglia robust (0.05)")
+                       label="Soglia di robustezza (0.05)")
         else:
             ax.axhline(0.15, color="red", ls="--", lw=1.8)
             ax.axhline(0.05, color="dodgerblue", ls="--", lw=1.8)
@@ -1351,7 +1346,7 @@ def fig_comp_jsd_violins(data, outdir):
         ax.tick_params(axis='x', rotation=25)
 
     fig.legend(*axes[0].get_legend_handles_labels(), loc="upper right",
-               fontsize=8, frameon=True)
+               fontsize=10, frameon=True)
     fig.suptitle("Distribuzione JSD per tipo di perturbazione",
                  fontsize=16, fontweight="bold", y=1.02)
     fig.tight_layout()
@@ -1526,12 +1521,6 @@ def fig_comp_position_bias(data, outdir):
             ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.005,
                     f"{val:.3f}", ha="center", va="bottom", fontsize=8, fontweight="bold")
                    
-        if ax == axes[-1]:
-            ax.axhline(uniform, color="red", ls="--", lw=1.2, label=f"Attesa uniforme ({uniform:.3f})")
-            ax.legend(fontsize=8)
-        else:
-            ax.axhline(uniform, color="red", ls="--", lw=1.2)
-            
         ax.set_title(label, fontsize=14, fontweight="bold")
         ax.set_xlabel("")
         if ax == axes[0]:
@@ -1573,13 +1562,6 @@ def fig_comp_primacy_recency(data, outdir):
             ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.005,
                     f"{val:.3f}", ha="center", va="bottom", fontsize=8, fontweight="bold")
                    
-        if ax == axes[-1]:
-            ax.axhline(uniform, color="red", ls="--", lw=1.2,
-                       label=f"Attesa uniforme ({uniform:.3f})")
-            ax.legend(fontsize=8)
-        else:
-            ax.axhline(uniform, color="red", ls="--", lw=1.2)
-            
         ax.set_title(label, fontsize=14, fontweight="bold")
         ax.set_xlabel("")
         if ax == axes[0]:

@@ -5,21 +5,20 @@
 \section{Conclusioni e sviluppi futuri}
 % ======================================================================
 
-Questo lavoro ha proposto un'analisi sistematica di scaling su bias (position e frequency), robustezza e allineamento umano e politico per la famiglia Pythia, estendendo le analisi e osservazioni proposte nei paper di riferimento (\cite{santurkar2023whose} e \cite{rottger2024political}).
+Questo lavoro ha proposto un'analisi sistematica sugli effetti dello \textit{scaling}, considerando i bias (\textit{position} e \textit{frequency}), resistenza alle minacce, robustezza e allineamento umano e politico, estendendo le analisi e osservazioni proposte nei paper di riferimento (\cite{santurkar2023whose} e \cite{rottger2024political}).
 
 I risultati principali possono essere sintetizzati in quattro punti chiave:
 \begin{enumerate}
-    \item \textbf{Superamento dei bias strutturali:} l'aumento dei parametri risolve le distorsioni di posizione (\textit{primacy bias}) e di frequenza (\textit{frequency bias}), che risultano azzerate a partire dal modello da 1.4B;
-    \item \textbf{Divergenza logica-sintattica:} l'alta validità formale non garantisce la sincerità del modello. La divergenza tra logit e testo generato conferma che la distribuzione di probabilità interna rimane l'unico indicatore affidabile delle reali ``convinzioni'' della rete;
-    \item \textbf{Ancoraggio semantico delle minacce:} le minacce di tipo IT/Sistema si sono dimostrate i trigger più efficaci per i modelli grandi, il che fa ipotizzare che questi associno il lessico tecnico a contesti di generazione rigidi e vincolati;
-    \item \textbf{Neutralità nativa:} contrariamente ai modelli commerciali post-RLHF, i modelli pre-trained Pythia mostrano una naturale tendenza alla neutralità e al pluralismo ideologico con l'aumentare della scala, dimostrando che le polarizzazioni spesso osservate derivano dalle fasi di allineamento umano e non dai dati grezzi di addestramento.
+    \item \textbf{Superamento dei bias strutturali:} l'aumento dei parametri risolve i bias di posizione e di frequenza, che risultano azzerati a partire dal modello da 1.4B;
+    \item \textbf{Divergenza logica-sintattica:} l'alta validità formale non garantisce la sincerità del modello. La bassa coerenza tra logit e testo generato conferma che la distribuzione di probabilità interna rimane l'unico indicatore affidabile delle reali ``convinzioni'' della rete;
+    \item \textbf{Funzione semantica delle minacce:} le minacce di tipo IT/Sistema si sono dimostrate gli inneschi più efficaci per i modelli grandi, il che fa ipotizzare che questi associno il lessico tecnico informatico a contesti di generazione rigidi e vincolati;
+    \item \textbf{Propensione alla neutralità:} contrariamente ai modelli post-RLHF, i modelli pre-trained Pythia mostrano una naturale tendenza alla neutralità e alla varietà ideologica con lo \textit{scaling}, dimostrando che le polarizzazioni politiche spesso osservate derivano dalle fasi di allineamento umano e non dai dati grezzi di addestramento.
 \end{enumerate}
-Nonostante la solidità dei dati, l'analisi evidenzia vincoli strutturali non risolvibili col solo scaling, come il plateau nell'allineamento umano e un "paradosso della coerenza" nel modello 1.4B, dove l'aderenza sintattica maschera una dissociazione semantica dai logit. Tali evidenze suggeriscono che il comportamento dei modelli pre-trained sia un delicato equilibrio tra capacità di calcolo e sensibilità al prompt.
 
 \subsection{Sviluppi futuri}
 Questo studio apre diverse direzioni di ricerca:
 \begin{itemize}
-    \item \textbf{Analisi dell'entropia:} Indagare il paradosso del modello 1.4B per determinare se l'incoerenza logit-testo derivi da un'effettiva indecisione interna o da fattori strutturali della rete;
+    \item \textbf{Analisi dell'entropia:} indagare la discrepanza osservata nel modello 1.4B per determinare se l'incoerenza logit-testo derivi da un'effettiva indecisione del modello (logit vicini) o da fattori strutturali della rete;
     \item \textbf{Generalizzazione famiglia}: estendere l'analisi ad altri modelli pre-trained per verificare se i pattern osservati sono specifici di Pythia o generali;
     \item \textbf{Impatto dell'RLHF}: confrontare sistematicamente modelli pre-trained e versioni istruite della stessa famiglia, per isolare con precisione gli effetti visti;
     \item \textbf{Diversità culturale}: utilizzare survey non statunitensi per verificare la specificità culturale dei bias emersi e la capacità dei modelli di rappresentare opinioni di diverse culture;
